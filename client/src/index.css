@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-display: 'Fredoka', sans-serif;
+    --font-sans: 'Quicksand', sans-serif;
+
+    /* Playful Color Palette */
+    --background: 210 40% 98%; /* Very soft blue-tinted white */
+    --foreground: 222 47% 15%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 15%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 15%;
+    
+    /* Playful Purple */
+    --primary: 262 83% 58%; 
+    --primary-foreground: 0 0% 100%;
+    
+    /* Soft Cyan/Teal for secondary actions */
+    --secondary: 189 71% 73%;
+    --secondary-foreground: 222 47% 15%;
+    
+    --muted: 210 40% 92%;
+    --muted-foreground: 215 16% 47%;
+    
+    /* Coin Yellow */
+    --accent: 43 96% 56%;
+    --accent-foreground: 222 47% 15%;
+    
+    /* Bouncy Red */
+    --destructive: 346 84% 61%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Success Green */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 262 83% 58%;
+    
+    /* Extra rounded for the bouncy vibe */
+    --radius: 1.25rem;
+  }
+
+  .dark {
+    /* Keeping dark mode soft, not pitch black */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    
+    --card: 222 47% 15%;
+    --card-foreground: 210 40% 98%;
+    
+    --primary: 262 83% 65%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 189 71% 45%;
+    --secondary-foreground: 222 47% 11%;
+    
+    --accent: 43 96% 56%;
+    --accent-foreground: 222 47% 11%;
+    
+    --destructive: 346 84% 61%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    
+    --border: 215 27.9% 25%;
+    --input: 215 27.9% 25%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/20;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply font-semibold tracking-wide;
+  }
+}
+
+@layer utilities {
+  /* Playful shadow for cards */
+  .shadow-bouncy {
+    box-shadow: 0 8px 0 0 hsl(var(--border)), 0 15px 20px -10px rgba(0,0,0,0.1);
+  }
+  
+  .shadow-bouncy-active {
+    box-shadow: 0 2px 0 0 hsl(var(--border)), 0 5px 10px -5px rgba(0,0,0,0.1);
+  }
+
+  .shadow-bouncy-primary {
+    box-shadow: 0 6px 0 0 hsl(262 83% 45%), 0 15px 20px -10px rgba(0,0,0,0.2);
+  }
+
+  .shadow-bouncy-primary:active {
+    box-shadow: 0 0px 0 0 hsl(262 83% 45%), 0 5px 10px -5px rgba(0,0,0,0.2);
+  }
+}

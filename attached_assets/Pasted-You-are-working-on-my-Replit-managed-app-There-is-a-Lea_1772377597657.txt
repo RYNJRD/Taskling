@@ -1,0 +1,72 @@
+You are working on my Replit managed app. There is a “Leaderboard” tab with an admin-only control that lets admins choose which users appear on the leaderboard. Right now the backend partially works: when I click a user it shows “Removed from leaderboard” and they disappear, but the UI state stays wrong (the checkbox remains ticked as if they’re still shown). Also the design/layout looks poor.
+
+GOALS
+1) Fix the broken toggle behavior so UI reflects the real backend state after each click.
+2) Improve the UI design of the admin “Who appears on leaderboard” screen so it looks clean and modern.
+3) Ensure only admins can change visibility; non-admins can only view the leaderboard.
+4) Make the system resilient: no stale state, correct optimistic updates, proper error handling, and consistent DB state.
+
+REQUIREMENTS (FUNCTIONAL)
+- Add a single source of truth: each user has a boolean like `leaderboardVisible` (or similar) stored in the database.
+- The leaderboard list endpoint must ONLY return users where `leaderboardVisible = true` (and any other existing leaderboard criteria).
+- The admin settings screen must load the list of users + their `leaderboardVisible` state from the backend on mount.
+- Clicking a user toggles `leaderboardVisible` and:
+  - updates the DB
+  - updates the UI checkmark immediately and correctly
+  - shows a toast/snackbar message (“Added to leaderboard” / “Removed from leaderboard”)
+- The checkbox state must come from the actual `leaderboardVisible` value returned by the API, NOT from local assumptions.
+- If the API call fails, revert the toggle state and show an error toast.
+- After successful toggle, either:
+  - update local state in-place (preferred), OR
+  - re-fetch the list to guarantee correctness (acceptable if performance is fine)
+
+REQUIREMENTS (SECURITY / AUTH)
+- The toggle API route must be protected: verify the current session/user is admin.
+- If non-admin calls the toggle endpoint, return 403.
+- UI must hide admin controls for non-admins.
+
+REQUIREMENTS (UI/UX)
+- Redesign the admin screen:
+  - Title: “Leaderboard visibility”
+  - Subtitle: “Choose which accounts appear publicly on the leaderboard.”
+  - List rows should look like: avatar/initials, name, role badge (Admin/Member), and a switch/checkbox aligned right.
+  - Use a switch component instead of a checkbox if available.
+  - Add a search box (“Search users…”) and optional filter chips (All / Visible / Hidden).
+  - Add loading skeletons while fetching.
+  - Use consistent spacing, typography, and subtle dividers.
+- Make the “toast” not block interaction and be consistent.
+
+DEBUG/FIX SPECIFIC BUG
+- Current bug: user disappears from the leaderboard but remains checked in the admin list. This implies:
+  - local UI state isn’t updating after mutation OR
+  - the UI is keyed incorrectly (e.g., using array index keys) causing stale row rendering OR
+  - the list is filtered in a way that hides the user but keeps their prior checked state
+- Find the exact cause and fix it properly:
+  - Ensure list items use stable keys (user id).
+  - Ensure the toggle handler updates the correct item in state.
+  - Ensure you do not keep a separate “selectedUsers” state that drifts from backend truth unless it is derived from backend data.
+
+DELIVERABLES
+1) Show me the relevant files you changed and explain why.
+2) Provide the final API contract:
+   - GET users + visibility states
+   - PATCH/POST toggle visibility for a user
+3) Provide the final frontend logic:
+   - state shape
+   - toggle handler (optimistic update + rollback on error)
+4) Update any DB schema/migrations if needed.
+
+IMPLEMENTATION NOTES
+- If using React:
+  - Use `useEffect` to fetch users.
+  - Keep state like `users: Array<{id, name, role, leaderboardVisible}>`.
+  - Toggle: optimistic update: set `leaderboardVisible` locally, call API, rollback on error.
+  - Use `key={user.id}` in list rendering.
+- If using a server framework (Express/Next/etc.):
+  - Validate inputs, return updated user record in response.
+  - Make sure leaderboard query filters by `leaderboardVisible`.
+
+Do the work end-to-end, run the app, and verify:
+- Toggling admin screen instantly updates the switch/checkbox correctly.
+- Leaderboard tab immediately reflects visibility changes (or after refresh depending on how it’s implemented).
+- No-admin cannot toggle.
