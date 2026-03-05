@@ -21,6 +21,7 @@ import Admin from "@/pages/Admin";
 import Chat from "@/pages/Chat";
 import Profile from "@/pages/Profile";
 import VerifyEmail from "@/pages/VerifyEmail";
+import EmailAction from "@/pages/EmailAction";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -39,7 +40,12 @@ function EmailVerificationGate() {
         (provider) => provider.providerId === "password",
       );
 
-      if (passwordProvider && !user.emailVerified && location !== "/verify-email") {
+      if (
+        passwordProvider &&
+        !user.emailVerified &&
+        location !== "/verify-email" &&
+        location !== "/email-action"
+      ) {
         setLocation("/verify-email");
       }
     };
@@ -59,6 +65,7 @@ function Router() {
       <Route path="/get-started" component={GetStarted} />
       <Route path="/auth" component={AuthWelcome} />
       <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/email-action" component={EmailAction} />
       <Route path="/join-family" component={JoinFamily} />
       <Route path="/join/:code" component={JoinFamily} />
       <Route path="/setup-family" component={FamilySetup} />

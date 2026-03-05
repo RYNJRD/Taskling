@@ -11,6 +11,7 @@ import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPass
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/store/useStore";
 import { handlePostAuthNavigation } from "@/lib/postAuth";
+import { getEmailVerificationActionSettings } from "@/lib/emailVerification";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -80,7 +81,7 @@ export default function AuthWelcome() {
     setPasswordError("");
     try {
       const result = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      await sendEmailVerification(result.user);
+      await sendEmailVerification(result.user, getEmailVerificationActionSettings());
       setFirebaseUid(result.user.uid);
       toast({
         title: "Verify your email",

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { Loader2, MailCheck, RefreshCw } from "lucide-react";
+import { ChevronLeft, Loader2, MailCheck, RefreshCw } from "lucide-react";
 import { sendEmailVerification } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/store/useStore";
 import { Button } from "@/components/ui/button";
 import { handlePostAuthNavigation } from "@/lib/postAuth";
+import { getEmailVerificationActionSettings } from "@/lib/emailVerification";
 
 function isPasswordAuthUser() {
   const user = auth.currentUser;
@@ -20,6 +21,14 @@ export default function VerifyEmail() {
   const { onboardingIntent, setFirebaseUid, setFamily, setCurrentUser } = useStore();
   const [isResending, setIsResending] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
+
+  const handleBack = async () => {
+    await auth.signOut();
+    setFirebaseUid(null);
+    setCurrentUser(null);
+    setFamily(null);
+    setLocation("/auth");
+  };
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -49,7 +58,7 @@ export default function VerifyEmail() {
 
     setIsResending(true);
     try {
-      await sendEmailVerification(user);
+      await sendEmailVerification(user, getEmailVerificationActionSettings());
       toast({
         title: "Verification email sent",
         description: "Check your inbox and spam folder.",
@@ -108,6 +117,13 @@ export default function VerifyEmail() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-primary/10 to-background">
+      <button
+        data-testid="button-back-verify-email"
+        onClick={handleBack}
+        className="absolute top-6 left-6 w-9 h-9 rounded-xl bg-white/80 flex items-center justify-center hover:bg-white active:scale-90 transition-all shadow-sm"
+      >
+        <ChevronLeft className="w-5 h-5 text-foreground" />
+      </button>
       <div className="w-20 h-20 bg-white rounded-[1.5rem] shadow-bouncy flex items-center justify-center mb-6">
         <MailCheck className="w-10 h-10 text-primary" />
       </div>
@@ -157,4 +173,3 @@ export default function VerifyEmail() {
     </div>
   );
 }
-
