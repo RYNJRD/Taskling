@@ -12,6 +12,7 @@ import { Star, ShoppingBag, Check, Save, RotateCcw, ChevronDown } from "lucide-r
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/apiFetch";
 
 const SECTIONS = [
   { id: 'pants', label: 'Pants' },
@@ -51,7 +52,7 @@ export default function Profile() {
 
   const mutation = useMutation({
     mutationFn: async (newConfig: any) => {
-      const res = await fetch(buildUrl(api.users.updateAvatar.path, { id: currentUser?.id || 0 }), {
+      const res = await apiFetch(buildUrl(api.users.updateAvatar.path, { id: currentUser?.id || 0 }), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatarConfig: JSON.stringify(newConfig) }),

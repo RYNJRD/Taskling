@@ -17,7 +17,7 @@ const missingFirebaseEnvVars = requiredFirebaseEnvVars.filter((key) => {
 
 if (missingFirebaseEnvVars.length > 0) {
   throw new Error(
-    `Missing Firebase env vars: ${missingFirebaseEnvVars.join(", ")}. Add them to root .env and restart Vite.`,
+    `Missing Firebase env vars: ${missingFirebaseEnvVars.join(", ")}. Add them to client/.env.local and restart Vite.`,
   );
 }
 
@@ -34,3 +34,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+

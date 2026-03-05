@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { api, buildUrl } from "@shared/routes";
 import { queryClient } from "@/lib/queryClient";
+import { apiFetch } from "@/lib/apiFetch";
 
 const EMOJI_MAP: Record<string, string> = {
   "ice cream": "🍦",
@@ -46,7 +47,7 @@ export default function Rewards() {
   const handleClaim = async (reward: any) => {
     setIsPending(true);
     try {
-      const res = await fetch(buildUrl(api.rewards.claim.path, { id: reward.id }), {
+      const res = await apiFetch(buildUrl(api.rewards.claim.path, { id: reward.id }), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUser.id, quantity }),

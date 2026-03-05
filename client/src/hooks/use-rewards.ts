@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, buildUrl, type InsertReward } from "@shared/routes";
+import { apiFetch } from "@/lib/apiFetch";
 
 export function useRewards(familyId: number | undefined) {
   return useQuery({
@@ -7,7 +8,7 @@ export function useRewards(familyId: number | undefined) {
     queryFn: async () => {
       if (!familyId) throw new Error("No family id provided");
       const url = buildUrl(api.rewards.list.path, { id: familyId });
-      const res = await fetch(url, { credentials: "include" });
+      const res = await apiFetch(url);
       if (!res.ok) throw new Error("Failed to fetch rewards");
       return api.rewards.list.responses[200].parse(await res.json());
     },
@@ -19,11 +20,10 @@ export function useCreateReward() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: InsertReward) => {
-      const res = await fetch(api.rewards.create.path, {
+      const res = await apiFetch(api.rewards.create.path, {
         method: api.rewards.create.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(api.rewards.create.input.parse(data)),
-        credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to create reward");
       return api.rewards.create.responses[201].parse(await res.json());

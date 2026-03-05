@@ -8,6 +8,7 @@ import { useStore } from "@/store/useStore";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { getFamilyTimeZone } from "@shared/streak";
+import { apiFetch } from "@/lib/apiFetch";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 
@@ -35,7 +36,7 @@ export default function FamilySetup() {
     setIsSubmitting(true);
     try {
       const timeZone = getFamilyTimeZone(null);
-      const famRes = await fetch("/api/families", {
+      const famRes = await apiFetch("/api/families", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: familyName.trim(), timeZone }),
@@ -43,7 +44,7 @@ export default function FamilySetup() {
       if (!famRes.ok) throw new Error("Failed to create family");
       const family = await famRes.json();
 
-      const userRes = await fetch("/api/users", {
+      const userRes = await apiFetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

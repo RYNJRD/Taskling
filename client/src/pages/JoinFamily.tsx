@@ -8,6 +8,7 @@ import { useStore } from "@/store/useStore";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import type { Family } from "@shared/schema";
+import { apiFetch } from "@/lib/apiFetch";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 
@@ -46,7 +47,7 @@ export default function JoinFamily() {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch(`/api/families/code/${inviteCode.trim().toUpperCase()}`);
+      const res = await apiFetch(`/api/families/code/${inviteCode.trim().toUpperCase()}`);
       if (!res.ok) {
         setError("No family found with that code. Check and try again!");
         return;
@@ -67,7 +68,7 @@ export default function JoinFamily() {
     if (!foundFamily || !firebaseUid) return;
     setIsCreating(true);
     try {
-      const userRes = await fetch("/api/users", {
+      const userRes = await apiFetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

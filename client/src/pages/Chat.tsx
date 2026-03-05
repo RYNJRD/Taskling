@@ -13,6 +13,7 @@ import type { Message, User } from "@shared/schema";
 import { useQuery as useTanstackQuery } from "@tanstack/react-query";
 import { UserAvatar } from "@/components/UserAvatar";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/apiFetch";
 
 export default function Chat() {
   const { family, currentUser } = useStore();
@@ -39,7 +40,7 @@ export default function Chat() {
 
   const mutation = useMutation({
     mutationFn: async (newMsg: any) => {
-      const res = await fetch(api.messages.create.path, {
+      const res = await apiFetch(api.messages.create.path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newMsg),

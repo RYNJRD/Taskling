@@ -10,6 +10,7 @@ import { buildUrl, api } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import type { User } from "@shared/schema";
+import { apiFetch } from "@/lib/apiFetch";
 
 export default function Admin() {
   const { familyId } = useParams();
@@ -51,7 +52,7 @@ export default function Admin() {
   const fetchInviteInfo = async () => {
     try {
       setInviteLoading(true);
-      const res = await fetch(`/api/families/${id}/invite?userId=${currentUser?.id}`);
+      const res = await apiFetch(`/api/families/${id}/invite`);
       if (res.ok) {
         const data = await res.json();
         setInviteCode(data.inviteCode);
@@ -474,7 +475,7 @@ export default function Admin() {
                           try {
                             const res = await apiRequest(
                               "PATCH",
-                              `${buildUrl(api.users.updateRole.path, { id: user.id })}?requestingUserId=${currentUser?.id}`,
+                              buildUrl(api.users.updateRole.path, { id: user.id }),
                               { role: newRole }
                             );
                             const updated: User = await res.json();

@@ -31,6 +31,7 @@ export interface IStorage {
   updateUserLeaderboard(id: number, hide: boolean): Promise<User | undefined>;
   updateUserRole(id: number, role: string): Promise<User | undefined>;
   createChore(chore: InsertChore): Promise<Chore>;
+  getChore(id: number): Promise<Chore | undefined>;
   updateChore(id: number, updates: Partial<InsertChore>): Promise<Chore>;
   completeChore(choreId: number, userId: number): Promise<{ chore: Chore, user: User }>;
   getRewards(familyId: number): Promise<Reward[]>;
@@ -105,6 +106,10 @@ export class DatabaseStorage implements IStorage {
   async createChore(chore: InsertChore): Promise<Chore> {
     const [newChore] = await db.insert(chores).values(chore).returning();
     return newChore;
+  }
+  async getChore(id: number): Promise<Chore | undefined> {
+    const [chore] = await db.select().from(chores).where(eq(chores.id, id));
+    return chore;
   }
   async updateChore(id: number, updates: Partial<InsertChore>): Promise<Chore> {
     const [updated] = await db.update(chores).set(updates).where(eq(chores.id, id)).returning();

@@ -10,6 +10,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/store/useStore";
+import { apiFetch } from "@/lib/apiFetch";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -32,12 +33,12 @@ export default function AuthWelcome() {
   const handlePostAuth = async (uid: string) => {
     setFirebaseUid(uid);
     try {
-      const res = await fetch(`/api/users/firebase/${uid}`);
+      const res = await apiFetch(`/api/users/firebase/${uid}`);
       if (res.ok) {
         const user = await res.json();
         setCurrentUser(user);
         if (user.familyId) {
-          const famRes = await fetch(`/api/families/${user.familyId}`);
+          const famRes = await apiFetch(`/api/families/${user.familyId}`);
           if (famRes.ok) {
             const family = await famRes.json();
             setFamily(family);
