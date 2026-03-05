@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Star, Sparkles, ArrowRight } from "lucide-react";
+import { Star, Sparkles, ArrowRight, ChevronLeft } from "lucide-react";
 import { useDemoSetup } from "@/hooks/use-families";
 import { useLocation } from "wouter";
 import { useState } from "react";
@@ -20,6 +20,13 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative overflow-hidden bg-gradient-to-b from-primary/10 to-background">
+      <button
+        data-testid="button-back-landing"
+        onClick={() => setLocation("/get-started")}
+        className="absolute top-6 left-6 w-9 h-9 rounded-xl bg-white/80 flex items-center justify-center hover:bg-white active:scale-90 transition-all shadow-sm z-20"
+      >
+        <ChevronLeft className="w-5 h-5 text-foreground" />
+      </button>
       {/* Decorative background blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-primary/20 rounded-full blur-3xl mix-blend-multiply" />
       <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-accent/20 rounded-full blur-3xl mix-blend-multiply" />

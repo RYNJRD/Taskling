@@ -21,13 +21,17 @@ export default function EmailAction() {
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
   const mode = params.get("mode");
   const oobCode = params.get("oobCode");
+  const email = params.get("email") ?? "";
 
   const continueToApp = async () => {
     setIsContinuing(true);
     try {
       const user = auth.currentUser;
       if (!user) {
-        setLocation("/auth");
+        const authUrl = email
+          ? `/auth?email=${encodeURIComponent(email)}&mode=signin`
+          : "/auth";
+        setLocation(authUrl);
         return;
       }
 
@@ -52,8 +56,12 @@ export default function EmailAction() {
   };
 
   useEffect(() => {
-    if (mode !== "verifyEmail" || !oobCode) {
-      setStatus("invalid");
+    if (!oobCode || mode !== "verifyEmail") {
+      if (auth.currentUser?.emailVerified) {
+        setStatus("verified");
+      } else {
+        setStatus("invalid");
+      }
       return;
     }
 
@@ -73,12 +81,6 @@ export default function EmailAction() {
 
     void run();
   }, [mode, oobCode, toast]);
-
-  useEffect(() => {
-    if (status === "invalid") {
-      setLocation("/verify-email");
-    }
-  }, [setLocation, status]);
 
   if (status === "verifying") {
     return (
@@ -131,18 +133,22 @@ export default function EmailAction() {
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground mb-2">Verification failed</h1>
           <p className="text-muted-foreground font-medium mb-8 max-w-sm">
-            {errorMessage || "This verification link is invalid or expired."}
+            {errorMessage || "This verification link is invalid or already used."}
           </p>
           <Button
             data-testid="button-return-verify-email"
-            onClick={() => setLocation("/verify-email")}
+            onClick={() => {
+              const authUrl = email
+                ? `/auth?email=${encodeURIComponent(email)}&mode=signin`
+                : "/verify-email";
+              setLocation(authUrl);
+            }}
             className="w-full max-w-sm h-12 rounded-2xl font-bold text-base"
           >
-            Back to verification page
+            Continue
           </Button>
         </>
       )}
     </div>
   );
 }
-

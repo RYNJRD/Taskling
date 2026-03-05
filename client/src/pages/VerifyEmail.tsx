@@ -58,7 +58,7 @@ export default function VerifyEmail() {
 
     setIsResending(true);
     try {
-      await sendEmailVerification(user, getEmailVerificationActionSettings());
+      await sendEmailVerification(user, getEmailVerificationActionSettings(user.email ?? undefined));
       toast({
         title: "Verification email sent",
         description: "Check your inbox and spam folder.",

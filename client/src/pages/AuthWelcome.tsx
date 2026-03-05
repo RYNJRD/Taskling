@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, ArrowRight, ChevronLeft, Loader2 } from "lucide-react";
 import { SiGoogle, SiApple } from "react-icons/si";
@@ -28,8 +28,20 @@ export default function AuthWelcome() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const searchParams = useMemo(() => new URLSearchParams(window.location.search), []);
 
   const emailValid = isValidEmail(email);
+
+  useEffect(() => {
+    const emailFromLink = searchParams.get("email");
+    const modeFromLink = searchParams.get("mode");
+    if (!emailFromLink) return;
+
+    setEmail(emailFromLink);
+    if (modeFromLink === "signin") {
+      setStep("password");
+    }
+  }, [searchParams]);
 
   const handlePostAuth = async (uid: string) =>
     handlePostAuthNavigation({
@@ -81,7 +93,10 @@ export default function AuthWelcome() {
     setPasswordError("");
     try {
       const result = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      await sendEmailVerification(result.user, getEmailVerificationActionSettings());
+      await sendEmailVerification(
+        result.user,
+        getEmailVerificationActionSettings(result.user.email ?? email.trim()),
+      );
       setFirebaseUid(result.user.uid);
       toast({
         title: "Verify your email",
