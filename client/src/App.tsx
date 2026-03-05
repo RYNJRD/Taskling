@@ -1,4 +1,6 @@
 import { Switch, Route } from "wouter";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,6 +20,37 @@ import Rewards from "@/pages/Rewards";
 import Admin from "@/pages/Admin";
 import Chat from "@/pages/Chat";
 import Profile from "@/pages/Profile";
+import VerifyEmail from "@/pages/VerifyEmail";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+
+function EmailVerificationGate() {
+  const [location, setLocation] = useLocation();
+
+  useEffect(() => {
+    const enforceVerification = () => {
+      const user = auth.currentUser;
+      if (!user) {
+        if (location === "/verify-email") setLocation("/auth");
+        return;
+      }
+
+      const passwordProvider = user.providerData.some(
+        (provider) => provider.providerId === "password",
+      );
+
+      if (passwordProvider && !user.emailVerified && location !== "/verify-email") {
+        setLocation("/verify-email");
+      }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, enforceVerification);
+    enforceVerification();
+    return unsubscribe;
+  }, [location, setLocation]);
+
+  return null;
+}
 
 function Router() {
   return (
@@ -25,6 +58,7 @@ function Router() {
       <Route path="/" component={Splash} />
       <Route path="/get-started" component={GetStarted} />
       <Route path="/auth" component={AuthWelcome} />
+      <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/join-family" component={JoinFamily} />
       <Route path="/join/:code" component={JoinFamily} />
       <Route path="/setup-family" component={FamilySetup} />
@@ -44,6 +78,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <EmailVerificationGate />
         <Layout>
           <Router />
         </Layout>

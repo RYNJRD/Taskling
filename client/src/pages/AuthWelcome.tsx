@@ -7,10 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { auth, googleProvider } from "@/lib/firebase";
-import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/store/useStore";
-import { apiFetch } from "@/lib/apiFetch";
+import { handlePostAuthNavigation } from "@/lib/postAuth";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -30,28 +30,15 @@ export default function AuthWelcome() {
 
   const emailValid = isValidEmail(email);
 
-  const handlePostAuth = async (uid: string) => {
-    setFirebaseUid(uid);
-    try {
-      const res = await apiFetch(`/api/users/firebase/${uid}`);
-      if (res.ok) {
-        const user = await res.json();
-        setCurrentUser(user);
-        if (user.familyId) {
-          const famRes = await apiFetch(`/api/families/${user.familyId}`);
-          if (famRes.ok) {
-            const family = await famRes.json();
-            setFamily(family);
-            setLocation(`/family/${family.id}/dashboard`);
-            return;
-          }
-        }
-      }
-    } catch {}
-    if (onboardingIntent === "create") setLocation("/setup-family");
-    else if (onboardingIntent === "join") setLocation("/join-family");
-    else setLocation("/get-started");
-  };
+  const handlePostAuth = async (uid: string) =>
+    handlePostAuthNavigation({
+      uid,
+      onboardingIntent,
+      setFirebaseUid,
+      setFamily,
+      setCurrentUser,
+      setLocation,
+    });
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
@@ -93,12 +80,26 @@ export default function AuthWelcome() {
     setPasswordError("");
     try {
       const result = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      toast({ title: "Account created!", description: "Welcome to ChoreQuest" });
-      await handlePostAuth(result.user.uid);
+      await sendEmailVerification(result.user);
+      setFirebaseUid(result.user.uid);
+      toast({
+        title: "Verify your email",
+        description: "We sent a verification link. Verify your email to continue.",
+      });
+      setLocation("/verify-email");
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
         try {
           const result = await signInWithEmailAndPassword(auth, email.trim(), password);
+          if (!result.user.emailVerified) {
+            setFirebaseUid(result.user.uid);
+            toast({
+              title: "Email not verified",
+              description: "Please verify your email before continuing.",
+            });
+            setLocation("/verify-email");
+            return;
+          }
           toast({ title: "Welcome back!", description: "Signed in successfully" });
           await handlePostAuth(result.user.uid);
         } catch (signInError: any) {
