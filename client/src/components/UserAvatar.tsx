@@ -1,5 +1,6 @@
 import type { User } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { AVATAR_OPTIONS, parseAvatarConfig } from "@/lib/avatar";
 
 interface UserAvatarProps {
   user: User;
@@ -7,59 +8,43 @@ interface UserAvatarProps {
   className?: string;
 }
 
+function findOption(section: keyof typeof AVATAR_OPTIONS, id: string | null | undefined) {
+  return AVATAR_OPTIONS[section].find((option) => option.id === id) ?? AVATAR_OPTIONS[section][0];
+}
+
 export function UserAvatar({ user, size = "md", className }: UserAvatarProps) {
-  let config: any = {};
-  try {
-    config = JSON.parse(user.avatarConfig || "{}");
-  } catch (e) {
-    config = {};
-  }
+  const config = parseAvatarConfig(user.avatarConfig);
+  const hair = findOption("hair", config.hair);
+  const top = findOption("top", config.top);
+  const bottom = findOption("bottom", config.bottom);
+  const accessory = findOption("accessory", config.accessory);
 
   const sizeClasses = {
-    sm: "w-8 h-8",
-    md: "w-12 h-12",
-    lg: "w-24 h-24",
-    xl: "w-48 h-48",
-  };
-
-  const scale = {
-    sm: "scale-[0.15]",
-    md: "scale-[0.22]",
-    lg: "scale-[0.45]",
-    xl: "scale-1",
+    sm: "w-8 h-8 text-[8px]",
+    md: "w-12 h-12 text-[10px]",
+    lg: "w-24 h-24 text-sm",
+    xl: "w-48 h-48 text-2xl",
   };
 
   return (
-    <div className={cn(
-      "relative bg-slate-100 rounded-2xl flex items-center justify-center overflow-hidden border-2 border-white shadow-sm shrink-0",
-      sizeClasses[size],
-      className
-    )}>
-      <div className={cn("relative flex items-center justify-center transition-transform", scale[size])}>
-        {/* Base Character Body */}
-        <div className="absolute w-12 h-12 bg-slate-300 rounded-full border-2 border-slate-400 z-0 top-[20%]" />
-        
-        {/* Clothing Layers */}
-        <div className="relative w-64 h-64 flex flex-col items-center justify-center pt-8">
-          {/* Jacket (Top Layer) */}
-          {config.jacket === 'default' && (
-            <img 
-              src="/avatar/jacket_layer.png" 
-              alt="Jacket" 
-              className="absolute top-[10%] w-[60%] h-[50%] object-contain z-20"
-            />
-          )}
+    <div
+      className={cn(
+        "relative rounded-[28px] overflow-hidden border-2 border-white bg-gradient-to-b from-sky-100 via-white to-violet-50 shadow-sm shrink-0",
+        sizeClasses[size],
+        className,
+      )}
+    >
+      <div className="absolute inset-x-[18%] top-[14%] h-[22%] rounded-t-[999px] bg-slate-800 opacity-90" />
+      <div className={cn("absolute inset-x-[18%] top-[10%] h-[24%] opacity-95", hair.className)} />
+      <div className="absolute inset-x-[24%] top-[20%] h-[28%] rounded-[999px] bg-amber-100 border border-amber-200" />
+      <div className={cn("absolute inset-x-[22%] top-[46%] h-[26%] rounded-[30%]", top.className)} />
+      <div className={cn("absolute inset-x-[26%] bottom-[4%] h-[24%] rounded-t-[30%]", bottom.className)} />
+      <div className="absolute inset-x-[38%] bottom-[4%] h-[22%] w-[24%] mx-auto rounded-full bg-white/30" />
 
-          {/* Pants (Bottom Layer) */}
-          {config.pants === 'default' && (
-            <img 
-              src="/avatar/pants_layer.png" 
-              alt="Pants" 
-              className="absolute bottom-[10%] w-[50%] h-[50%] object-contain z-10"
-            />
-          )}
-        </div>
-      </div>
+      {accessory.id === "star-clip" && <div className="absolute top-[14%] right-[18%] text-yellow-400">⭐</div>}
+      {accessory.id === "headphones" && <div className="absolute top-[20%] inset-x-[18%] text-center">🎧</div>}
+      {accessory.id === "glasses" && <div className="absolute top-[28%] inset-x-[25%] text-center">🕶️</div>}
+      {accessory.id === "sparkle" && <div className="absolute top-[16%] left-[18%] text-primary">✨</div>}
     </div>
   );
 }

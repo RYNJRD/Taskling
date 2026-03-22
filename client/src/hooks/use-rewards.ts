@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type InsertReward } from "@shared/routes";
+import { api, buildUrl } from "@shared/routes";
+import type { InsertReward } from "@shared/schema";
 import { apiFetch } from "@/lib/apiFetch";
 
 export function useRewards(familyId: number | undefined) {

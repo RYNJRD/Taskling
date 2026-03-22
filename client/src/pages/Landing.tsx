@@ -1,18 +1,22 @@
 import { motion } from "framer-motion";
 import { Star, Sparkles, ArrowRight, ChevronLeft } from "lucide-react";
 import { useDemoSetup } from "@/hooks/use-families";
+import { useStore } from "@/store/useStore";
 import { useLocation } from "wouter";
 import { useState } from "react";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
   const demoMutation = useDemoSetup();
+  const { setFamily, setCurrentUser } = useStore();
   const [isCreating, setIsCreating] = useState(false);
 
   const handleDemo = async () => {
     try {
-      const family = await demoMutation.mutateAsync();
-      setLocation(`/family/${family.id}/dashboard`);
+      const demo = await demoMutation.mutateAsync();
+      setFamily(demo.family);
+      setCurrentUser(demo.user);
+      setLocation(`/family/${demo.family.id}/dashboard`);
     } catch (error) {
       console.error(error);
     }

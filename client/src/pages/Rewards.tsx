@@ -1,94 +1,102 @@
-import { useParams, Link } from "wouter";
-import { useRewards } from "@/hooks/use-rewards";
-import { useStore } from "@/store/useStore";
-import { Gift, Star, Lock, Plus, Minus, Check } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import confetti from "canvas-confetti";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { Gift, Lock, Minus, Plus, ShieldCheck, Star } from "lucide-react";
+import { useParams } from "wouter";
+import confetti from "canvas-confetti";
 import { api, buildUrl } from "@shared/routes";
 import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { useRewards } from "@/hooks/use-rewards";
+import { useStore } from "@/store/useStore";
 import { apiFetch } from "@/lib/apiFetch";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const EMOJI_MAP: Record<string, string> = {
-  "ice cream": "🍦",
-  "pizza": "🍕",
-  "movie": "🎬",
-  "robux": "🎮",
-  "stay up": "🌙",
-  "game": "🕹️",
-  "toy": "🧸",
-  "candy": "🍬",
-  "money": "💰",
-  "trip": "🚗",
-  "pass": "🎫",
+  robux: "🎮",
+  movie: "🎬",
+  bedtime: "🌙",
+  pizza: "🍕",
+  game: "🕹️",
+  ice: "🍦",
+  trip: "🚗",
 };
 
-function getEmoji(title: string) {
-  const t = title.toLowerCase();
-  for (const [key, val] of Object.entries(EMOJI_MAP)) {
-    if (t.includes(key)) return val;
-  }
-  return "🎁";
+function getRewardEmoji(title: string, fallback?: string | null) {
+  if (fallback) return fallback;
+  const match = Object.entries(EMOJI_MAP).find(([key]) => title.toLowerCase().includes(key));
+  return match?.[1] ?? "🎁";
 }
 
 export default function Rewards() {
   const { familyId } = useParams();
-  const id = parseInt(familyId || "0");
-  const { data: rewards, isLoading } = useRewards(id);
+  const id = Number(familyId || 0);
+  const { toast } = useToast();
   const { currentUser, setCurrentUser } = useStore();
-  const [claimingId, setClaimingId] = useState<number | null>(null);
+  const { data: rewards = [], isLoading } = useRewards(id);
+  const [activeRewardId, setActiveRewardId] = useState<number | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [isPending, setIsPending] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (isLoading || !rewards || !currentUser) return null;
+  if (!currentUser || isLoading) return null;
 
-  const handleClaim = async (reward: any) => {
-    setIsPending(true);
+  const handleClaim = async (rewardId: number) => {
+    setIsSubmitting(true);
     try {
-      const res = await apiFetch(buildUrl(api.rewards.claim.path, { id: reward.id }), {
+      const res = await apiFetch(buildUrl(api.rewards.claim.path, { id: rewardId }), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUser.id, quantity }),
       });
-      
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Could not claim reward");
+
+      setCurrentUser(data.user);
+      queryClient.invalidateQueries({ queryKey: [api.families.getActivity.path, id] });
+
+      if (data.claim?.status === "submitted") {
+        toast({
+          title: "Request sent",
+          description: "A parent or admin will review your reward request.",
+        });
+      } else {
+        confetti({
+          particleCount: 180,
+          spread: 120,
+          origin: { y: 0.5 },
+          colors: ["#FFD700", "#FDB931", "#FF8C00"],
+        });
+        toast({
+          title: "Reward claimed",
+          description: "Enjoy it. You earned it.",
+        });
       }
 
-      const data = await res.json();
-      setCurrentUser(data.user);
-      queryClient.invalidateQueries({ queryKey: [buildUrl(api.messages.list.path, { id: currentUser.familyId || 0 })] });
-
-      confetti({
-        particleCount: 200,
-        spread: 120,
-        origin: { y: 0.5 },
-        colors: ['#FFD700', '#FDB931', '#FF8C00']
-      });
-
-      setClaimingId(null);
+      setActiveRewardId(null);
       setQuantity(1);
-    } catch (e: any) {
-      alert(e.message);
+    } catch (error) {
+      toast({
+        title: "Could not claim reward",
+        description: error instanceof Error ? error.message : "Try again in a moment.",
+        variant: "destructive",
+      });
     } finally {
-      setIsPending(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="pt-8 px-6 pb-32 min-h-screen bg-background">
+    <div className="pt-8 px-5 pb-32 min-h-screen bg-background">
       <div className="flex justify-between items-end mb-8">
         <div>
           <div className="w-14 h-14 bg-secondary/20 rounded-[1.5rem] flex items-center justify-center mb-3 -rotate-6">
             <Gift className="w-7 h-7 text-secondary" strokeWidth={2.5} />
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">Rewards</h1>
+          <p className="text-sm text-muted-foreground mt-1">Turn your stars into something fun.</p>
         </div>
         <div className="text-right">
-          <p className="text-sm font-bold text-muted-foreground mb-1">Your Balance</p>
+          <p className="text-sm font-bold text-muted-foreground mb-1">Your balance</p>
           <div className="inline-flex items-center gap-1 bg-accent/10 px-3 py-1.5 rounded-xl border-2 border-accent/20">
             <Star className="w-5 h-5 fill-accent text-accent" />
             <span className="font-display font-bold text-xl text-foreground">{currentUser.points}</span>
@@ -96,111 +104,98 @@ export default function Rewards() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {rewards.map((reward, i) => {
-          const canAfford = currentUser.points >= (reward.costPoints * (claimingId === reward.id ? quantity : 1));
-          const isClaiming = claimingId === reward.id;
-          
+      <div className="space-y-4">
+        {rewards.map((reward, index) => {
+          const isActive = activeRewardId === reward.id;
+          const totalCost = reward.costPoints * (isActive ? quantity : 1);
+          const canAfford = currentUser.points >= totalCost;
+
           return (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.1 }}
               key={reward.id}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.04 }}
               className={cn(
-                "bg-card rounded-[1.5rem] p-4 border-2 flex flex-col h-full relative overflow-hidden",
-                canAfford ? "border-border shadow-bouncy" : "border-border/50 opacity-80"
+                "rounded-[1.75rem] border-2 bg-card p-4 shadow-sm",
+                canAfford ? "border-border" : "border-border/70 opacity-85",
               )}
             >
-              <div className="flex-1 flex flex-col items-center justify-center text-center mb-4 min-h-[120px]">
-                {!canAfford && !isClaiming && <Lock className="w-8 h-8 text-muted-foreground/50 absolute top-4 right-4" />}
-                <div className="text-4xl mb-2">{reward.emoji || (reward.title.match(/\p{Emoji}/u) ? "" : getEmoji(reward.title))}</div>
-                <h3 className="font-display font-bold text-lg leading-tight">{reward.title}</h3>
-              </div>
-              
-              <AnimatePresence mode="wait">
-                {isClaiming ? (
-                  <motion.div 
-                    key="adjuster"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="space-y-3"
-                  >
-                    <div className="flex items-center justify-between bg-muted rounded-xl p-1">
-                      <Button 
-                        variant="ghost" size="icon" className="h-8 w-8"
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      >
-                        <Minus size={16} />
-                      </Button>
-                      <span className="font-black text-lg">{quantity}</span>
-                      <Button 
-                        variant="ghost" size="icon" className="h-8 w-8"
-                        onClick={() => setQuantity(quantity + 1)}
-                      >
-                        <Plus size={16} />
-                      </Button>
+              <div className="flex items-start gap-4">
+                <div className="h-14 w-14 rounded-[1.5rem] bg-primary/8 flex items-center justify-center text-3xl shrink-0">
+                  {getRewardEmoji(reward.title, reward.emoji)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="font-display text-lg font-bold leading-tight">{reward.title}</h2>
+                      {reward.description ? <p className="text-sm text-muted-foreground mt-1">{reward.description}</p> : null}
                     </div>
-                    <Button 
-                      className="w-full bg-success text-success-foreground font-black uppercase tracking-tighter"
-                      disabled={!canAfford || isPending}
-                      onClick={() => handleClaim(reward)}
-                    >
-                      {isPending ? "..." : <><Check className="mr-1" size={16}/> Confirm</>}
-                    </Button>
-                    <button 
-                      className="w-full text-[10px] font-bold text-muted-foreground uppercase"
-                      onClick={() => { setClaimingId(null); setQuantity(1); }}
-                    >
-                      Cancel
-                    </button>
-                  </motion.div>
-                ) : (
-                  <button
-                    key="buy"
-                    disabled={!canAfford}
-                    onClick={() => setClaimingId(reward.id)}
-                    className={cn(
-                      "w-full py-3 rounded-xl font-bold flex items-center justify-center gap-1 transition-all",
-                      canAfford 
-                        ? "bg-secondary text-secondary-foreground shadow-bouncy-active active:translate-y-[2px]" 
-                        : "bg-muted text-muted-foreground cursor-not-allowed"
+                    {!canAfford && !reward.requiresApproval && <Lock className="w-5 h-5 text-muted-foreground/60 shrink-0" />}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <span className="rounded-full bg-accent/10 px-2.5 py-1 text-[11px] font-bold text-accent flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-accent" />
+                      {reward.costPoints} each
+                    </span>
+                    {reward.requiresApproval && (
+                      <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-700 flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3" />
+                        Needs approval
+                      </span>
                     )}
-                  >
-                    {reward.costPoints} <Star size={16} className={canAfford ? "fill-secondary-foreground" : ""} />
-                  </button>
-                )}
-              </AnimatePresence>
+                  </div>
+
+                  {isActive ? (
+                    <div className="mt-4 rounded-2xl bg-muted/60 p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={() => setQuantity((value) => Math.max(1, value - 1))}>
+                            <Minus size={16} />
+                          </Button>
+                          <span className="min-w-8 text-center font-black text-lg">{quantity}</span>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={() => setQuantity((value) => value + 1)}>
+                            <Plus size={16} />
+                          </Button>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">Total</p>
+                          <p className="font-display text-lg font-bold">{totalCost} stars</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex gap-2">
+                        <Button className="flex-1 rounded-2xl font-black" disabled={!canAfford && !reward.requiresApproval || isSubmitting} onClick={() => handleClaim(reward.id)}>
+                          {reward.requiresApproval ? "Request reward" : "Claim reward"}
+                        </Button>
+                        <Button variant="outline" className="rounded-2xl" onClick={() => { setActiveRewardId(null); setQuantity(1); }}>
+                          Cancel
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {reward.requiresApproval
+                          ? "Stars are deducted only if this request gets approved."
+                          : `You will have ${Math.max(0, currentUser.points - totalCost)} stars left after claiming.`}
+                      </p>
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={() => { setActiveRewardId(reward.id); setQuantity(1); }}
+                      disabled={!canAfford && !reward.requiresApproval}
+                      className={cn(
+                        "mt-4 w-full rounded-2xl font-black",
+                        !canAfford && !reward.requiresApproval && "opacity-60 cursor-not-allowed",
+                      )}
+                    >
+                      {reward.requiresApproval ? "Request this reward" : "Claim for " + reward.costPoints}
+                    </Button>
+                  )}
+                </div>
+              </div>
             </motion.div>
           );
         })}
-
-        {/* Admin Quick Create Button */}
-        {currentUser.role === 'admin' && (
-          <Link href="/admin">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: rewards.length * 0.1 }}
-              className="bg-dashed rounded-[1.5rem] p-4 border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center text-center h-full min-h-[180px] hover:border-secondary hover:bg-secondary/5 cursor-pointer transition-all group"
-            >
-              <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <Plus className="w-6 h-6 text-secondary" strokeWidth={3} />
-              </div>
-              <h3 className="font-display font-bold text-sm text-muted-foreground group-hover:text-secondary transition-colors">
-                Create More<br/>Rewards
-              </h3>
-            </motion.div>
-          </Link>
-        )}
       </div>
-      
-      {rewards.length === 0 && currentUser.role !== 'admin' && (
-        <div className="text-center py-12 text-muted-foreground font-medium">
-          No rewards set up yet. Ask an admin to create some!
-        </div>
-      )}
     </div>
   );
 }

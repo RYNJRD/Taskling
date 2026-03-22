@@ -1,11 +1,8 @@
 import { forwardRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Star, Clock, Users } from "lucide-react";
-import type { Chore, User } from "@shared/schema";
+import { Check, Clock3, ShieldCheck, Star, Users } from "lucide-react";
+import type { Chore } from "@shared/schema";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { api, buildUrl } from "@shared/routes";
-import { UserAvatar } from "./UserAvatar";
 
 interface ChoreCardProps {
   chore: Chore;
@@ -13,165 +10,146 @@ interface ChoreCardProps {
   isCompleting: boolean;
   displayPoints?: number;
   streakBonusPercent?: number;
+  footerNote?: string;
+  stateLabel?: string;
+  actionLabel?: string;
+  completed?: boolean;
 }
 
-const EMOJI_MAP: Record<string, string> = {
-  "dish": "🍽️",
-  "tidy": "✨",
-  "lawn": "🚜",
-  "grass": "🌱",
-  "laundry": "🧺",
-  "dog": "🐕",
-  "trash": "🗑️",
-  "room": "🏠",
-  "floor": "🧹",
-  "clean": "🧼",
+const TYPE_LABELS: Record<string, string> = {
+  daily: "Daily",
+  weekly: "Weekly",
+  monthly: "Monthly",
+  box: "Shared",
 };
 
-function getEmoji(chore: Chore) {
-  if (chore.emoji) return chore.emoji;
-  const title = chore.title;
-  if (/\p{Emoji}/u.test(title)) return "";
-  const t = title.toLowerCase();
-  for (const [key, val] of Object.entries(EMOJI_MAP)) {
-    if (t.includes(key)) return val;
-  }
-  return "📋";
-}
-
-const TYPE_COLORS: Record<string, { border: string; check: string; bg: string }> = {
-  daily: { border: "border-primary", check: "border-primary bg-primary/10 text-primary", bg: "hover:bg-primary/10" },
-  weekly: { border: "border-blue-500", check: "border-blue-500 bg-blue-500/10 text-blue-500", bg: "hover:bg-blue-500/10" },
-  monthly: { border: "border-purple-500", check: "border-purple-500 bg-purple-500/10 text-purple-500", bg: "hover:bg-purple-500/10" },
-  big: { border: "border-secondary", check: "border-secondary bg-secondary/10 text-secondary", bg: "hover:bg-secondary/10" },
-  box: { border: "border-accent", check: "border-accent bg-accent/10 text-accent", bg: "hover:bg-accent/10" },
+const TYPE_EMOJIS: Record<string, string> = {
+  daily: "☀️",
+  weekly: "📅",
+  monthly: "🗓️",
+  box: "🤝",
 };
 
 export const ChoreCard = forwardRef<HTMLDivElement, ChoreCardProps>(
-  ({ chore, onComplete, isCompleting, displayPoints, streakBonusPercent }, ref) => {
-    const [isConfirming, setIsConfirming] = useState(false);
-    const isBox = chore.type === 'box';
-    const isPublic = chore.assigneeId === null;
-    const typeKey = chore.type || 'daily';
-    const colors = TYPE_COLORS[typeKey] || TYPE_COLORS.daily;
-    
-    const { data: users = [] } = useQuery<User[]>({
-      queryKey: [buildUrl(api.families.getUsers.path, { id: chore.familyId || 0 })],
-      enabled: !!chore.familyId,
-    });
+  (
+    {
+      chore,
+      onComplete,
+      isCompleting,
+      displayPoints,
+      streakBonusPercent,
+      footerNote,
+      stateLabel,
+      actionLabel = "Complete",
+      completed,
+    },
+    ref,
+  ) => {
+    const [confirming, setConfirming] = useState(false);
+    const isDone = completed ?? Boolean(chore.lastCompletedAt);
 
-    const completedByUser = users.find(u => u.id === chore.lastCompletedBy);
-    
-    const isDone = chore.lastCompletedAt ? 
-      new Date(chore.lastCompletedAt).toDateString() === new Date().toDateString() : false;
-    
     return (
       <motion.div
         ref={ref}
         layout
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, x: 100 }}
-        whileHover={isDone ? {} : { y: -2 }}
-        data-testid={`card-chore-${chore.id}`}
+        exit={{ opacity: 0, scale: 0.97 }}
         className={cn(
-          "bg-card rounded-[1.5rem] p-4 border-2 shadow-bouncy relative overflow-hidden group transition-all",
-          isDone ? "opacity-60 grayscale-[0.2] border-muted bg-muted/5" :
-          (isConfirming || isCompleting) ? colors.border : "border-border",
-          isCompleting && "opacity-50 pointer-events-none"
+          "rounded-[1.75rem] border-2 bg-card p-4 shadow-sm",
+          isDone ? "border-border/60 opacity-75" : "border-border",
         )}
       >
-        <div className="flex items-center gap-4">
+        <div className="flex gap-3">
           <button
-            onClick={() => !isDone && setIsConfirming(true)}
-            disabled={isCompleting || isConfirming || isDone}
-            data-testid={`button-complete-chore-${chore.id}`}
+            onClick={() => {
+              if (!confirming) {
+                setConfirming(true);
+                return;
+              }
+              onComplete();
+              setConfirming(false);
+            }}
+            disabled={isDone || isCompleting}
             className={cn(
-              "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90 flex-shrink-0",
-              "border-4",
-              isDone ? "border-success bg-success/10 text-success" :
-              (isConfirming || isCompleting) ? colors.check :
-              `border-muted-foreground/30 text-muted-foreground ${colors.bg}`
+              "h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all",
+              isDone
+                ? "bg-success/10 border-success/30 text-success"
+                : "border-primary/20 bg-primary/5 text-primary hover:scale-[1.02]",
             )}
           >
-            {isCompleting ? (
-              <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
-                <Star className="w-6 h-6" />
-              </motion.div>
-            ) : (
-              <Check className={cn("w-6 h-6 transition-opacity", (isConfirming || isCompleting || isDone) ? "opacity-100" : "opacity-0 group-hover:opacity-100")} strokeWidth={4} />
-            )}
+            {isCompleting ? <Star className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
           </button>
 
-          <div className="flex-1 min-w-0 py-1">
-            <h3 className={cn(
-              "font-display font-semibold text-lg text-foreground truncate transition-all",
-              isDone && "line-through text-muted-foreground opacity-50"
-            )}>
-              {getEmoji(chore)} {chore.title}
-            </h3>
-            <div className="flex items-center justify-between gap-2 mt-1">
-              <div className="flex items-center gap-2 text-sm font-semibold flex-wrap">
-                <span className="flex items-center gap-1 text-accent font-bold bg-accent/10 px-2 py-0.5 rounded-lg" data-testid={`text-chore-points-${chore.id}`}>
-                  <Star size={14} className="fill-accent" />
-                  {(displayPoints ?? chore.points)} pts
-                </span>
-                {streakBonusPercent !== undefined && streakBonusPercent > 0 && (
-                  <span className="text-[10px] font-bold text-accent bg-accent/5 px-2 py-0.5 rounded-lg">
-                    +{streakBonusPercent}% streak
-                  </span>
-                )}
-                {chore.type === 'big' && chore.cooldownHours && (
-                  <span className="flex items-center gap-1 text-secondary font-bold bg-secondary/10 px-2 py-0.5 rounded-lg">
-                    <Clock size={14} />
-                    {chore.cooldownHours}h
-                  </span>
-                )}
-                {(isBox || isPublic) && (
-                  <span className="flex items-center gap-1 text-accent font-bold bg-accent/10 px-2 py-0.5 rounded-lg text-xs">
-                    <Users size={12} />
-                    Anyone
-                  </span>
-                )}
-                {isPublic && !isBox && (
-                  <span className="text-[10px] font-bold text-success bg-success/10 px-2 py-0.5 rounded-lg">
-                    +Bonus
-                  </span>
-                )}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                  {TYPE_EMOJIS[chore.type]} {TYPE_LABELS[chore.type] || "Chore"}
+                </p>
+                <h3 className="font-display text-lg font-bold leading-tight">{chore.title}</h3>
+                {chore.description && <p className="text-sm text-muted-foreground mt-1">{chore.description}</p>}
               </div>
+              <div className="rounded-2xl bg-accent/10 px-3 py-2 text-sm font-black text-accent flex items-center gap-1">
+                <Star className="w-4 h-4 fill-accent" />
+                {displayPoints ?? chore.points}
+              </div>
+            </div>
 
-              {isDone && completedByUser && (
-                <div className="flex items-center gap-1.5 bg-success/10 px-2 py-1 rounded-full border border-success/20">
-                  <span className="text-[10px] font-black text-success uppercase italic">
-                    - {completedByUser.username}
-                  </span>
-                  <UserAvatar user={completedByUser} size="sm" className="w-5 h-5 rounded-full border border-white" />
-                </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {chore.assigneeId === null && (
+                <span className="rounded-full bg-primary/8 px-2.5 py-1 text-[11px] font-bold text-primary flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  Anyone can help
+                </span>
               )}
+              {chore.requiresApproval && (
+                <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-700 flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" />
+                  Needs review
+                </span>
+              )}
+              {streakBonusPercent ? (
+                <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-bold text-orange-700">
+                  +{streakBonusPercent}% streak
+                </span>
+              ) : null}
+              {stateLabel ? (
+                <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-bold text-muted-foreground flex items-center gap-1">
+                  <Clock3 className="w-3 h-3" />
+                  {stateLabel}
+                </span>
+              ) : null}
+            </div>
 
-              <AnimatePresence>
-                {isConfirming && !isCompleting && (
-                  <motion.button
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    data-testid={`button-confirm-chore-${chore.id}`}
+            {footerNote ? <p className="text-xs text-muted-foreground mt-3">{footerNote}</p> : null}
+
+            <AnimatePresence initial={false}>
+              {!isDone && confirming ? (
+                <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="mt-4 flex gap-2">
+                  <button
                     onClick={() => {
                       onComplete();
-                      setIsConfirming(false);
+                      setConfirming(false);
                     }}
-                    className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-black uppercase tracking-tighter shadow-lg active:scale-95"
+                    className="flex-1 rounded-2xl bg-primary px-4 py-3 text-sm font-black text-primary-foreground"
                   >
-                    You sure?
-                  </motion.button>
-                )}
-              </AnimatePresence>
-            </div>
+                    {actionLabel}
+                  </button>
+                  <button
+                    onClick={() => setConfirming(false)}
+                    className="rounded-2xl border border-border px-4 py-3 text-sm font-bold text-muted-foreground"
+                  >
+                    Not yet
+                  </button>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>
     );
-  }
+  },
 );
 
 ChoreCard.displayName = "ChoreCard";

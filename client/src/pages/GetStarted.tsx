@@ -6,7 +6,7 @@ import { useDemoSetup } from "@/hooks/use-families";
 
 export default function GetStarted() {
   const [, setLocation] = useLocation();
-  const { setOnboardingIntent } = useStore();
+  const { setOnboardingIntent, setFamily, setCurrentUser } = useStore();
   const demoMutation = useDemoSetup();
 
   const handleCreate = () => {
@@ -21,8 +21,10 @@ export default function GetStarted() {
 
   const handleDemo = async () => {
     try {
-      const family = await demoMutation.mutateAsync();
-      setLocation(`/family/${family.id}/dashboard`);
+      const demo = await demoMutation.mutateAsync();
+      setFamily(demo.family);
+      setCurrentUser(demo.user);
+      setLocation(`/family/${demo.family.id}/dashboard`);
     } catch (error) {
       console.error(error);
     }

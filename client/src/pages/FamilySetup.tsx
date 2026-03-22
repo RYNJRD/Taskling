@@ -22,6 +22,7 @@ export default function FamilySetup() {
   const [userName, setUserName] = useState("");
   const [gender, setGender] = useState("");
   const [age, setAge] = useState("");
+  const [starterMode, setStarterMode] = useState<"guided" | "blank">("guided");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const canProceedStep0 = familyName.trim().length >= 2;
@@ -59,11 +60,47 @@ export default function FamilySetup() {
       if (!userRes.ok) throw new Error("Failed to create profile");
       const createdUser = await userRes.json();
 
+      if (starterMode === "guided") {
+        const starterChores = [
+          { title: "Empty dishwasher", description: "A quick nightly reset.", points: 20, type: "daily" },
+          { title: "Tidy bedroom", description: "Five minutes makes a huge difference.", points: 15, type: "daily" },
+          { title: "Take out recycling", description: "A good first approval-based chore.", points: 30, type: "weekly", requiresApproval: true },
+        ];
+
+        for (const starterChore of starterChores) {
+          await apiFetch("/api/chores", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              familyId: family.id,
+              assigneeId: null,
+              emoji: "",
+              createdBy: createdUser.id,
+              ...starterChore,
+            }),
+          });
+        }
+
+        await apiFetch("/api/rewards", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            familyId: family.id,
+            title: "Choose dessert night",
+            description: "A fun first reward so the stars mean something right away.",
+            costPoints: 120,
+            emoji: "",
+            requiresApproval: false,
+            createdBy: createdUser.id,
+          }),
+        });
+      }
+
       setFamily(family);
       setCurrentUser(createdUser);
       toast({
         title: "Family created!",
-        description: `Welcome to ${family.name}! Find your invite code in Admin panel.`,
+        description: starterMode === "guided" ? `Welcome to ${family.name}. Starter chores are ready to use tonight.` : `Welcome to ${family.name}! Find your invite code in Admin.`,
         duration: 5000,
       });
       setLocation(`/family/${family.id}/dashboard`);
@@ -200,8 +237,31 @@ export default function FamilySetup() {
               </div>
 
               <p className="text-xs text-muted-foreground text-center">
-                Other family members can join using your invite code after you create the family.
+                Other family members can join with your invite code after this step.
               </p>
+
+              <div className="bg-muted/50 p-4 rounded-2xl border border-border">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground mb-2">Starter setup</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setStarterMode("guided")}
+                    className={cn("rounded-xl px-3 py-3 text-sm font-bold border", starterMode === "guided" ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border")}
+                  >
+                    Guided starter
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStarterMode("blank")}
+                    className={cn("rounded-xl px-3 py-3 text-sm font-bold border", starterMode === "blank" ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border")}
+                  >
+                    Start blank
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Guided adds a few chores and a first reward so your family can start tonight.
+                </p>
+              </div>
 
               <Button
                 data-testid="button-create-family-submit"

@@ -1,12 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
-import { getApps, initializeApp, cert, applicationDefault } from "firebase-admin/app";
+import { applicationDefault, cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { storage } from "./storage";
 import type { User } from "@shared/schema";
+import { storage } from "./storage";
+import { getEnv } from "./env";
 
 type AuthRequest = Request & {
   auth?: {
     uid: string;
+    demoUserId?: number;
   };
   currentUser?: User;
 };
@@ -14,32 +16,41 @@ type AuthRequest = Request & {
 function initializeFirebaseAdmin() {
   if (getApps().length > 0) return;
 
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const env = getEnv();
+  const privateKey = env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
-  if (projectId && clientEmail && privateKey) {
+  if (env.FIREBASE_CLIENT_EMAIL && privateKey) {
     initializeApp({
-      credential: cert({ projectId, clientEmail, privateKey }),
-      projectId,
+      credential: cert({
+        projectId: env.FIREBASE_PROJECT_ID,
+        clientEmail: env.FIREBASE_CLIENT_EMAIL,
+        privateKey,
+      }),
+      projectId: env.FIREBASE_PROJECT_ID,
     });
     return;
   }
 
-  if (projectId) {
-    initializeApp({
-      credential: applicationDefault(),
-      projectId,
-    });
-    return;
-  }
+  initializeApp({
+    credential: applicationDefault(),
+    projectId: env.FIREBASE_PROJECT_ID,
+  });
+}
 
-  throw new Error(
-    "Firebase admin credentials are not configured. Set FIREBASE_PROJECT_ID and either FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY or ADC credentials.",
-  );
+export async function verifyBearerToken(token: string) {
+  initializeFirebaseAdmin();
+  return getAuth().verifyIdToken(token, true);
 }
 
 export async function requireAuth(req: AuthRequest, res: Response, next: NextFunction) {
+  if (process.env.NODE_ENV !== "production") {
+    const demoUserId = Number(req.headers["x-demo-user-id"]);
+    if (Number.isFinite(demoUserId) && demoUserId > 0) {
+      req.auth = { uid: `demo:${demoUserId}`, demoUserId };
+      return next();
+    }
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Missing bearer token" });
@@ -51,24 +62,30 @@ export async function requireAuth(req: AuthRequest, res: Response, next: NextFun
   }
 
   try {
-    initializeFirebaseAdmin();
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Firebase auth misconfigured";
-    return res.status(500).json({ message });
-  }
-
-  try {
-    const decoded = await getAuth().verifyIdToken(token, true);
+    const decoded = await verifyBearerToken(token);
     req.auth = { uid: decoded.uid };
     return next();
-  } catch {
-    return res.status(401).json({ message: "Invalid or expired auth token" });
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message.includes("environment variable")
+        ? error.message
+        : "Invalid or expired auth token";
+    return res.status(message.startsWith("Missing required") ? 500 : 401).json({ message });
   }
 }
 
 export async function attachCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
   if (!req.auth?.uid) {
     return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  if (req.auth.demoUserId) {
+    const demoUser = await storage.getUser(req.auth.demoUserId);
+    if (!demoUser) {
+      return res.status(404).json({ message: "Demo user no longer exists" });
+    }
+    req.currentUser = demoUser;
+    return next();
   }
 
   const user = await storage.getUserByFirebaseUid(req.auth.uid);

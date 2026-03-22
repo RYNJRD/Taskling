@@ -1,5 +1,6 @@
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { useStore } from "@/store/useStore";
 
 let authResolved = false;
 let authReadyPromise: Promise<void> | null = null;
@@ -27,6 +28,11 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
   if (user) {
     const token = await user.getIdToken();
     headers.set("Authorization", `Bearer ${token}`);
+  } else {
+    const { currentUser } = useStore.getState();
+    if (currentUser?.id && !currentUser.firebaseUid) {
+      headers.set("X-Demo-User-Id", String(currentUser.id));
+    }
   }
 
   return fetch(input, {
@@ -35,4 +41,3 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
     credentials: "include",
   });
 }
-

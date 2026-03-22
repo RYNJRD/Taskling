@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type CreateFamilyRequest } from "@shared/routes";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { api, buildUrl } from "@shared/routes";
 import { apiFetch } from "@/lib/apiFetch";
 
 export function useFamily(id: number | undefined) {
@@ -67,5 +67,61 @@ export function useDemoSetup() {
       if (!res.ok) throw new Error("Failed to setup demo");
       return api.demo.setup.responses[201].parse(await res.json());
     },
+  });
+}
+
+export function useFamilyActivity(id: number | undefined) {
+  return useQuery({
+    queryKey: [api.families.getActivity.path, id],
+    queryFn: async () => {
+      if (!id) throw new Error("No id provided");
+      const url = buildUrl(api.families.getActivity.path, { id });
+      const res = await apiFetch(url);
+      if (!res.ok) throw new Error("Failed to fetch activity");
+      return api.families.getActivity.responses[200].parse(await res.json());
+    },
+    enabled: !!id,
+  });
+}
+
+export function useFamilyAchievements(id: number | undefined) {
+  return useQuery({
+    queryKey: [api.families.getAchievements.path, id],
+    queryFn: async () => {
+      if (!id) throw new Error("No id provided");
+      const url = buildUrl(api.families.getAchievements.path, { id });
+      const res = await apiFetch(url);
+      if (!res.ok) throw new Error("Failed to fetch achievements");
+      return api.families.getAchievements.responses[200].parse(await res.json());
+    },
+    enabled: !!id,
+  });
+}
+
+export function useFamilyMonthlyWinners(id: number | undefined) {
+  return useQuery({
+    queryKey: [api.families.getMonthlyWinners.path, id],
+    queryFn: async () => {
+      if (!id) throw new Error("No id provided");
+      const url = buildUrl(api.families.getMonthlyWinners.path, { id });
+      const res = await apiFetch(url);
+      if (!res.ok) throw new Error("Failed to fetch monthly winners");
+      return api.families.getMonthlyWinners.responses[200].parse(await res.json());
+    },
+    enabled: !!id,
+  });
+}
+
+export function useFamilyOnboarding(id: number | undefined) {
+  return useQuery({
+    queryKey: [api.families.getOnboarding.path, id],
+    queryFn: async () => {
+      if (!id) throw new Error("No id provided");
+      const url = buildUrl(api.families.getOnboarding.path, { id });
+      const res = await apiFetch(url);
+      if (!res.ok) throw new Error("Failed to fetch onboarding");
+      return api.families.getOnboarding.responses[200].parse(await res.json());
+    },
+    enabled: !!id,
   });
 }
