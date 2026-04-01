@@ -81,6 +81,23 @@ export default function AuthWelcome() {
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
   const canCreateAccount = passwordLongEnough && passwordsMatch;
 
+  const passwordChecks = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password),
+  };
+  const complexityCount = [passwordChecks.uppercase, passwordChecks.number, passwordChecks.special].filter(Boolean).length;
+  const passwordStrength = password.length === 0 ? 0
+    : !passwordChecks.length ? 1
+    : complexityCount === 0 ? 1
+    : complexityCount === 1 ? 2
+    : complexityCount === 2 ? 3
+    : 4;
+  const strengthColors = ["bg-muted", "bg-red-500", "bg-orange-400", "bg-amber-400", "bg-green-500"] as const;
+  const strengthLabels = ["", "Too short", "Weak", "Almost there", "Strong"] as const;
+  const activeColor = strengthColors[passwordStrength];
+
   const handleCreateAccount = async () => {
     if (!passwordLongEnough) {
       setPasswordError("Password must be at least 8 characters");
@@ -279,17 +296,53 @@ export default function AuthWelcome() {
               <p className="text-sm font-bold text-foreground truncate" data-testid="text-email-display">{email}</p>
             </div>
 
-            <Input
-              data-testid="input-password"
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (passwordError) setPasswordError("");
-              }}
-              placeholder="Create a password"
-              className="h-12 rounded-2xl border-2 font-medium text-base focus-visible:ring-primary"
-            />
+            <div className="space-y-1.5">
+              <Input
+                data-testid="input-password"
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (passwordError) setPasswordError("");
+                }}
+                placeholder="Create a password"
+                className="h-12 rounded-2xl border-2 font-medium text-base focus-visible:ring-primary"
+              />
+              {password.length > 0 && (
+                <div className="space-y-1.5 px-0.5">
+                  <div className="flex gap-1.5">
+                    {[1, 2, 3, 4].map((bar) => (
+                      <div
+                        key={bar}
+                        className={cn(
+                          "flex-1 h-1.5 rounded-full transition-all duration-300",
+                          bar <= passwordStrength ? activeColor : "bg-muted"
+                        )}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className={cn("text-xs font-bold transition-colors duration-200",
+                      passwordStrength === 1 ? "text-red-500" :
+                      passwordStrength === 2 ? "text-orange-400" :
+                      passwordStrength === 3 ? "text-amber-500" :
+                      "text-green-600"
+                    )}>
+                      {strengthLabels[passwordStrength]}
+                    </p>
+                    {passwordStrength < 4 && (
+                      <p className="text-xs text-muted-foreground">
+                        {!passwordChecks.length ? "8+ characters" :
+                         !passwordChecks.uppercase ? "+ uppercase" :
+                         !passwordChecks.number ? "+ number" :
+                         "+ symbol"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <Input
               data-testid="input-confirm-password"
               type="password"
@@ -300,23 +353,16 @@ export default function AuthWelcome() {
               }}
               onKeyDown={(e) => e.key === "Enter" && canCreateAccount && handleCreateAccount()}
               placeholder="Confirm password"
-              className="h-12 rounded-2xl border-2 font-medium text-base focus-visible:ring-primary"
+              className={cn(
+                "h-12 rounded-2xl border-2 font-medium text-base focus-visible:ring-primary",
+                confirmPassword.length > 0 && !passwordsMatch ? "border-red-300" : ""
+              )}
             />
-
-            <div className="flex flex-col gap-1 px-2">
-              <div className="flex items-center gap-2">
-                <div className={cn("w-2 h-2 rounded-full transition-colors", passwordLongEnough ? "bg-green-500" : "bg-muted-foreground/30")} />
-                <span className={cn("text-xs font-bold transition-colors", passwordLongEnough ? "text-green-600" : "text-muted-foreground")}>
-                  At least 8 characters
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className={cn("w-2 h-2 rounded-full transition-colors", passwordsMatch ? "bg-green-500" : "bg-muted-foreground/30")} />
-                <span className={cn("text-xs font-bold transition-colors", passwordsMatch ? "text-green-600" : "text-muted-foreground")}>
-                  Passwords match
-                </span>
-              </div>
-            </div>
+            {confirmPassword.length > 0 && (
+              <p className={cn("text-xs font-bold px-1 -mt-1 transition-colors", passwordsMatch ? "text-green-600" : "text-red-500")}>
+                {passwordsMatch ? "Passwords match" : "Passwords do not match"}
+              </p>
+            )}
 
             {passwordError && (
               <motion.p
