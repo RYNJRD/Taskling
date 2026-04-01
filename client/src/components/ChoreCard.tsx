@@ -75,10 +75,16 @@ export const ChoreCard = forwardRef<HTMLDivElement, ChoreCardProps>(
               "h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all",
               isDone
                 ? "bg-success/10 border-success/30 text-success"
-                : "border-primary/20 bg-primary/5 text-primary hover:scale-[1.02]",
+                : confirming
+                  ? "border-primary bg-primary/10 text-primary hover:scale-[1.02]"
+                  : "border-red-400 bg-red-50 dark:bg-red-950/20 hover:scale-[1.02]",
             )}
           >
-            {isCompleting ? <Star className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
+            {isCompleting
+              ? <Star className="w-5 h-5 animate-spin text-primary" />
+              : isDone || confirming
+                ? <Check className="w-5 h-5" />
+                : null}
           </button>
 
           <div className="min-w-0 flex-1">
