@@ -26,7 +26,7 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
   const headers = new Headers(init.headers || {});
   const user = auth.currentUser;
   if (user) {
-    const token = await user.getIdToken();
+    const token = await user.getIdToken(/* forceRefresh */ true);
     headers.set("Authorization", `Bearer ${token}`);
   } else {
     const { currentUser } = useStore.getState();
