@@ -1,14 +1,16 @@
-import penguinImg from "@assets/0d1f6a25-4983-496c-a1e9-cf33a6774d85_removalai_preview_1775145431205.png";
 import type { User } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { getOutfitImage } from "@/lib/avatar";
 
 interface UserAvatarProps {
-  user: Pick<User, "username" | "gender" | "avatarConfig">;
+  user: Pick<User, "username" | "avatarConfig">;
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
 }
 
 export function UserAvatar({ user, size = "md", className }: UserAvatarProps) {
+  const outfitImg = getOutfitImage(user.avatarConfig);
+
   const sizeClasses: Record<string, string> = {
     sm: "w-8 h-8",
     md: "w-12 h-12",
@@ -28,7 +30,7 @@ export function UserAvatar({ user, size = "md", className }: UserAvatarProps) {
       )}
     >
       <img
-        src={penguinImg}
+        src={outfitImg}
         alt={user.username}
         draggable={false}
         className={cn(

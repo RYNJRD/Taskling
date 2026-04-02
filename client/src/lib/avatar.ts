@@ -1,66 +1,27 @@
-export type HeadSubSection = "hair" | "face" | "eyebrows" | "eyes" | "beard";
-export type ClothingSubSection = "jacket" | "pants" | "shoes" | "hat" | "glasses" | "accessories";
-export type AvatarSubSection = HeadSubSection | ClothingSubSection;
+import penguinBaseImg from "@assets/0d1f6a25-4983-496c-a1e9-cf33a6774d85_removalai_preview_1775145431205.png";
+import penguinTuxedoImg from "@assets/image_1775148166336.png";
 
-export const HEAD_SUB_SECTIONS: HeadSubSection[] = ["hair", "face", "eyebrows", "eyes", "beard"];
-export const CLOTHING_SUB_SECTIONS: ClothingSubSection[] = ["jacket", "pants", "shoes", "hat", "glasses", "accessories"];
-
-export const MALE_ONLY_SECTIONS: AvatarSubSection[] = ["beard"];
-
-export type AvatarItem = {
+export type PenguinOutfit = {
   id: string;
   label: string;
-  image?: string;
-  color?: string;
-  preview?: string;
+  image: string;
+  comingSoon?: boolean;
 };
 
-export const AVATAR_ITEMS: Record<AvatarSubSection, AvatarItem[]> = {
-  hair: [
-    { id: "none", label: "Nothing" },
-    { id: "gold-spiky", label: "Gold Spiky" },
-  ],
-  face: [],
-  eyebrows: [],
-  eyes: [],
-  beard: [],
-  jacket: [],
-  pants: [],
-  shoes: [],
-  hat: [],
-  glasses: [],
-  accessories: [],
-};
+export const PENGUIN_OUTFITS: PenguinOutfit[] = [
+  { id: "classic",    label: "Classic",    image: penguinBaseImg },
+  { id: "tuxedo",    label: "Tuxedo",     image: penguinTuxedoImg },
+  { id: "superhero", label: "Superhero",  image: penguinBaseImg, comingSoon: true },
+  { id: "pirate",    label: "Pirate",     image: penguinBaseImg, comingSoon: true },
+  { id: "astronaut", label: "Astronaut",  image: penguinBaseImg, comingSoon: true },
+  { id: "chef",      label: "Chef",       image: penguinBaseImg, comingSoon: true },
+];
 
-export const SUB_SECTION_LABELS: Record<AvatarSubSection, string> = {
-  hair: "Hair",
-  face: "Face",
-  eyebrows: "Eyebrows",
-  eyes: "Eyes",
-  beard: "Beard",
-  jacket: "Jacket",
-  pants: "Pants",
-  shoes: "Shoes",
-  hat: "Hat",
-  glasses: "Glasses",
-  accessories: "Accessories",
-};
+export const OUTFIT_MAP: Record<string, string> = Object.fromEntries(
+  PENGUIN_OUTFITS.map((o) => [o.id, o.image]),
+);
 
-export const SUB_SECTION_ICONS: Record<AvatarSubSection, string> = {
-  hair: "💇",
-  face: "🙂",
-  eyebrows: "〰️",
-  eyes: "👁️",
-  beard: "🧔",
-  jacket: "🧥",
-  pants: "👖",
-  shoes: "👟",
-  hat: "🧢",
-  glasses: "🕶️",
-  accessories: "💍",
-};
-
-export type AvatarConfig = Partial<Record<AvatarSubSection, string | null>>;
+export type AvatarConfig = { outfit?: string | null };
 
 export function parseAvatarConfig(raw?: string | null): AvatarConfig {
   if (!raw) return {};
@@ -69,4 +30,12 @@ export function parseAvatarConfig(raw?: string | null): AvatarConfig {
   } catch {
     return {};
   }
+}
+
+export function getOutfitImage(avatarConfig?: string | null): string {
+  const config = parseAvatarConfig(avatarConfig);
+  if (config.outfit && OUTFIT_MAP[config.outfit]) {
+    return OUTFIT_MAP[config.outfit];
+  }
+  return penguinBaseImg;
 }
