@@ -41,14 +41,12 @@ export default function AuthWelcome() {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
     number: /[0-9]/.test(password),
-    special: /[^A-Za-z0-9]/.test(password),
   };
-  const complexityCount = [passwordChecks.uppercase, passwordChecks.number, passwordChecks.special].filter(Boolean).length;
+  const complexityCount = [passwordChecks.uppercase, passwordChecks.number].filter(Boolean).length;
   const passwordStrength = password.length === 0 ? 0
     : !passwordChecks.length ? 1
-    : complexityCount === 0 ? 1
-    : complexityCount === 1 ? 2
-    : complexityCount === 2 ? 3
+    : complexityCount === 0 ? 2
+    : complexityCount === 1 ? 3
     : 4;
   const strengthColors = ["bg-muted", "bg-red-500", "bg-orange-400", "bg-amber-400", "bg-green-500"] as const;
   const strengthLabels = ["", "Too short", "Weak", "Almost there", "Strong"] as const;
@@ -274,8 +272,8 @@ export default function AuthWelcome() {
                       {passwordStrength < 4 && (
                         <p className="text-xs text-muted-foreground">
                           {!passwordChecks.length ? "8+ characters" :
-                           !passwordChecks.uppercase ? "+ uppercase" :
-                           !passwordChecks.number ? "+ number" : "+ symbol"}
+                           !passwordChecks.uppercase ? "+ uppercase letter" :
+                           "+ a number"}
                         </p>
                       )}
                     </div>
