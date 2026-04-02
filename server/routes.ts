@@ -468,8 +468,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       return res.status(403).json({ message: "Demo setup is disabled in production" });
     }
     const family = await storage.getOrCreateCurrentDemo();
-    const [user] = await storage.getFamilyUsers(family.id);
-    return res.status(201).json({ family, user });
+    const users = await storage.getFamilyUsers(family.id);
+    return res.status(201).json({ family, users });
   });
 
   return httpServer;

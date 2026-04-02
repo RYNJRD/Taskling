@@ -1,5 +1,4 @@
-import maleModelImg from "@assets/d228ba9d-e9b6-44a6-a3bf-ba22f99114fd_removalai_preview_1775090740007.png";
-import femaleModelImg from "@assets/c033f10f-b630-4dab-b599-e1e948a32c27_removalai_preview_1775090736187.png";
+import penguinImg from "@assets/0d1f6a25-4983-496c-a1e9-cf33a6774d85_removalai_preview_1775145431205.png";
 import type { User } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
@@ -10,9 +9,6 @@ interface UserAvatarProps {
 }
 
 export function UserAvatar({ user, size = "md", className }: UserAvatarProps) {
-  const isFemale = user.gender === "female";
-  const baseModel = isFemale ? femaleModelImg : maleModelImg;
-
   const sizeClasses: Record<string, string> = {
     sm: "w-8 h-8",
     md: "w-12 h-12",
@@ -32,14 +28,14 @@ export function UserAvatar({ user, size = "md", className }: UserAvatarProps) {
       )}
     >
       <img
-        src={baseModel}
+        src={penguinImg}
         alt={user.username}
         draggable={false}
         className={cn(
           "absolute inset-0 w-full h-full pointer-events-none select-none",
           isSmall
-            ? "object-cover object-top scale-[1.8] origin-top"
-            : "object-contain object-top",
+            ? "object-cover object-top scale-[1.6] origin-top"
+            : "object-contain object-bottom",
         )}
       />
     </div>

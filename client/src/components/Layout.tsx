@@ -1,4 +1,5 @@
 import { BottomNav } from "./BottomNav";
+import { DemoSwitcher } from "./DemoSwitcher";
 import { useLocation } from "wouter";
 import { useStore } from "@/store/useStore";
 import { useFamilyLive } from "@/hooks/use-family-live";
@@ -18,6 +19,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       {showNav && <BottomNav />}
+      {showNav && <DemoSwitcher />}
     </div>
   );
 }

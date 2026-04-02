@@ -246,7 +246,7 @@ export const api = {
     setup: {
       method: "POST" as const,
       path: "/api/demo/setup" as const,
-      responses: { 201: z.object({ family: z.custom<typeof families.$inferSelect>(), user: z.custom<typeof users.$inferSelect>() }) },
+      responses: { 201: z.object({ family: z.custom<typeof families.$inferSelect>(), users: z.array(z.custom<typeof users.$inferSelect>()) }) },
     },
   },
 };

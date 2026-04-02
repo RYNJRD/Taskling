@@ -12,7 +12,6 @@ import { apiFetch } from "@/lib/apiFetch";
 import {
   HEAD_SUB_SECTIONS,
   CLOTHING_SUB_SECTIONS,
-  MALE_ONLY_SECTIONS,
   AVATAR_ITEMS,
   SUB_SECTION_LABELS,
   SUB_SECTION_ICONS,
@@ -21,8 +20,7 @@ import {
   type AvatarSubSection,
 } from "@/lib/avatar";
 import { cn } from "@/lib/utils";
-import maleModelImg from "@assets/d228ba9d-e9b6-44a6-a3bf-ba22f99114fd_removalai_preview_1775090740007.png";
-import femaleModelImg from "@assets/c033f10f-b630-4dab-b599-e1e948a32c27_removalai_preview_1775090736187.png";
+import penguinImg from "@assets/0d1f6a25-4983-496c-a1e9-cf33a6774d85_removalai_preview_1775145431205.png";
 
 type AvatarCategory = "head" | "clothing";
 
@@ -37,9 +35,6 @@ export default function Profile() {
   const [activeCategory, setActiveCategory] = useState<AvatarCategory>("head");
   const [activeSubSection, setActiveSubSection] = useState<AvatarSubSection>("hair");
 
-  const isMale = currentUser?.gender !== "female";
-  const isFemale = currentUser?.gender === "female";
-  const baseModel = isFemale ? femaleModelImg : maleModelImg;
 
   useEffect(() => {
     setConfig(parseAvatarConfig(currentUser?.avatarConfig));
@@ -72,9 +67,7 @@ export default function Profile() {
 
   if (!currentUser) return null;
 
-  const headSections = HEAD_SUB_SECTIONS.filter(
-    (s) => !MALE_ONLY_SECTIONS.includes(s) || isMale,
-  );
+  const headSections = HEAD_SUB_SECTIONS;
   const clothingSections = CLOTHING_SUB_SECTIONS;
 
   const currentSections = activeCategory === "head" ? headSections : clothingSections;
@@ -118,11 +111,11 @@ export default function Profile() {
         {/* Decorative glow behind character */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-32 bg-primary/10 rounded-full blur-3xl" />
         <motion.img
-          key={baseModel}
+          key="penguin"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
-          src={baseModel}
+          src={penguinImg}
           alt="Character"
           draggable={false}
           className="relative z-10 h-full w-auto object-contain object-bottom select-none pointer-events-none drop-shadow-2xl"

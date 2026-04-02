@@ -224,7 +224,7 @@ async function setupDemoFamily(storage: DatabaseStorage): Promise<Family> {
     role: "admin",
     gender: "other",
     age: 38,
-    avatarConfig: JSON.stringify({ hair: "puff", top: "hoodie-blue", bottom: "joggers-navy", accessory: "star-clip" }),
+    avatarConfig: JSON.stringify({}),
   });
 
   const alex = await storage.createUser({
@@ -233,16 +233,16 @@ async function setupDemoFamily(storage: DatabaseStorage): Promise<Family> {
     role: "member",
     gender: "other",
     age: 13,
-    avatarConfig: JSON.stringify({ hair: "spiky", top: "tee-green", bottom: "shorts-coral", accessory: "headphones" }),
+    avatarConfig: JSON.stringify({}),
   });
 
   const mia = await storage.createUser({
     familyId: family.id,
     username: "Mia",
     role: "member",
-    gender: "female",
+    gender: "other",
     age: 10,
-    avatarConfig: JSON.stringify({ hair: "bob", top: "sweater-sun", bottom: "leggings-plum", accessory: "glasses" }),
+    avatarConfig: JSON.stringify({}),
   });
 
   await storage.createChore({
