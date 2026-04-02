@@ -1,10 +1,21 @@
-export type AvatarSection = "hair" | "top" | "bottom" | "accessory";
+import charcoalJacketImg from "@assets/Gemini_Generated_Image_hhpzoohhpzoohhpz_1775089122027.png";
+import navyJacketImg from "@assets/Gemini_Generated_Image_yj9ccsyj9ccsyj9c_1775089122028.png";
+import greenJacketImg from "@assets/Gemini_Generated_Image_rt5ankrt5ankrt5a_1775089122029.png";
+import maroonJacketImg from "@assets/Gemini_Generated_Image_elgqwielgqwielgq_1775089122030.png";
+
+import charcoalPantsImg from "@assets/Gemini_Generated_Image_vxgzzdvxgzzdvxgz_1775089122026.png";
+import navyPantsImg from "@assets/Gemini_Generated_Image_bn5eq4bn5eq4bn5e_1775089122028.png";
+import greenPantsImg from "@assets/Gemini_Generated_Image_uejso1uejso1uejs_1775089122029.png";
+import maroonPantsImg from "@assets/Gemini_Generated_Image_icusr8icusr8icus_1775089122030.png";
+
+export type AvatarSection = "hair" | "top" | "bottom" | "accessory" | "jacket" | "pants";
 
 export type AvatarOption = {
   id: string;
   label: string;
   preview: string;
   className: string;
+  image?: string;
 };
 
 export const AVATAR_OPTIONS: Record<AvatarSection, AvatarOption[]> = {
@@ -32,7 +43,24 @@ export const AVATAR_OPTIONS: Record<AvatarSection, AvatarOption[]> = {
     { id: "glasses", label: "Glasses", preview: "🕶️", className: "text-slate-700" },
     { id: "sparkle", label: "Sparkle", preview: "✨", className: "text-primary" },
   ],
+  jacket: [
+    { id: "none", label: "None", preview: "🚫", className: "" },
+    { id: "jacket-charcoal", label: "Charcoal Suit", preview: "🩶", className: "", image: charcoalJacketImg },
+    { id: "jacket-navy", label: "Navy Suit", preview: "💙", className: "", image: navyJacketImg },
+    { id: "jacket-green", label: "Green Tuxedo", preview: "💚", className: "", image: greenJacketImg },
+    { id: "jacket-maroon", label: "Maroon Suit", preview: "🍷", className: "", image: maroonJacketImg },
+  ],
+  pants: [
+    { id: "none", label: "None", preview: "🚫", className: "" },
+    { id: "pants-charcoal", label: "Charcoal Trousers", preview: "🩶", className: "", image: charcoalPantsImg },
+    { id: "pants-navy", label: "Navy Trousers", preview: "💙", className: "", image: navyPantsImg },
+    { id: "pants-green", label: "Forest Trousers", preview: "💚", className: "", image: greenPantsImg },
+    { id: "pants-maroon", label: "Maroon Trousers", preview: "🍷", className: "", image: maroonPantsImg },
+  ],
 };
+
+export const BASE_SECTIONS: AvatarSection[] = ["hair", "top", "bottom", "accessory"];
+export const MALE_CLOTHING_SECTIONS: AvatarSection[] = ["jacket", "pants"];
 
 export type AvatarConfig = Partial<Record<AvatarSection, string | null>>;
 
