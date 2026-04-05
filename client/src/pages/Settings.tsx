@@ -6,6 +6,7 @@ import {
   ArrowLeft, User, Users, CheckSquare, Bell, Gift, Smartphone,
   ChevronRight, Link2, LogOut, Trash2, Moon, Sun, Flame, RefreshCw,
   Pencil, Check, X, AlertTriangle, Lock, Crown, Star,
+  Download, ShieldCheck, FileText, Info, MessageCircle, UserX,
 } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { useSettings, type PointsResetCycle } from "@/hooks/use-settings";
@@ -15,6 +16,12 @@ import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { api, buildUrl } from "@shared/routes";
 import { cn } from "@/lib/utils";
+import {
+  TermsScreen, PrivacyScreen, DisclaimerScreen, ContactScreen,
+  type LegalScreenId,
+} from "@/components/LegalScreen";
+
+const APP_VERSION = "1.0.1";
 
 /* ─── Primitives ─── */
 
@@ -151,8 +158,10 @@ export default function Settings() {
   const [nameValue, setNameValue] = useState(currentUser?.username ?? "");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [copiedInvite, setCopiedInvite] = useState(false);
   const [cycleOpen, setCycleOpen] = useState(false);
+  const [activeScreen, setActiveScreen] = useState<LegalScreenId | null>(null);
 
   const familyId = family?.id ?? 0;
   const role = currentUser?.role ?? "member";
@@ -211,6 +220,45 @@ export default function Settings() {
     logout();
     setShowLeaveConfirm(false);
     setLocation("/get-started");
+  }
+
+  function handleDownloadData() {
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      note: "This is a mock data export. Replace with real user data export in production.",
+      user: currentUser
+        ? {
+            id: currentUser.id,
+            username: currentUser.username,
+            role: currentUser.role,
+            points: currentUser.points,
+            streak: currentUser.streak,
+            familyId: currentUser.familyId,
+            avatarConfig: currentUser.avatarConfig,
+            createdAt: currentUser.createdAt,
+          }
+        : null,
+      family: family
+        ? { id: family.id, name: family.name }
+        : null,
+      settings: settings,
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `chorequest-data-${currentUser?.username ?? "user"}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "Data downloaded!", description: "Your data export is saved." });
+  }
+
+  function handleDeleteAccount() {
+    resetAllSettings();
+    logout();
+    setShowDeleteConfirm(false);
+    setLocation("/get-started");
+    toast({ title: "Account data cleared", description: "Your local data has been removed." });
   }
 
   const cycleLabels: Record<PointsResetCycle, string> = {
@@ -473,8 +521,89 @@ export default function Settings() {
             </div>
           )}
 
+          {/* ── Privacy & Data ── */}
+          <SectionHeader icon={ShieldCheck} label="Privacy & Data" color="bg-violet-500" />
+          <SettingCard>
+            <SettingRow
+              label="Download my data"
+              sublabel="Export your profile and settings as JSON"
+              icon={Download}
+              iconColor="bg-violet-500"
+              onClick={handleDownloadData}
+            />
+            <SettingRow
+              label="Delete my account"
+              sublabel="Clears your local data and signs you out"
+              icon={UserX}
+              iconColor="bg-rose-500"
+              onClick={() => setShowDeleteConfirm(true)}
+              last
+            />
+          </SettingCard>
+
+          {/* ── Legal ── */}
+          <SectionHeader icon={FileText} label="Legal" color="bg-slate-500" />
+          <SettingCard>
+            <SettingRow
+              label="Terms of Service"
+              sublabel="Rules for using ChoreQuest"
+              icon={FileText}
+              iconColor="bg-slate-500"
+              onClick={() => setActiveScreen("tos")}
+            />
+            <SettingRow
+              label="Privacy Policy"
+              sublabel="How we handle your data"
+              icon={ShieldCheck}
+              iconColor="bg-blue-500"
+              onClick={() => setActiveScreen("privacy")}
+            />
+            <SettingRow
+              label="Disclaimer"
+              sublabel="Important limitations and notices"
+              icon={AlertTriangle}
+              iconColor="bg-amber-500"
+              onClick={() => setActiveScreen("disclaimer")}
+              last
+            />
+          </SettingCard>
+
+          {/* ── About ── */}
+          <SectionHeader icon={Info} label="About" color="bg-teal-500" />
+          <SettingCard>
+            <SettingRow
+              label="App version"
+              sublabel={`ChoreQuest v${APP_VERSION}`}
+              icon={Info}
+              iconColor="bg-teal-500"
+            >
+              <span className="text-xs font-black text-muted-foreground bg-muted px-2.5 py-1 rounded-lg">
+                v{APP_VERSION}
+              </span>
+            </SettingRow>
+            <SettingRow
+              label="Contact support"
+              sublabel="Get help or report a problem"
+              icon={MessageCircle}
+              iconColor="bg-green-500"
+              onClick={() => setActiveScreen("contact")}
+              last
+            />
+          </SettingCard>
+
+          {/* Footer */}
+          <p className="text-center text-xs text-muted-foreground pb-4 mt-2">
+            Made with 🐧 by ChoreQuest · v{APP_VERSION}
+          </p>
+
         </div>
       </div>
+
+      {/* ── Legal sub-screens ── */}
+      <TermsScreen open={activeScreen === "tos"} onClose={() => setActiveScreen(null)} />
+      <PrivacyScreen open={activeScreen === "privacy"} onClose={() => setActiveScreen(null)} />
+      <DisclaimerScreen open={activeScreen === "disclaimer"} onClose={() => setActiveScreen(null)} />
+      <ContactScreen open={activeScreen === "contact"} onClose={() => setActiveScreen(null)} />
 
       {/* Confirm dialogs */}
       <AnimatePresence>
@@ -496,6 +625,16 @@ export default function Settings() {
             confirmLabel="Leave family"
             onConfirm={handleLeaveFamily}
             onCancel={() => setShowLeaveConfirm(false)}
+          />
+        )}
+        {showDeleteConfirm && (
+          <ConfirmDialog
+            key="delete"
+            title="Delete account?"
+            body="This will clear all your local data and sign you out. Your family's shared data (chores, rewards, activity) stays on the server."
+            confirmLabel="Delete & sign out"
+            onConfirm={handleDeleteAccount}
+            onCancel={() => setShowDeleteConfirm(false)}
           />
         )}
       </AnimatePresence>
