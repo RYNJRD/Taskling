@@ -4,6 +4,7 @@ import { useStore } from "@/store/useStore";
 import { Trophy, Star, Crown, Medal } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { UserAvatar } from "@/components/UserAvatar";
 
 export default function Leaderboard() {
   const { familyId } = useParams();
@@ -55,11 +56,13 @@ export default function Leaderboard() {
               </div>
 
               {/* Avatar */}
-              <div className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center font-display font-bold text-white shadow-inner flex-shrink-0 z-10",
-                isFirst ? "bg-accent border-2 border-white" : "bg-primary"
-              )}>
-                {user.username.charAt(0).toUpperCase()}
+              <div className="relative flex-shrink-0 z-10">
+                <UserAvatar user={user} size="md" />
+                {user.role === "admin" && (
+                  <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center shadow-sm text-[10px]">
+                    👑
+                  </div>
+                )}
               </div>
 
               {/* Progress & Info */}

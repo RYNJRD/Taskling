@@ -3,35 +3,20 @@ import { useLocation } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft,
-  User,
-  Users,
-  CheckSquare,
-  Bell,
-  Gift,
-  Smartphone,
-  ChevronRight,
-  Link2,
-  LogOut,
-  Trash2,
-  Moon,
-  Sun,
-  Flame,
-  RefreshCw,
-  Pencil,
-  Check,
-  X,
-  AlertTriangle,
+  ArrowLeft, User, Users, CheckSquare, Bell, Gift, Smartphone,
+  ChevronRight, Link2, LogOut, Trash2, Moon, Sun, Flame, RefreshCw,
+  Pencil, Check, X, AlertTriangle, Lock, Crown, Star,
 } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { useSettings, type PointsResetCycle } from "@/hooks/use-settings";
+import { canAccess, getRoleLabel, getRoleEmoji, isParent, PARENT_ONLY_MSG } from "@/lib/permissions";
 import { apiFetch } from "@/lib/apiFetch";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { api, buildUrl } from "@shared/routes";
 import { cn } from "@/lib/utils";
 
-/* ─── Reusable primitives ─── */
+/* ─── Primitives ─── */
 
 function SectionHeader({ icon: Icon, label, color }: { icon: React.ElementType; label: string; color: string }) {
   return (
@@ -53,29 +38,29 @@ function SettingCard({ children, className }: { children: React.ReactNode; class
 }
 
 function SettingRow({
-  label,
-  sublabel,
-  icon: Icon,
-  iconColor,
-  children,
-  onClick,
-  last,
+  label, sublabel, icon: Icon, iconColor, children, onClick, last, locked, lockedMsg,
 }: {
-  label: string;
-  sublabel?: string;
-  icon?: React.ElementType;
-  iconColor?: string;
-  children?: React.ReactNode;
-  onClick?: () => void;
-  last?: boolean;
+  label: string; sublabel?: string; icon?: React.ElementType; iconColor?: string;
+  children?: React.ReactNode; onClick?: () => void; last?: boolean;
+  locked?: boolean; lockedMsg?: string;
 }) {
+  const { toast } = useToast();
+
+  function handleClick() {
+    if (locked) {
+      toast({ title: lockedMsg ?? PARENT_ONLY_MSG, description: "Ask a parent to do this 😊" });
+      return;
+    }
+    onClick?.();
+  }
+
   return (
     <div
-      onClick={onClick}
+      onClick={locked || onClick ? handleClick : undefined}
       className={cn(
         "flex items-center gap-3 px-4 py-3.5",
         !last && "border-b border-border/40",
-        onClick && "cursor-pointer active:bg-muted/60 transition-colors",
+        locked ? "opacity-60 cursor-not-allowed" : onClick && "cursor-pointer active:bg-muted/60 transition-colors",
       )}
     >
       {Icon && (
@@ -85,23 +70,30 @@ function SettingRow({
       )}
       <div className="flex-1 min-w-0">
         <p className="font-bold text-sm leading-tight">{label}</p>
-        {sublabel && <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{sublabel}</p>}
+        {locked && lockedMsg
+          ? <p className="text-xs text-amber-600 font-semibold mt-0.5">👑 Parents only</p>
+          : sublabel && <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{sublabel}</p>}
       </div>
-      {children}
-      {onClick && !children && <ChevronRight className="w-4 h-4 text-muted-foreground flex-none" />}
+      {locked
+        ? <Lock className="w-4 h-4 text-muted-foreground/50 flex-none" />
+        : children
+          ? children
+          : onClick && <ChevronRight className="w-4 h-4 text-muted-foreground flex-none" />}
     </div>
   );
 }
 
-/* ─── Toggle switch ─── */
-function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+/* ─── Toggle ─── */
+function Toggle({ on, onChange, disabled }: { on: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
   return (
     <button
       data-testid="toggle"
-      onClick={(e) => { e.stopPropagation(); onChange(!on); }}
+      onClick={(e) => { e.stopPropagation(); if (!disabled) onChange(!on); }}
+      disabled={disabled}
       className={cn(
         "relative w-12 h-6 rounded-full transition-colors duration-200 flex-none",
-        on ? "bg-primary" : "bg-muted-foreground/30",
+        on && !disabled ? "bg-primary" : "bg-muted-foreground/30",
+        disabled && "cursor-not-allowed opacity-50",
       )}
     >
       <motion.div
@@ -114,32 +106,18 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
   );
 }
 
-/* ─── Destructive confirm dialog ─── */
-function ConfirmDialog({
-  title,
-  body,
-  confirmLabel,
-  onConfirm,
-  onCancel,
-}: {
-  title: string;
-  body: string;
-  confirmLabel: string;
-  onConfirm: () => void;
-  onCancel: () => void;
+/* ─── Confirm dialog ─── */
+function ConfirmDialog({ title, body, confirmLabel, onConfirm, onCancel }: {
+  title: string; body: string; confirmLabel: string; onConfirm: () => void; onCancel: () => void;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[200] flex items-end justify-center bg-black/40 backdrop-blur-sm p-4"
       onClick={onCancel}
     >
       <motion.div
-        initial={{ y: 80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 80, opacity: 0 }}
+        initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-sm bg-card rounded-3xl p-6 shadow-2xl border border-border"
@@ -150,16 +128,10 @@ function ConfirmDialog({
         <h3 className="font-display text-xl font-bold text-center mb-2">{title}</h3>
         <p className="text-sm text-muted-foreground text-center mb-6">{body}</p>
         <div className="flex gap-3">
-          <button
-            onClick={onCancel}
-            className="flex-1 py-3 rounded-2xl bg-muted font-bold text-sm text-muted-foreground hover:bg-muted/80 transition-colors"
-          >
+          <button onClick={onCancel} className="flex-1 py-3 rounded-2xl bg-muted font-bold text-sm text-muted-foreground hover:bg-muted/80 transition-colors">
             Cancel
           </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-3 rounded-2xl bg-destructive font-bold text-sm text-destructive-foreground hover:bg-destructive/90 transition-colors"
-          >
+          <button onClick={onConfirm} className="flex-1 py-3 rounded-2xl bg-destructive font-bold text-sm text-destructive-foreground hover:bg-destructive/90 transition-colors">
             {confirmLabel}
           </button>
         </div>
@@ -168,7 +140,7 @@ function ConfirmDialog({
   );
 }
 
-/* ─── Main Settings page ─── */
+/* ─── Main ─── */
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { currentUser, family, setCurrentUser, logout } = useStore();
@@ -183,24 +155,22 @@ export default function Settings() {
   const [cycleOpen, setCycleOpen] = useState(false);
 
   const familyId = family?.id ?? 0;
+  const role = currentUser?.role ?? "member";
+  const parent = isParent(role);
 
   const { data: inviteData } = useQuery({
     queryKey: [api.families.getInviteInfo.path, familyId],
-    queryFn: () =>
-      apiFetch(buildUrl(api.families.getInviteInfo.path, { id: familyId })).then((r) => r.json()),
-    enabled: !!familyId,
+    queryFn: () => apiFetch(buildUrl(api.families.getInviteInfo.path, { id: familyId })).then((r) => r.json()),
+    enabled: !!familyId && parent,
   });
 
   const nameMutation = useMutation({
     mutationFn: async (username: string) => {
-      const res = await apiFetch(
-        buildUrl(api.users.updateProfile.path, { id: currentUser?.id ?? 0 }),
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username }),
-        },
-      );
+      const res = await apiFetch(buildUrl(api.users.updateProfile.path, { id: currentUser?.id ?? 0 }), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      });
       if (!res.ok) throw new Error("Failed to update name");
       return res.json();
     },
@@ -220,6 +190,10 @@ export default function Settings() {
   }
 
   async function handleCopyInvite() {
+    if (!canAccess("invite_family", role)) {
+      toast({ title: PARENT_ONLY_MSG, description: "Ask a parent to share the invite link 😊" });
+      return;
+    }
     const link = inviteData?.inviteUrl ?? `${window.location.origin}/join/${family?.inviteCode}`;
     await navigator.clipboard.writeText(link).catch(() => undefined);
     setCopiedInvite(true);
@@ -246,9 +220,12 @@ export default function Settings() {
     "12months": "Every 12 months",
   };
 
+  if (!currentUser) return null;
+
   return (
     <>
       <div className="flex flex-col h-dvh overflow-hidden bg-background">
+
         {/* Top bar */}
         <div className="flex-none flex items-center gap-3 px-4 pt-4 pb-3 border-b border-border/60">
           <button
@@ -258,17 +235,27 @@ export default function Settings() {
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <h1 className="font-black text-lg text-primary tracking-tight">Settings</h1>
+          <h1 className="font-black text-lg text-primary tracking-tight flex-1">Settings</h1>
+          {/* Role badge */}
+          <div className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border-2 font-black text-xs",
+            parent
+              ? "bg-amber-50 border-amber-300 text-amber-700 dark:bg-amber-950/30 dark:border-amber-700 dark:text-amber-400"
+              : "bg-sky-50 border-sky-200 text-sky-700 dark:bg-sky-950/30 dark:border-sky-700 dark:text-sky-400",
+          )}>
+            {parent ? <Crown className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />}
+            {getRoleLabel(role)}
+          </div>
         </div>
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28">
 
-          {/* ── Profile Settings ── */}
+          {/* ── Profile ── */}
           <SectionHeader icon={User} label="Profile" color="bg-violet-500" />
           <SettingCard>
             {/* Edit name */}
-            <div className={cn("px-4 py-3.5 border-b border-border/40")}>
+            <div className="px-4 py-3.5 border-b border-border/40">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-violet-500 flex items-center justify-center flex-none">
                   <Pencil className="w-4 h-4 text-white" />
@@ -290,49 +277,57 @@ export default function Settings() {
                         <button onClick={handleSaveName} disabled={nameMutation.isPending} className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center flex-none">
                           <Check className="w-4 h-4 text-primary-foreground" />
                         </button>
-                        <button onClick={() => { setEditingName(false); setNameValue(currentUser?.username ?? ""); }} className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center flex-none">
+                        <button onClick={() => { setEditingName(false); setNameValue(currentUser.username); }} className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center flex-none">
                           <X className="w-4 h-4" />
                         </button>
                       </motion.div>
                     ) : (
                       <motion.p key="display" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-xs text-muted-foreground mt-0.5">
-                        {currentUser?.username}
+                        {currentUser.username}
                       </motion.p>
                     )}
                   </AnimatePresence>
                 </div>
                 {!editingName && (
-                  <button
-                    data-testid="button-edit-name"
-                    onClick={() => { setNameValue(currentUser?.username ?? ""); setEditingName(true); }}
-                    className="text-xs font-bold text-primary hover:underline flex-none"
-                  >
+                  <button data-testid="button-edit-name" onClick={() => { setNameValue(currentUser.username); setEditingName(true); }} className="text-xs font-bold text-primary hover:underline flex-none">
                     Edit
                   </button>
                 )}
               </div>
             </div>
-            {/* Edit avatar */}
-            <SettingRow
-              label="Edit character"
-              sublabel="Change your penguin outfit"
-              icon={User}
-              iconColor="bg-indigo-400"
-              onClick={() => setLocation(`/family/${familyId}/profile`)}
-              last
-            />
+
+            {/* Role display */}
+            <div className="px-4 py-3.5 border-b border-border/40 flex items-center gap-3">
+              <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center flex-none text-sm", parent ? "bg-amber-400" : "bg-sky-400")}>
+                {getRoleEmoji(role)}
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-sm">Your role</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {parent ? "You have full parent access — you can manage chores, rewards & family settings." : "You can complete chores and claim rewards. Parents manage the rest."}
+                </p>
+              </div>
+              <span className={cn("text-xs font-black px-2.5 py-1 rounded-xl border", parent ? "text-amber-700 bg-amber-50 border-amber-200" : "text-sky-700 bg-sky-50 border-sky-200")}>
+                {getRoleLabel(role)}
+              </span>
+            </div>
+
+            {/* Edit character */}
+            <SettingRow label="Edit character" sublabel="Change your penguin outfit" icon={User} iconColor="bg-indigo-400" onClick={() => setLocation(`/family/${familyId}/profile`)} last />
           </SettingCard>
 
-          {/* ── Family Settings ── */}
+          {/* ── Family ── */}
           <SectionHeader icon={Users} label="Family" color="bg-sky-500" />
           <SettingCard>
             <SettingRow label="Family name" sublabel={family?.name ?? "—"} icon={Users} iconColor="bg-sky-500" />
             <SettingRow
-              label={copiedInvite ? "Link copied!" : "Invite via link"}
-              sublabel="Send a link so others can join"
+              label={copiedInvite ? "Link copied! ✓" : "Invite via link"}
+              sublabel={parent ? "Send a link so others can join" : undefined}
               icon={Link2}
               iconColor={copiedInvite ? "bg-green-500" : "bg-sky-400"}
-              onClick={handleCopyInvite}
+              onClick={parent ? handleCopyInvite : undefined}
+              locked={!parent}
+              lockedMsg="Only parents can generate invite links"
             />
             <SettingRow
               label="Leave family"
@@ -344,57 +339,53 @@ export default function Settings() {
             />
           </SettingCard>
 
-          {/* ── Chore Settings ── */}
+          {/* ── Chores ── */}
           <SectionHeader icon={CheckSquare} label="Chores" color="bg-green-500" />
           <SettingCard>
             <SettingRow
               label="Daily chore streaks"
-              sublabel="Bonus points for keeping your streak alive"
+              sublabel={parent ? "Bonus points for keeping your streak alive" : undefined}
               icon={Flame}
               iconColor="bg-orange-400"
+              locked={!parent}
+              lockedMsg="Only parents can change chore settings"
             >
-              <Toggle on={settings.enableStreaks} onChange={(v) => updateSetting("enableStreaks", v)} />
+              {parent && <Toggle on={settings.enableStreaks} onChange={(v) => updateSetting("enableStreaks", v)} />}
             </SettingRow>
 
             {/* Points reset cycle */}
-            <div className="px-4 py-3.5 border-t border-border/40">
+            <div className={cn("px-4 py-3.5 border-t border-border/40", !parent && "opacity-60")}>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-green-500 flex items-center justify-center flex-none">
                   <RefreshCw className="w-4 h-4 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm">Points reset cycle</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">How often star totals reset</p>
+                  {parent
+                    ? <p className="text-xs text-muted-foreground mt-0.5">How often star totals reset</p>
+                    : <p className="text-xs text-amber-600 font-semibold mt-0.5">👑 Parents only</p>}
                 </div>
                 <button
                   data-testid="button-cycle-picker"
-                  onClick={() => setCycleOpen(!cycleOpen)}
-                  className="flex items-center gap-1.5 bg-muted/60 rounded-xl px-3 py-1.5 border border-border/60 hover:bg-muted transition-colors"
+                  disabled={!parent}
+                  onClick={() => parent && setCycleOpen(!cycleOpen)}
+                  className={cn("flex items-center gap-1.5 bg-muted/60 rounded-xl px-3 py-1.5 border border-border/60 transition-colors", parent ? "hover:bg-muted" : "cursor-not-allowed")}
                 >
-                  <span className="text-xs font-bold">{cycleLabels[settings.pointsResetCycle]}</span>
-                  <ChevronRight className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform", cycleOpen && "rotate-90")} />
+                  {parent
+                    ? <><span className="text-xs font-bold">{cycleLabels[settings.pointsResetCycle]}</span><ChevronRight className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform", cycleOpen && "rotate-90")} /></>
+                    : <Lock className="w-4 h-4 text-muted-foreground/50" />}
                 </button>
               </div>
               <AnimatePresence>
-                {cycleOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden mt-3"
-                  >
+                {cycleOpen && parent && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden mt-3">
                     <div className="grid grid-cols-2 gap-2">
                       {(Object.entries(cycleLabels) as [PointsResetCycle, string][]).map(([val, label]) => (
                         <button
                           key={val}
                           data-testid={`cycle-${val}`}
                           onClick={() => { updateSetting("pointsResetCycle", val); setCycleOpen(false); }}
-                          className={cn(
-                            "py-2.5 px-3 rounded-xl text-xs font-bold border transition-all",
-                            settings.pointsResetCycle === val
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : "bg-muted/50 border-border/60 hover:bg-muted text-foreground",
-                          )}
+                          className={cn("py-2.5 px-3 rounded-xl text-xs font-bold border transition-all", settings.pointsResetCycle === val ? "bg-primary text-primary-foreground border-primary" : "bg-muted/50 border-border/60 hover:bg-muted text-foreground")}
                         >
                           {label}
                         </button>
@@ -424,11 +415,20 @@ export default function Settings() {
           <SectionHeader icon={Gift} label="Rewards" color="bg-pink-500" />
           <SettingCard>
             <SettingRow
-              label="Manage rewards"
-              sublabel="Add or edit rewards for the family"
+              label="Browse rewards"
+              sublabel="See what you can claim with your stars"
               icon={Gift}
               iconColor="bg-pink-500"
               onClick={() => setLocation(`/family/${familyId}/rewards`)}
+            />
+            <SettingRow
+              label="Manage rewards"
+              sublabel={parent ? "Add, edit or remove family rewards" : undefined}
+              icon={Gift}
+              iconColor="bg-pink-400"
+              onClick={parent ? () => setLocation(`/family/${familyId}/admin`) : undefined}
+              locked={!parent}
+              lockedMsg="Only parents can manage rewards"
               last
             />
           </SettingCard>
@@ -446,13 +446,32 @@ export default function Settings() {
             </SettingRow>
             <SettingRow
               label="Reset all data"
-              sublabel="Clears all settings and signs you out"
+              sublabel={parent ? "Clears all settings and signs you out" : undefined}
               icon={Trash2}
               iconColor="bg-rose-600"
-              onClick={() => setShowResetConfirm(true)}
+              onClick={parent ? () => setShowResetConfirm(true) : undefined}
+              locked={!parent}
+              lockedMsg="Only parents can reset app data"
               last
             />
           </SettingCard>
+
+          {/* Parent panel shortcut */}
+          {parent && (
+            <div
+              onClick={() => setLocation(`/family/${familyId}/admin`)}
+              className="flex items-center gap-3 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl px-4 py-4 mb-4 cursor-pointer hover:border-amber-300 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-2xl bg-amber-400 flex items-center justify-center text-xl flex-none">
+                👑
+              </div>
+              <div className="flex-1">
+                <p className="font-black text-sm text-amber-800 dark:text-amber-300">Parent control panel</p>
+                <p className="text-xs text-amber-700/70 dark:text-amber-400/70 mt-0.5">Manage chores, rewards, and family members</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            </div>
+          )}
 
         </div>
       </div>

@@ -56,7 +56,28 @@ export default function Admin() {
   }, [currentUser, id]);
 
   if (!currentUser || currentUser.role !== "admin") {
-    return <div className="p-8 text-center text-destructive font-bold">Admins only.</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center gap-6 pb-32">
+        <div className="w-24 h-24 rounded-[2rem] bg-amber-100 dark:bg-amber-950/30 flex items-center justify-center text-5xl shadow-lg">
+          👑
+        </div>
+        <div>
+          <h2 className="font-display text-2xl font-bold mb-2">Parents only 😊</h2>
+          <p className="text-sm text-muted-foreground max-w-[260px]">
+            This area is for parents. You can still complete chores and claim rewards from the other tabs!
+          </p>
+        </div>
+        <div className="bg-primary/8 rounded-2xl px-5 py-4 border border-primary/20 max-w-[280px]">
+          <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">What you can do</p>
+          <ul className="text-sm text-muted-foreground space-y-1 text-left">
+            <li>✅ Complete your chores</li>
+            <li>✅ Earn stars &amp; climb the leaderboard</li>
+            <li>✅ Claim rewards you've earned</li>
+            <li>✅ Chat with your family</li>
+          </ul>
+        </div>
+      </div>
+    );
   }
 
   const usersQueryKey = [api.families.getUsers.path, id] as const;

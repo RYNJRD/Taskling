@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Trophy, Gift, Settings, MessageSquare, User } from "lucide-react";
+import { Home, Trophy, Gift, Crown, MessageSquare, User } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -19,7 +19,7 @@ export function BottomNav() {
   ];
 
   if (currentUser.role === "admin") {
-    navItems.push({ href: `/family/${family.id}/admin`, icon: Settings, label: "Admin" });
+    navItems.push({ href: `/family/${family.id}/admin`, icon: Crown, label: "Parent" });
   }
 
   return (

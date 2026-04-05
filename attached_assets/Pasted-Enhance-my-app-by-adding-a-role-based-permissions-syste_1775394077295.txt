@@ -1,0 +1,71 @@
+Enhance my app by adding a role-based permissions system (Parent vs Child users).
+
+Context:
+- The app already has a Settings screen and core chore/points features.
+- Users belong to a "family/group".
+- We now want certain features to be restricted to parents only.
+
+Requirements:
+
+1. User Roles:
+- Each user must have a role: "parent" or "child"
+- Store this in user state / database (for now local state is fine)
+- Default role on creation: child
+- Allow one or more users to be marked as parent
+
+2. Parent-Only Features:
+Restrict the following so ONLY parents can access or interact:
+
+- Create / edit / delete chores
+- Set points for chores
+- Create and manage rewards
+- Approve reward claims
+- Change family settings (name, rules, reset cycle)
+- Reset all data
+- Generate invite link
+
+If a child tries to access these:
+- Show a friendly message: “Only parents can do this 😊”
+
+3. UI Changes:
+- In Settings:
+  - Clearly label user role (e.g. "Parent" or "Child")
+  - Disable or hide parent-only options for children
+- Add visual indicators (e.g. crown icon 👑 for parents)
+
+4. Permissions Handling:
+- Implement reusable helper function like:
+  canAccess(feature, userRole)
+
+- Use this across the app to control access cleanly
+
+5. Reward System Changes:
+- When a child redeems a reward:
+  - Send a "pending approval" request
+  - Only parents can approve or reject
+
+6. Chore System Changes:
+- Children:
+  - Can view chores
+  - Can mark chores as complete
+- Parents:
+  - Can create, edit, delete chores
+  - Can assign chores or use AI distribution
+
+7. Invite System:
+- Only parents can generate invite links
+- When a new user joins:
+  - Default to "child" role
+
+8. UX:
+- Keep everything friendly and non-restrictive feeling
+- Avoid harsh “access denied” — make it playful
+
+9. Code Quality:
+- Modular role/permission logic
+- Easy to expand later (e.g. adding "admin" role)
+
+Output:
+- Updated components with role checks
+- Any new helper functions
+- Updated Settings UI reflecting permissions
