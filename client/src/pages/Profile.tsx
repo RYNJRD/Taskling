@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Save, RotateCcw, Check, X, Lock, Settings as SettingsIcon } from "lucide-react";
+import { Lock, Settings as SettingsIcon, Check } from "lucide-react";
 import { useLocation } from "wouter";
 import { api, buildUrl } from "@shared/routes";
 import { queryClient } from "@/lib/queryClient";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/store/useStore";
 import { apiFetch } from "@/lib/apiFetch";
 import {
@@ -18,13 +16,11 @@ import { cn } from "@/lib/utils";
 
 export default function Profile() {
   const { currentUser, setCurrentUser, family } = useStore();
-  const { toast } = useToast();
   const [, setLocation] = useLocation();
 
   const [config, setConfig] = useState<AvatarConfig>(() =>
     parseAvatarConfig(currentUser?.avatarConfig),
   );
-  const [confirmReset, setConfirmReset] = useState(false);
 
   useEffect(() => {
     setConfig(parseAvatarConfig(currentUser?.avatarConfig));
@@ -48,95 +44,29 @@ export default function Profile() {
       queryClient.invalidateQueries({
         queryKey: [api.families.getUsers.path, user.familyId],
       });
-      toast({ title: "Character saved!", description: "Your penguin is ready." });
     },
     onError: () => {
-      toast({ title: "Could not save", description: "Try again in a moment.", variant: "destructive" });
+      // Failed silently for better UX in auto-save, but could add a small indicator
     },
   });
 
   if (!currentUser) return null;
 
   const selectedId = config.outfit ?? "classic";
-  const selectedOutfit = PENGUIN_OUTFITS.find((o) => o.id === selectedId) ?? PENGUIN_OUTFITS[0];
-
-  function handleReset() {
-    setConfig({});
-    setConfirmReset(false);
-    toast({ title: "Character reset", description: "Back to your classic penguin." });
-  }
+  const selectedOutfit = useMemo(
+    () => PENGUIN_OUTFITS.find((o) => o.id === selectedId) ?? PENGUIN_OUTFITS[0],
+    [selectedId],
+  );
+  const settingsPath = family?.id ? `/family/${family.id}/settings` : "/get-started";
 
   return (
-    <div className="flex flex-col h-dvh overflow-hidden bg-background">
+    <div className="flex flex-col h-[100dvh] overflow-hidden bg-tab-profile">
 
       {/* ── Top bar ── */}
-      <div className="flex-none flex items-center justify-between px-4 pt-4 pb-2">
+      <div className="flex-none flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-2">
         <div className="flex items-center gap-2">
-          <h1 className="text-base font-black text-primary tracking-tight">Chorely</h1>
-          <span className="text-xs font-bold text-muted-foreground/70 bg-muted/60 rounded-lg px-2 py-0.5">My Character</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <AnimatePresence mode="wait">
-            {confirmReset ? (
-              <motion.div
-                key="confirm"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="flex items-center gap-2"
-              >
-                <span className="text-xs font-bold text-muted-foreground">Reset look?</span>
-                <button
-                  data-testid="button-confirm-reset"
-                  onClick={handleReset}
-                  className="flex items-center gap-1 bg-destructive text-destructive-foreground rounded-xl h-8 px-3 text-xs font-bold"
-                >
-                  <Check className="w-3.5 h-3.5" /> Yes
-                </button>
-                <button
-                  data-testid="button-cancel-reset"
-                  onClick={() => setConfirmReset(false)}
-                  className="flex items-center gap-1 bg-muted text-muted-foreground rounded-xl h-8 px-3 text-xs font-bold hover:bg-muted/80"
-                >
-                  <X className="w-3.5 h-3.5" /> No
-                </button>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="actions"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="flex items-center gap-2"
-              >
-                <button
-                  data-testid="button-undo-avatar"
-                  onClick={() => setConfirmReset(true)}
-                  className="flex items-center gap-1 text-muted-foreground hover:text-foreground rounded-xl h-8 px-3 text-xs font-bold border border-border/60 hover:bg-muted/60 transition-colors"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" /> Undo
-                </button>
-                <Button
-                  size="sm"
-                  data-testid="button-save-avatar"
-                  onClick={() => mutation.mutate(config)}
-                  disabled={mutation.isPending}
-                  className="rounded-xl font-bold h-8 px-3 text-xs"
-                >
-                  <Save className="w-3.5 h-3.5 mr-1.5" /> Save
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <button
-            data-testid="button-open-settings"
-            onClick={() => setLocation(`/family/${family?.id}/settings`)}
-            className="w-9 h-9 flex items-center justify-center rounded-2xl bg-muted/60 hover:bg-muted border border-border/60 transition-colors flex-none"
-          >
-            <SettingsIcon className="w-4 h-4 text-muted-foreground" />
-          </button>
+          <h1 className="text-base font-bold text-primary tracking-tight">Chorely</h1>
+          <span className="text-xs font-bold text-foreground/50 bg-muted/80 rounded-lg px-2 py-0.5">My Character</span>
         </div>
       </div>
 
@@ -162,9 +92,9 @@ export default function Profile() {
       </div>
 
       {/* ── Outfit picker panel ── */}
-      <div className="flex-1 min-h-0 flex flex-col bg-card rounded-t-[2rem] shadow-2xl border-t border-border/60 overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col bg-card rounded-t-[2rem] shadow-2xl border-t-2 border-x-2 border-slate-300/70 dark:border-slate-700/70 overflow-hidden">
         <div className="flex-none px-4 pt-4 pb-3">
-          <h2 className="font-black text-sm text-foreground uppercase tracking-widest">Choose Your Penguin</h2>
+          <h2 className="font-bold text-sm text-foreground uppercase tracking-widest">Choose Your Penguin</h2>
           <p className="text-xs text-muted-foreground font-medium mt-0.5">More outfits coming soon!</p>
         </div>
 
@@ -184,14 +114,20 @@ export default function Profile() {
                   transition={{ delay: i * 0.05 }}
                   data-testid={`outfit-${outfit.id}`}
                   disabled={outfit.comingSoon}
-                  onClick={() => !outfit.comingSoon && setConfig({ outfit: outfit.id })}
+                  onClick={() => {
+                    if (!outfit.comingSoon) {
+                      const nextConfig = { outfit: outfit.id };
+                      setConfig(nextConfig);
+                      mutation.mutate(nextConfig);
+                    }
+                  }}
                   className={cn(
-                    "relative aspect-square rounded-2xl border-2 overflow-hidden transition-all flex flex-col",
+                    "relative aspect-square rounded-2xl border-2 overflow-hidden transition-all flex flex-col shadow-sm",
                     outfit.comingSoon
-                      ? "border-border/40 bg-muted/20 opacity-60 cursor-not-allowed"
+                      ? "border-slate-300/40 dark:border-slate-700/40 bg-muted/20 opacity-60 cursor-not-allowed"
                       : isSelected
-                      ? "border-primary ring-2 ring-primary/20 bg-primary/5"
-                      : "border-border/60 hover:border-primary/40 bg-muted/30 active:scale-[0.97]",
+                      ? "border-primary border-[3px] ring-2 ring-primary/30 bg-primary/5 shadow-md shadow-primary/15"
+                      : "border-slate-300 dark:border-slate-600 hover:border-primary/50 bg-muted/30 active:scale-[0.97]",
                   )}
                 >
                   <div className="flex-1 flex items-end justify-center px-2 pt-2 overflow-hidden">
@@ -205,7 +141,7 @@ export default function Profile() {
                     />
                   </div>
                   <div className={cn("flex-none py-1.5 px-2 text-center", isSelected ? "bg-primary/10" : "bg-background/60 backdrop-blur-sm")}>
-                    <p className={cn("text-[10px] font-black truncate", isSelected ? "text-primary" : "text-foreground/70")}>
+                    <p className={cn("text-[10px] font-bold truncate", isSelected ? "text-primary" : "text-foreground/70")}>
                       {outfit.label}
                     </p>
                   </div>
@@ -218,7 +154,7 @@ export default function Profile() {
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="bg-background/80 backdrop-blur-sm rounded-xl px-2 py-1 flex items-center gap-1">
                         <Lock className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-wide">Soon</span>
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wide">Soon</span>
                       </div>
                     </div>
                   )}

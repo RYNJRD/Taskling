@@ -39,7 +39,7 @@ export interface IStorage {
   getFamily(id: number): Promise<Family | undefined>;
   getFamilyByCode(code: string): Promise<Family | undefined>;
   getFamilyUsers(familyId: number): Promise<User[]>;
-  getFamilyChores(familyId: number): Promise<Chore[]>;
+  getFamilyChores(familyId: number, userId?: number): Promise<(Chore & { latestSubmissionStatus?: string; rejectionReason?: string; submissionNote?: string })[]>;
   createUser(user: InsertUser): Promise<User>;
   getUser(id: number): Promise<User | undefined>;
   getUserByFirebaseUid(uid: string): Promise<User | undefined>;
@@ -92,8 +92,31 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(users).where(eq(users.familyId, familyId)).orderBy(desc(users.points), users.username);
   }
 
-  async getFamilyChores(familyId: number): Promise<Chore[]> {
-    return db.select().from(chores).where(and(eq(chores.familyId, familyId), eq(chores.isActive, true)));
+  async getFamilyChores(familyId: number, userId?: number): Promise<(Chore & { latestSubmissionStatus?: string; rejectionReason?: string; submissionNote?: string })[]> {
+    const rawChores = await db.select().from(chores).where(and(eq(chores.familyId, familyId), eq(chores.isActive, true)));
+    
+    if (!userId) return rawChores;
+
+    // Fetch latest submissions for this user for these chores
+    const submissions = await db
+      .select()
+      .from(choreSubmissions)
+      .where(and(
+        eq(choreSubmissions.familyId, familyId),
+        eq(choreSubmissions.userId, userId)
+      ))
+      .orderBy(desc(choreSubmissions.createdAt));
+
+    return rawChores.map(chore => {
+      // Find the most recent submission for this chore
+      const latest = submissions.find(s => s.choreId === chore.id);
+      return {
+        ...chore,
+        latestSubmissionStatus: latest?.status,
+        rejectionReason: latest?.rejectionReason ?? undefined,
+        submissionNote: latest?.note ?? undefined,
+      };
+    });
   }
 
   async createUser(user: InsertUser): Promise<User> {

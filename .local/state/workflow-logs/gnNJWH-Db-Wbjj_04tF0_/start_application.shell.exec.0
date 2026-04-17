@@ -1,0 +1,160 @@
+
+> rest-express@1.0.1 dev
+> cross-env NODE_ENV=development tsx server/index.ts
+
+[1G[0K12:57:59 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+12:58:15 PM [express] GET /api/families/1/onboarding 304 in 7ms :: {"checklist":[{"key":"family-created","label":"Create your family","description":"Your home base is ready to go.","complete":true},{"key":"add-first-chore","label":"Add your first chore","description":"Give everyone something they can do tonight.","complete":true},{"key":"create-reward","label":"Create a reward","description":"Connect stars to something exciting.","complete":true},{"key":"invite-family","label":"Invite another family member","description":"The game gets better when more people join in.","complete":true}]}
+12:58:15 PM [express] GET /api/families/1/monthly-winners 304 in 6ms :: [{"id":1,"familyId":1,"monthKey":"2026-03","awardType":"household_star","userId":1,"title":"Household Star","summary":"Jordan led the family with the strongest month.","stats":{"points":0,"streak":0,"completedChores":"0"},"createdAt":"2026-04-02T15:47:58.758Z"}]
+12:58:15 PM [express] GET /api/families/1/chores 304 in 16ms :: [{"id":1,"familyId":1,"title":"Empty dishwasher","description":"Put everything away before dinner.","points":20,"type":"daily","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🍽️","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.430Z"},{"id":2,"familyId":1,"title":"Tidy bedroom","description":"Quick five-minute reset.","points":15,"type":"daily","assigneeId":3,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🧸","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.434Z"},{"id":3,"familyId":1,"title":"Take out recycling","description":"Snap a quick photo if the bin is already full.","points":30,"type":"weekly","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"♻️","requiresApproval":true,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.436Z"},{"id":4,"familyId":1,"title":"Dog walk backup","description":"Anyone can jump in and help.","points":25,"type":"box","assigneeId":null,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🐶","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.439Z"}]
+12:58:15 PM [express] GET /api/families/1/leaderboard 304 in 15ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+12:59:00 PM [express] GET /api/families/1/invite 403 in 13ms :: {"message":"Admins only"}
+12:59:16 PM [express] GET /api/families/1/invite 403 in 10ms :: {"message":"Admins only"}
+12:59:20 PM [express] GET /api/families/1/invite 403 in 3ms :: {"message":"Admins only"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:04:52 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Settings.tsx, /src/index.css[22m
+1:04:59 PM [express] GET /api/families/1/invite 403 in 11ms :: {"message":"Admins only"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:05:04 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Admin.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:05:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Leaderboard.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:05:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Leaderboard.tsx, /src/index.css[22m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:06:04 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/BottomNav.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:06:09 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/BottomNav.tsx, /src/index.css[22m [33m(x2)[39m

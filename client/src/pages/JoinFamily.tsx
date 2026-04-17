@@ -18,6 +18,8 @@ export default function JoinFamily() {
   const { code: urlCode } = useParams();
   const { setFamily, setCurrentUser, firebaseUid } = useStore();
   const { toast } = useToast();
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
+  const effectiveFirebaseUid = firebaseUid ?? (isDemoMode ? "demo-local-user" : null);
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,12 +35,12 @@ export default function JoinFamily() {
   const canSubmitProfile = userName.trim().length >= 1 && gender && age && parseInt(age) > 0;
 
   useEffect(() => {
-    if (!firebaseUid) { setLocation("/auth"); return; }
+    if (!effectiveFirebaseUid) { setLocation("/auth"); return; }
     if (urlCode) {
       setCode(urlCode.toUpperCase());
       handleJoinWithCode(urlCode.toUpperCase());
     }
-  }, [urlCode]);
+  }, [urlCode, effectiveFirebaseUid, setLocation]);
 
   const handleJoinWithCode = async (inviteCode: string) => {
     if (!inviteCode.trim()) return;
@@ -60,7 +62,7 @@ export default function JoinFamily() {
   const handleJoin = () => handleJoinWithCode(code);
 
   const handleCreateProfile = async () => {
-    if (!foundFamily || !firebaseUid) return;
+    if (!foundFamily || !effectiveFirebaseUid) return;
     setIsCreating(true);
     try {
       const userRes = await apiFetch("/api/users", {
@@ -68,7 +70,7 @@ export default function JoinFamily() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           familyId: foundFamily.id,
-          firebaseUid,
+          firebaseUid: effectiveFirebaseUid,
           username: userName.trim(),
           role: "member",
           gender: gender.toLowerCase(),
@@ -130,7 +132,7 @@ export default function JoinFamily() {
               className="text-muted-foreground font-medium mb-7 text-sm max-w-[260px]"
             >
               {isViaLink
-                ? "Please wait while Chorly connects you to your family"
+                ? "Please wait while Chorely connects you to your family"
                 : "Enter the invite code your family shared with you"}
             </motion.p>
 

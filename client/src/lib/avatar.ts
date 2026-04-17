@@ -1,5 +1,8 @@
-import penguinBaseImg from "@assets/0d1f6a25-4983-496c-a1e9-cf33a6774d85_removalai_preview_1775145431205.png";
-import penguinTuxedoImg from "@assets/image_1775148166336.png";
+import penguinBaseImg from "@assets/base_penguin.png";
+import penguinCoatImg from "@assets/coat_penguin.png";
+import penguinSuitImg from "@assets/suit_penguin.png";
+import penguinPirateImg from "@assets/pirate_penguin.png";
+import penguinAstronautImg from "@assets/astronaut_penguin.png";
 
 export type PenguinOutfit = {
   id: string;
@@ -10,11 +13,10 @@ export type PenguinOutfit = {
 
 export const PENGUIN_OUTFITS: PenguinOutfit[] = [
   { id: "classic",    label: "Classic",    image: penguinBaseImg },
-  { id: "tuxedo",    label: "Tuxedo",     image: penguinTuxedoImg },
-  { id: "superhero", label: "Superhero",  image: penguinBaseImg, comingSoon: true },
-  { id: "pirate",    label: "Pirate",     image: penguinBaseImg, comingSoon: true },
-  { id: "astronaut", label: "Astronaut",  image: penguinBaseImg, comingSoon: true },
-  { id: "chef",      label: "Chef",       image: penguinBaseImg, comingSoon: true },
+  { id: "fancy",      label: "Formal",     image: penguinSuitImg },
+  { id: "pirate",     label: "Pirate",     image: penguinPirateImg },
+  { id: "astronaut",  label: "Astronaut",  image: penguinAstronautImg },
+  { id: "winter",     label: "Winter",     image: penguinCoatImg },
 ];
 
 export const OUTFIT_MAP: Record<string, string> = Object.fromEntries(

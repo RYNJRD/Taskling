@@ -1,30 +1,41 @@
 import { Switch, Route } from "wouter";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
 import { Layout } from "@/components/Layout";
-
-import Splash from "@/pages/Splash";
-import GetStarted from "@/pages/GetStarted";
-import AuthWelcome from "@/pages/AuthWelcome";
-import JoinFamily from "@/pages/JoinFamily";
-import FamilySetup from "@/pages/FamilySetup";
-import Landing from "@/pages/Landing";
-import Dashboard from "@/pages/Dashboard";
-import Leaderboard from "@/pages/Leaderboard";
-import Rewards from "@/pages/Rewards";
-import Admin from "@/pages/Admin";
-import Chat from "@/pages/Chat";
-import Profile from "@/pages/Profile";
-import Settings from "@/pages/Settings";
-import VerifyEmail from "@/pages/VerifyEmail";
-import EmailAction from "@/pages/EmailAction";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+
+const Splash = lazy(() => import("@/pages/Splash"));
+const GetStarted = lazy(() => import("@/pages/GetStarted"));
+const AuthWelcome = lazy(() => import("@/pages/AuthWelcome"));
+const JoinFamily = lazy(() => import("@/pages/JoinFamily"));
+const FamilySetup = lazy(() => import("@/pages/FamilySetup"));
+const Landing = lazy(() => import("@/pages/Landing"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Leaderboard = lazy(() => import("@/pages/Leaderboard"));
+const Rewards = lazy(() => import("@/pages/Rewards"));
+const Admin = lazy(() => import("@/pages/Admin"));
+const Chat = lazy(() => import("@/pages/Chat"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const Settings = lazy(() => import("@/pages/Settings"));
+const VerifyEmail = lazy(() => import("@/pages/VerifyEmail"));
+const EmailAction = lazy(() => import("@/pages/EmailAction"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+
+function RouteFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6 text-center">
+      <div>
+        <p className="font-display text-2xl font-bold text-primary">Chorely</p>
+        <p className="mt-2 text-sm text-muted-foreground">Loading your family dashboard...</p>
+      </div>
+    </div>
+  );
+}
 
 function EmailVerificationGate() {
   const [location, setLocation] = useLocation();
@@ -70,25 +81,27 @@ function EmailVerificationGate() {
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Splash} />
-      <Route path="/get-started" component={GetStarted} />
-      <Route path="/auth" component={AuthWelcome} />
-      <Route path="/verify-email" component={VerifyEmail} />
-      <Route path="/email-action" component={EmailAction} />
-      <Route path="/join-family" component={JoinFamily} />
-      <Route path="/join/:code" component={JoinFamily} />
-      <Route path="/setup-family" component={FamilySetup} />
-      <Route path="/home" component={Landing} />
-      <Route path="/family/:familyId/dashboard" component={Dashboard} />
-      <Route path="/family/:familyId/leaderboard" component={Leaderboard} />
-      <Route path="/family/:familyId/rewards" component={Rewards} />
-      <Route path="/family/:familyId/chat" component={Chat} />
-      <Route path="/family/:familyId/profile" component={Profile} />
-      <Route path="/family/:familyId/settings" component={Settings} />
-      <Route path="/family/:familyId/admin" component={Admin} />
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<RouteFallback />}>
+      <Switch>
+        <Route path="/" component={Splash} />
+        <Route path="/get-started" component={GetStarted} />
+        <Route path="/auth" component={AuthWelcome} />
+        <Route path="/verify-email" component={VerifyEmail} />
+        <Route path="/email-action" component={EmailAction} />
+        <Route path="/join-family" component={JoinFamily} />
+        <Route path="/join/:code" component={JoinFamily} />
+        <Route path="/setup-family" component={FamilySetup} />
+        <Route path="/home" component={Landing} />
+        <Route path="/family/:familyId/dashboard" component={Dashboard} />
+        <Route path="/family/:familyId/leaderboard" component={Leaderboard} />
+        <Route path="/family/:familyId/rewards" component={Rewards} />
+        <Route path="/family/:familyId/chat" component={Chat} />
+        <Route path="/family/:familyId/profile" component={Profile} />
+        <Route path="/family/:familyId/settings" component={Settings} />
+        <Route path="/family/:familyId/admin" component={Admin} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 

@@ -9,8 +9,8 @@
     --font-display: 'Fredoka', sans-serif;
     --font-sans: 'Quicksand', sans-serif;
 
-    --background: 210 40% 98%;
-    --foreground: 222 47% 15%;
+    --background: 216 30% 95%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
     --card-foreground: 222 47% 15%;
@@ -24,8 +24,8 @@
     --secondary: 189 71% 73%;
     --secondary-foreground: 222 47% 15%;
 
-    --muted: 210 40% 92%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 40% 90%;
+    --muted-foreground: 215 20% 40%;
 
     --accent: 43 96% 56%;
     --accent-foreground: 222 47% 15%;
@@ -36,8 +36,8 @@
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
     --ring: 262 83% 58%;
 
     --radius: 1.25rem;
@@ -69,7 +69,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    @apply font-semibold tracking-wide;
+    @apply font-bold tracking-tight;
   }
 }
 
@@ -172,6 +172,11 @@
       0 0 0 2px hsl(var(--border)),
       0 8px 32px -4px rgba(124, 58, 237, 0.12),
       0 2px 8px rgba(0,0,0,0.06);
+    @apply border-2 border-slate-200/80 dark:border-slate-800/60;
+  }
+
+  .card-defined {
+    @apply border-2 border-slate-200/80 dark:border-slate-800/60 shadow-sm rounded-[2rem] bg-card overflow-hidden;
   }
 
   .input-glow:focus-within {
@@ -226,5 +231,25 @@
   }
   @keyframes shimmer-slide {
     to { transform: translateX(100%); }
+  }
+
+  /* ── Per-tab background gradients ── */
+  .bg-tab-home {
+    background: linear-gradient(180deg, hsl(216 30% 95%) 0%, hsl(210 40% 98%) 100%);
+  }
+  .bg-tab-leaderboard {
+    background: linear-gradient(180deg, hsl(43 80% 96%) 0%, hsl(210 40% 98%) 100%);
+  }
+  .bg-tab-chat {
+    background: linear-gradient(180deg, hsl(230 40% 96%) 0%, hsl(210 40% 98%) 100%);
+  }
+  .bg-tab-rewards {
+    background: linear-gradient(180deg, hsl(30 60% 97%) 0%, hsl(210 40% 98%) 100%);
+  }
+  .bg-tab-profile {
+    background: linear-gradient(180deg, hsl(0 0% 97%) 0%, hsl(210 40% 98%) 100%);
+  }
+  .bg-tab-admin {
+    background: linear-gradient(180deg, hsl(210 30% 96%) 0%, hsl(210 40% 98%) 100%);
   }
 }

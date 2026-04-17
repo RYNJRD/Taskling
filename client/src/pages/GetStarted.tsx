@@ -98,7 +98,7 @@ export default function GetStarted() {
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }} className="mb-1">
                 <h1 className="font-display text-4xl font-bold">
                   <span style={{ color: "hsl(262 83% 58%)" }} className="logo-glow">Chore</span>
-                  <span style={{ color: "hsl(43 96% 50%)" }} className="logo-accent-glow">Quest</span>
+                  <span style={{ color: "hsl(43 96% 50%)" }} className="logo-accent-glow">ly</span>
                 </h1>
               </motion.div>
 
@@ -183,7 +183,7 @@ export default function GetStarted() {
                     >
                       <UserAvatar user={user} size="lg" className="flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="font-black text-lg text-foreground">{user.username}</p>
+                        <p className="font-bold text-lg text-foreground">{user.username}</p>
                         <div className={cn("inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full border mt-0.5", badge.color)}>
                           <BadgeIcon className="w-3 h-3" />
                           {badge.label}

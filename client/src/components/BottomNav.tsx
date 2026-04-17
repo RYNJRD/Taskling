@@ -24,12 +24,12 @@ export function BottomNav() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50"
+      className="absolute bottom-0 w-full z-50"
       style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px), 8px)" }}
     >
       {/* Frosted glass backing */}
       <div className="mx-3 mb-2">
-        <div className="max-w-md mx-auto bg-background/85 backdrop-blur-2xl border border-border/60 rounded-[1.75rem] shadow-[0_8px_32px_rgba(0,0,0,0.12)] px-2 py-1.5">
+        <div className="max-w-md mx-auto bg-card/95 backdrop-blur-2xl border-2 border-slate-300/80 dark:border-slate-700/80 rounded-[1.75rem] shadow-[0_-4px_24px_rgba(0,0,0,0.08),0_8px_32px_rgba(0,0,0,0.12)] px-2 py-1.5">
           <div className="flex items-center">
             {navItems.map((item) => {
               const isActive = location === item.href;
@@ -56,7 +56,7 @@ export function BottomNav() {
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       className={cn(
                         "relative z-10 transition-colors",
-                        isActive ? "text-primary" : "text-muted-foreground",
+                        isActive ? "text-primary" : "text-foreground/50",
                       )}
                     >
                       <Icon
@@ -74,9 +74,9 @@ export function BottomNav() {
                   </div>
 
                   <motion.span
-                    animate={isActive ? { opacity: 1 } : { opacity: 0.55 }}
+                    animate={isActive ? { opacity: 1 } : { opacity: 0.65 }}
                     className={cn(
-                      "text-[9px] font-black tracking-wide uppercase truncate max-w-full px-0.5 leading-none",
+                      "text-[9px] font-bold tracking-wide uppercase truncate max-w-full px-0.5 leading-none",
                       isActive ? "text-primary" : "text-muted-foreground",
                       item.label === "Parent" && "text-amber-500",
                     )}

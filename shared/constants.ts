@@ -40,6 +40,7 @@ export const SSE_EVENT_TYPES = [
   "family:chore",
   "family:reward",
   "family:review",
+  "family:user",
   "family:heartbeat",
 ] as const;
 export type SseEventType = (typeof SSE_EVENT_TYPES)[number];

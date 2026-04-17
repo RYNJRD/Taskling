@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Copy, Gift, Link as LinkIcon, Plus, Search, Settings, Shield, ShieldCheck, ShieldOff, Trophy, Users as UsersIcon } from "lucide-react";
+import { Check, Copy, Gift, Link as LinkIcon, Plus, Search, Settings, Shield, ShieldCheck, ShieldOff, Star, Trophy, Users as UsersIcon, X } from "lucide-react";
 import { useParams } from "wouter";
 import { api, buildUrl } from "@shared/routes";
 import type { User } from "@shared/schema";
@@ -9,6 +9,7 @@ import { useCreateChore } from "@/hooks/use-chores";
 import { useFamilyUsers } from "@/hooks/use-families";
 import { useCreateReward } from "@/hooks/use-rewards";
 import { usePendingChoreReviews, usePendingRewardReviews, useReviewChore, useReviewReward } from "@/hooks/use-reviews";
+import { UserAvatar } from "@/components/UserAvatar";
 import { useStore } from "@/store/useStore";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -163,18 +164,18 @@ export default function Admin() {
   const inputClass = "w-full rounded-2xl border-2 border-border bg-input px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-primary/50";
 
   return (
-    <div className="pt-8 px-5 pb-32 min-h-screen bg-background">
+    <div className="pt-[max(2rem,env(safe-area-inset-top))] px-5 pb-32 min-h-screen bg-tab-admin">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center">
           <Settings className="text-foreground" />
         </div>
         <div>
           <h1 className="font-display text-3xl font-bold text-foreground">Admin</h1>
-          <p className="text-sm text-muted-foreground">Keep the house fair, warm, and moving.</p>
+          <p className="text-sm text-muted-foreground font-medium">Keep the house fair, warm, and moving.</p>
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         <section className="rounded-[1.75rem] border-2 border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 p-5">
           <h2 className="font-display text-lg font-bold mb-3 flex items-center gap-2">
             <UsersIcon className="w-5 h-5 text-primary" />
@@ -183,7 +184,7 @@ export default function Admin() {
           <div className="space-y-3">
             <div className="rounded-2xl bg-background/80 p-3 border-2 border-primary/20 flex items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">Code</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Code</p>
                 <p className="font-mono text-lg font-bold">{inviteCode || "Loading..."}</p>
               </div>
               <button className="rounded-xl bg-primary text-primary-foreground p-3" onClick={() => navigator.clipboard.writeText(inviteCode)}>
@@ -192,7 +193,7 @@ export default function Admin() {
             </div>
             <div className="rounded-2xl bg-background/80 p-3 border-2 border-accent/20 flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">Invite link</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Invite link</p>
                 <p className="truncate text-sm text-foreground/70">{inviteUrl || "Loading..."}</p>
               </div>
               <button className="rounded-xl bg-accent text-accent-foreground p-3" onClick={() => navigator.clipboard.writeText(inviteUrl)}>
@@ -202,47 +203,172 @@ export default function Admin() {
           </div>
         </section>
 
-        <section className="rounded-[1.75rem] border-2 border-border bg-card p-5 shadow-sm">
-          <h2 className="font-display text-lg font-bold mb-3 flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-primary" />
-            Pending approvals
-          </h2>
+        <section className="rounded-[1.75rem] border-2 border-primary/30 bg-card p-5 shadow-md">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-lg font-bold flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+              Pending approvals
+            </h2>
+            {(pendingChores.length + pendingRewards.length) > 0 && (
+              <span className="text-xs font-bold bg-primary text-primary-foreground rounded-full px-2.5 py-1">
+                {pendingChores.length + pendingRewards.length}
+              </span>
+            )}
+          </div>
+
           <div className="space-y-3">
-            {pendingChores.map((submission) => (
-              <div key={`chore-${submission.id}`} className="rounded-2xl bg-muted/50 p-3">
-                <p className="font-bold text-sm">Chore submission #{submission.id}</p>
-                <p className="text-sm text-muted-foreground mt-1">Worth {submission.pointsAwarded} stars. Review it now.</p>
-                <div className="mt-3 flex gap-2">
-                  <button className="rounded-xl bg-primary px-3 py-2 text-sm font-bold text-primary-foreground" onClick={() => reviewChoreMutation.mutate({ id: submission.id, action: "approve" })}>
-                    Approve
-                  </button>
-                  <button className="rounded-xl border border-border px-3 py-2 text-sm font-bold" onClick={() => reviewChoreMutation.mutate({ id: submission.id, action: "reject", note: "Give it one more pass." })}>
-                    Reject
-                  </button>
+            {/* ── Chore submissions ── */}
+            {(pendingChores as any[]).map((submission) => {
+              const submitter: User | undefined = submission.user;
+              const chore = submission.chore;
+              return (
+                <div key={`chore-${submission.id}`} className="rounded-2xl border-2 border-slate-300 dark:border-slate-600 bg-background overflow-hidden shadow-sm">
+                  {/* Header strip */}
+                  <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-border/40">
+                    {submitter && <UserAvatar user={submitter} size="sm" />}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm leading-tight truncate">
+                        {submitter?.username ?? `User #${submission.userId}`}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground font-medium">Chore completion request</p>
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-600 bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400 px-2 py-1 rounded-xl">
+                      ✔ Chore
+                    </span>
+                  </div>
+
+                  {/* Body */}
+                  <div className="px-4 py-3">
+                    <p className="font-bold text-base">
+                      {chore?.title ?? `Chore #${submission.choreId}`}
+                    </p>
+                    {chore?.description && (
+                      <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{chore.description}</p>
+                    )}
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span className="text-sm font-bold">{chore?.points ?? submission.pointsAwarded} stars on approval</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="px-4 pb-4 flex gap-2">
+                    <button
+                      className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-primary text-primary-foreground py-2.5 text-sm font-bold shadow-sm active:scale-[0.97] transition-transform"
+                      onClick={async () => {
+                        try {
+                          await reviewChoreMutation.mutateAsync({ id: submission.id, action: "approve" });
+                          toast({ title: "Chore approved! 🌟", description: `${submitter?.username ?? "They"} earned ${chore?.points ?? 0} stars.` });
+                        } catch {
+                          toast({ title: "Could not approve chore", variant: "destructive" });
+                        }
+                      }}
+                    >
+                      <Check className="w-4 h-4" /> Approve
+                    </button>
+                    <button
+                      className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-border px-4 py-2.5 text-sm font-bold active:scale-[0.97] transition-transform"
+                      onClick={async () => {
+                        const note = window.prompt("Reason for rejection?", "Give it one more pass.");
+                        if (note === null) return; // User cancelled
+                        try {
+                          await reviewChoreMutation.mutateAsync({ id: submission.id, action: "reject", note: note || "Give it one more pass." });
+                          toast({ title: "Chore rejected" });
+                        } catch {
+                          toast({ title: "Could not reject chore", variant: "destructive" });
+                        }
+                      }}
+                    >
+                      <X className="w-4 h-4" /> Reject
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-            {pendingRewards.map((claim) => (
-              <div key={`reward-${claim.id}`} className="rounded-2xl bg-muted/50 p-3">
-                <p className="font-bold text-sm">Reward request #{claim.id}</p>
-                <p className="text-sm text-muted-foreground mt-1">Costs {claim.totalCost} stars.</p>
-                <div className="mt-3 flex gap-2">
-                  <button className="rounded-xl bg-primary px-3 py-2 text-sm font-bold text-primary-foreground" onClick={() => reviewRewardMutation.mutate({ id: claim.id, action: "approve" })}>
-                    Approve
-                  </button>
-                  <button className="rounded-xl border border-border px-3 py-2 text-sm font-bold" onClick={() => reviewRewardMutation.mutate({ id: claim.id, action: "reject", note: "Not this one just now." })}>
-                    Reject
-                  </button>
+              );
+            })}
+
+            {/* ── Reward claims ── */}
+            {(pendingRewards as any[]).map((claim) => {
+              const requester: User | undefined = claim.user;
+              const reward = claim.reward;
+              return (
+                <div key={`reward-${claim.id}`} className="rounded-2xl border-2 border-slate-300 dark:border-slate-600 bg-background overflow-hidden shadow-sm">
+                  {/* Header strip */}
+                  <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-border/40">
+                    {requester && <UserAvatar user={requester} size="sm" />}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm leading-tight truncate">
+                        {requester?.username ?? `User #${claim.userId}`}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground font-medium">Reward request</p>
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-pink-600 bg-pink-100 dark:bg-pink-950/40 dark:text-pink-400 px-2 py-1 rounded-xl">
+                      🎁 Reward
+                    </span>
+                  </div>
+
+                  {/* Body */}
+                  <div className="px-4 py-3">
+                    <p className="font-bold text-base">
+                      {reward?.title ?? `Reward #${claim.rewardId}`}
+                    </p>
+                    {reward?.description && (
+                      <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{reward.description}</p>
+                    )}
+                    <div className="flex items-center gap-3 mt-2">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <span className="text-sm font-bold">{claim.totalCost} stars</span>
+                      </div>
+                      {claim.quantity > 1 && (
+                        <span className="text-xs text-muted-foreground font-medium">× {claim.quantity}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="px-4 pb-4 flex gap-2">
+                    <button
+                      className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-primary text-primary-foreground py-2.5 text-sm font-bold shadow-sm active:scale-[0.97] transition-transform"
+                      onClick={async () => {
+                        try {
+                          await reviewRewardMutation.mutateAsync({ id: claim.id, action: "approve" });
+                          toast({ title: "Reward approved! 🎉", description: `${requester?.username ?? "They"} can now enjoy ${reward?.title ?? "their reward"}.` });
+                        } catch {
+                          toast({ title: "Could not approve reward", variant: "destructive" });
+                        }
+                      }}
+                    >
+                      <Check className="w-4 h-4" /> Approve
+                    </button>
+                    <button
+                      className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-border px-4 py-2.5 text-sm font-bold active:scale-[0.97] transition-transform"
+                      onClick={async () => {
+                        try {
+                          await reviewRewardMutation.mutateAsync({ id: claim.id, action: "reject", note: "Not this one just now." });
+                          toast({ title: "Reward rejected" });
+                        } catch {
+                          toast({ title: "Could not reject reward", variant: "destructive" });
+                        }
+                      }}
+                    >
+                      <X className="w-4 h-4" /> Reject
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+
             {pendingChores.length === 0 && pendingRewards.length === 0 && (
-              <p className="text-sm text-muted-foreground">Nothing is waiting for review.</p>
+              <div className="text-center py-8">
+                <div className="text-3xl mb-2">✅</div>
+                <p className="font-bold text-sm">All caught up!</p>
+                <p className="text-xs text-muted-foreground mt-1">Nothing is waiting for review.</p>
+              </div>
             )}
           </div>
         </section>
 
-        <section className="rounded-[1.75rem] border-2 border-border bg-card p-5 shadow-sm">
+        <section className="rounded-[1.75rem] border-2 border-slate-300 dark:border-slate-600 bg-card p-5 shadow-md">
           <h2 className="font-display text-lg font-bold mb-3 flex items-center gap-2">
             <Trophy className="w-5 h-5 text-accent" />
             Leaderboard visibility
@@ -258,13 +384,13 @@ export default function Admin() {
                 <button
                   key={user.id}
                   onClick={() => handleToggleLeaderboard(user.id, hidden)}
-                  className="w-full rounded-2xl bg-muted/50 px-3 py-3 flex items-center justify-between gap-3 text-left"
+                  className="w-full rounded-2xl bg-muted/50 px-3 py-3 flex items-center justify-between gap-3 text-left border-2 border-transparent hover:border-primary/30 transition-colors"
                 >
                   <div>
                     <p className="font-bold text-sm">{user.username}</p>
                     <p className="text-xs text-muted-foreground">{user.role}</p>
                   </div>
-                  <span className={cn("text-xs font-black uppercase tracking-[0.18em]", hidden ? "text-muted-foreground" : "text-primary")}>
+                  <span className={cn("text-xs font-bold uppercase tracking-[0.18em]", hidden ? "text-muted-foreground" : "text-primary")}>
                     {hidden ? "Hidden" : "Visible"}
                   </span>
                 </button>
@@ -273,14 +399,14 @@ export default function Admin() {
           </div>
         </section>
 
-        <section className="rounded-[1.75rem] border-2 border-border bg-card p-5 shadow-sm">
+        <section className="rounded-[1.75rem] border-2 border-slate-300 dark:border-slate-600 bg-card p-5 shadow-md">
           <h2 className="font-display text-lg font-bold mb-3 flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
             Member roles
           </h2>
           <div className="space-y-2">
             {familyUsers.map((user) => (
-              <div key={user.id} className="rounded-2xl bg-muted/50 px-3 py-3 flex items-center justify-between gap-3">
+              <div key={user.id} className="rounded-2xl bg-muted/50 px-3 py-3 flex items-center justify-between gap-3 border-2 border-transparent">
                 <div>
                   <p className="font-bold text-sm">
                     {user.username} {user.id === currentUser.id ? "(you)" : ""}
@@ -294,10 +420,18 @@ export default function Admin() {
                       user.role === "admin" ? "border border-border" : "bg-primary text-primary-foreground",
                     )}
                     onClick={async () => {
-                      const newRole = user.role === "admin" ? "member" : "admin";
-                      const res = await apiRequest("PATCH", buildUrl(api.users.updateRole.path, { id: user.id }), { role: newRole });
-                      const updated: User = await res.json();
-                      queryClient.setQueryData<User[]>([...usersQueryKey], (old = []) => old.map((entry) => (entry.id === updated.id ? updated : entry)));
+                      try {
+                        const newRole = user.role === "admin" ? "member" : "admin";
+                        const res = await apiRequest("PATCH", buildUrl(api.users.updateRole.path, { id: user.id }), { role: newRole });
+                        const updated: User = await res.json();
+                        queryClient.setQueryData<User[]>([...usersQueryKey], (old = []) => old.map((entry) => (entry.id === updated.id ? updated : entry)));
+                        toast({
+                          title: newRole === "admin" ? "Promoting to parent" : "Role updated",
+                          description: newRole === "admin" ? `${user.username} is now a parent and can manage the family` : `${user.username} is now a regular member`,
+                        });
+                      } catch {
+                        toast({ title: "Could not update role", variant: "destructive" });
+                      }
                     }}
                   >
                     {user.role === "admin" ? <><ShieldOff className="w-4 h-4 inline mr-1" />Demote</> : <><Shield className="w-4 h-4 inline mr-1" />Promote</>}
@@ -308,7 +442,7 @@ export default function Admin() {
           </div>
         </section>
 
-        <section className="rounded-[1.75rem] border-2 border-border bg-card p-5 shadow-sm">
+        <section className="rounded-[1.75rem] border-2 border-slate-300 dark:border-slate-600 bg-card p-5 shadow-md">
           <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
             <Plus className="text-primary" /> Create chore
           </h2>
@@ -334,13 +468,13 @@ export default function Admin() {
               <input type="checkbox" checked={choreNeedsApproval} onChange={(event) => setChoreNeedsApproval(event.target.checked)} />
               Require parent approval
             </label>
-            <button type="submit" className="w-full rounded-2xl bg-primary px-4 py-4 font-black text-primary-foreground">
+            <button type="submit" className="w-full rounded-2xl bg-primary px-4 py-4 font-bold text-primary-foreground border-2 border-primary/80 shadow-md shadow-primary/20 active:scale-[0.98] transition-transform">
               Add chore
             </button>
           </form>
         </section>
 
-        <section className="rounded-[1.75rem] border-2 border-border bg-card p-5 shadow-sm">
+        <section className="rounded-[1.75rem] border-2 border-slate-300 dark:border-slate-600 bg-card p-5 shadow-md">
           <h2 className="font-display text-xl font-bold mb-4 flex items-center gap-2">
             <Gift className="text-secondary" /> Create reward
           </h2>
@@ -352,7 +486,7 @@ export default function Admin() {
               <input type="checkbox" checked={rewardNeedsApproval} onChange={(event) => setRewardNeedsApproval(event.target.checked)} />
               Require parent approval
             </label>
-            <button type="submit" className="w-full rounded-2xl bg-secondary px-4 py-4 font-black text-secondary-foreground">
+            <button type="submit" className="w-full rounded-2xl bg-secondary px-4 py-4 font-bold text-secondary-foreground border-2 border-secondary/80 shadow-md shadow-secondary/20 active:scale-[0.98] transition-transform">
               Add reward
             </button>
           </form>

@@ -8,9 +8,16 @@
   "description": "A playful family chore game with stars, streaks, rewards, and live family activity.",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/app_icon.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

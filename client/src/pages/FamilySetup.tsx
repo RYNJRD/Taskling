@@ -17,6 +17,8 @@ export default function FamilySetup() {
   const [, setLocation] = useLocation();
   const { setFamily, setCurrentUser, firebaseUid } = useStore();
   const { toast } = useToast();
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === "true";
+  const effectiveFirebaseUid = firebaseUid ?? (isDemoMode ? "demo-local-user" : null);
 
   const [step, setStep] = useState(0);
   const [familyName, setFamilyName] = useState("");
@@ -30,7 +32,7 @@ export default function FamilySetup() {
   const canSubmit = userName.trim().length >= 1 && gender && age && parseInt(age) > 0;
 
   const handleSubmit = async () => {
-    if (!firebaseUid) {
+    if (!effectiveFirebaseUid) {
       toast({ title: "Error", description: "Please sign in first.", variant: "destructive" });
       setLocation("/auth");
       return;
@@ -54,7 +56,7 @@ export default function FamilySetup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           familyId: family.id,
-          firebaseUid,
+          firebaseUid: effectiveFirebaseUid,
           username: userName.trim(),
           role: "admin",
           gender: gender.toLowerCase(),

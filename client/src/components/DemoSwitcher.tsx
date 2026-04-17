@@ -33,7 +33,7 @@ export function DemoSwitcher() {
       >
         <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
         <span className="opacity-60 uppercase tracking-widest text-[10px]">Demo</span>
-        <span className="font-black">{currentUser.username}</span>
+        <span className="font-bold">{currentUser.username}</span>
         <Users className="w-3.5 h-3.5 opacity-60" />
       </motion.button>
 
@@ -60,7 +60,7 @@ export function DemoSwitcher() {
             >
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="font-black text-lg text-foreground">Switch Character</h3>
+                  <h3 className="font-bold text-lg text-foreground">Switch Character</h3>
                   <p className="text-xs text-muted-foreground font-medium">Demo mode — dev only</p>
                 </div>
                 <button
@@ -72,11 +72,11 @@ export function DemoSwitcher() {
               </div>
 
               {/* Current user */}
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">Playing as</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Playing as</p>
               <div className="flex items-center gap-3 bg-primary/8 rounded-2xl p-3 mb-4 border-2 border-primary/20">
                 <UserAvatar user={currentUser} size="md" />
                 <div>
-                  <p className="font-black text-foreground">{currentUser.username}</p>
+                  <p className="font-bold text-foreground">{currentUser.username}</p>
                   {(() => {
                     const b = getRoleBadge(currentUser);
                     const Icon = b.icon;
@@ -91,7 +91,7 @@ export function DemoSwitcher() {
               </div>
 
               {/* Other characters */}
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">Switch to</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Switch to</p>
               <div className="space-y-2">
                 {otherUsers.map((user) => {
                   const badge = getRoleBadge(user);
@@ -105,7 +105,7 @@ export function DemoSwitcher() {
                     >
                       <UserAvatar user={user} size="md" />
                       <div className="flex-1">
-                        <p className="font-black text-foreground">{user.username}</p>
+                        <p className="font-bold text-foreground">{user.username}</p>
                         <div className={cn("inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full border", badge.color)}>
                           <BadgeIcon className="w-3 h-3" />
                           {badge.label}

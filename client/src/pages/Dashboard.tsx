@@ -18,17 +18,19 @@ import {
 import { useCompleteChore } from "@/hooks/use-chores";
 import { useStore } from "@/store/useStore";
 import { cn } from "@/lib/utils";
+import ParentDashboard from "./ParentDashboard";
 
-type ChoreBucket = "today" | "upcoming" | "overdue" | "recent";
+type ChoreBucket = "today" | "upcoming" | "overdue" | "recent" | "pending";
 
 function getDaysSinceCompleted(chore: Chore) {
   if (!chore.lastCompletedAt) return Number.POSITIVE_INFINITY;
   return (Date.now() - new Date(chore.lastCompletedAt).getTime()) / (1000 * 60 * 60 * 24);
 }
 
-function getChoreBucket(chore: Chore): ChoreBucket {
+function getChoreBucket(chore: Chore & { latestSubmissionStatus?: string }): ChoreBucket {
+  if (chore.latestSubmissionStatus === "submitted") return "pending";
   const d = getDaysSinceCompleted(chore);
-  if (d <= 1) return "recent";
+  if (d <= 1 && chore.latestSubmissionStatus !== "rejected") return "recent";
   if (chore.type === "daily") return d > 1 ? "overdue" : "today";
   if (chore.type === "weekly") return d > 7 ? "overdue" : "upcoming";
   if (chore.type === "monthly") return d > 30 ? "overdue" : "upcoming";
@@ -56,7 +58,7 @@ function CalendarStrip() {
                   : "text-muted-foreground hover:bg-muted/60",
               )}
             >
-              <span className="text-[10px] font-black uppercase">{format(day, "EEE")}</span>
+              <span className="text-[10px] font-bold uppercase">{format(day, "EEE")}</span>
               <span className={cn("text-sm font-bold mt-0.5", isToday && "text-primary-foreground")}>{format(day, "d")}</span>
               {isToday && <div className="w-1 h-1 rounded-full bg-primary-foreground/70 mt-1" />}
             </motion.div>
@@ -86,12 +88,15 @@ export default function Dashboard() {
   );
 
   const bucketed = useMemo(() => {
-    const b: Record<ChoreBucket, Chore[]> = { today: [], upcoming: [], overdue: [], recent: [] };
+    const b: Record<ChoreBucket, (Chore & { latestSubmissionStatus?: string; rejectionReason?: string })[]> = { 
+      today: [], upcoming: [], overdue: [], recent: [], pending: [] 
+    };
     myChores.forEach((c) => b[getChoreBucket(c)].push(c));
     return b;
   }, [myChores]);
 
   if (!currentUser) return null;
+  if (currentUser.role === "admin") return <ParentDashboard />;
 
   const timeZone = getFamilyTimeZone(family || undefined);
   const effectiveStreak = getEffectiveStreakForDate(currentUser, today, timeZone);
@@ -140,26 +145,20 @@ export default function Dashboard() {
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-5 rounded-[2rem] overflow-hidden shadow-xl shadow-primary/15 relative"
+        className="mb-5 rounded-[2rem] overflow-hidden shadow-lg shadow-primary/15 relative"
       >
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-violet-600 to-indigo-600" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
 
-        <div className="relative p-5">
+        <div className="relative px-4 pt-3 pb-2">
           {/* Top row: avatar + greeting + stars */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              {/* Avatar with idle float */}
-              <motion.div
-                animate={{ y: [0, -4, 0] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-              >
-                <UserAvatar user={currentUser} size="md" className="border-2 border-white/40 shadow-lg" />
-              </motion.div>
+          <div className="flex items-start justify-between mb-2.5">
+            <div className="flex items-center gap-2.5">
+              <UserAvatar user={currentUser} size="sm" className="border-2 border-white/40 shadow-lg" />
               <div>
-                <p className="text-[11px] font-black uppercase tracking-widest text-white/60">Welcome back</p>
-                <h1 className="font-display text-2xl font-bold text-white leading-tight">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">Welcome back</p>
+                <h1 className="font-display text-xl font-bold text-white leading-tight">
                   Hi, {currentUser.username}! 👋
                 </h1>
                 <p className="text-sm text-white/70 mt-0.5">
@@ -168,25 +167,25 @@ export default function Dashboard() {
               </div>
             </div>
             {/* Stars counter */}
-            <div className="bg-white/15 backdrop-blur-sm rounded-2xl px-3.5 py-2 text-right border border-white/20">
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/60">Stars</p>
+            <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-right border border-white/20">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-white/60">Stars</p>
               <div className="flex items-center gap-1 justify-end">
-                <Star className="w-4 h-4 fill-yellow-300 text-yellow-300" />
-                <p className="font-display text-2xl font-bold text-white leading-none">{currentUser.points}</p>
+                <Star className="w-3.5 h-3.5 fill-yellow-300 text-yellow-300" />
+                <p className="font-display text-xl font-bold text-white leading-none">{currentUser.points}</p>
               </div>
             </div>
           </div>
 
           {/* Progress to next rank */}
-          <div className="mb-1">
-            <div className="flex justify-between items-center mb-1.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/60 flex items-center gap-1">
+          <div className="mb-0.5">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
                 {userAbove ? `Progress to rank #${rank - 1}` : "You're #1 — keep it up!"}
               </p>
-              <p className="text-[10px] font-bold text-white/70">{progressToNext}%</p>
+              <p className="text-[9px] font-bold text-white/70">{progressToNext}%</p>
             </div>
-            <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressToNext}%` }}
@@ -204,10 +203,10 @@ export default function Dashboard() {
             { icon: CheckCircle2, label: "This week", value: `${completedThisWeek}`, sub: "chores done", color: "text-green-300" },
             { icon: Zap, label: "Next up", value: `${totalActionable}`, sub: "ready now", color: "text-yellow-300" },
           ].map(({ icon: Icon, label, value, sub, color }) => (
-            <div key={label} className="flex flex-col items-center py-3.5 px-2">
-              <Icon className={cn("w-4 h-4 mb-1", color)} />
-              <p className="font-display text-lg font-bold text-white leading-none">{value}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-white/50 mt-0.5">{sub}</p>
+            <div key={label} className="flex flex-col items-center py-2.5 px-2">
+              <Icon className={cn("w-3.5 h-3.5 mb-0.5", color)} />
+              <p className="font-display text-base font-bold text-white leading-none">{value}</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-white/50 mt-0.5 truncate w-full text-center">{sub}</p>
             </div>
           ))}
         </div>
@@ -246,13 +245,41 @@ export default function Dashboard() {
                   <p className="font-bold text-sm">{item.label}</p>
                   <p className="text-xs text-muted-foreground">{item.description}</p>
                 </div>
-                <span className={cn("text-[10px] font-black uppercase tracking-widest shrink-0", item.complete ? "text-green-500" : "text-primary")}>
+                <span className={cn("text-[10px] font-bold uppercase tracking-widest shrink-0", item.complete ? "text-green-500" : "text-primary")}>
                   {item.complete ? "✓ Done" : "Next"}
                 </span>
               </div>
             ))}
           </div>
         </motion.div>
+      )}
+
+      {/* ── Pending Review ── */}
+      {bucketed.pending.length > 0 && (
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-amber-500">Wait for it</p>
+              <h2 className="font-display text-base font-bold text-foreground/80">Pending Review</h2>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {bucketed.pending.map((chore) => (
+              <ChoreCard
+                key={chore.id}
+                chore={chore}
+                status={chore.latestSubmissionStatus}
+                actionLabel="In Review"
+                onComplete={() => {}}
+                isCompleting={false}
+              />
+            ))}
+          </div>
+        </motion.section>
       )}
 
       {/* ── Today's chores ── */}
@@ -264,11 +291,11 @@ export default function Dashboard() {
       >
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-[11px] font-black uppercase tracking-widest text-primary">Do next</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-primary">Do next</p>
             <h2 className="font-display text-xl font-bold">Today&apos;s chores</h2>
           </div>
           {totalActionable > 0 && (
-            <span className="text-xs font-black bg-primary/10 text-primary rounded-xl px-2.5 py-1">
+            <span className="text-xs font-bold bg-primary/10 text-primary rounded-xl px-2.5 py-1">
               {totalActionable} ready
             </span>
           )}
@@ -284,13 +311,15 @@ export default function Dashboard() {
             >
               <ChoreCard
                 chore={chore}
+                status={chore.latestSubmissionStatus}
+                rejectionReason={chore.rejectionReason}
                 onComplete={() => handleComplete(chore)}
                 isCompleting={completeMutation.isPending && completeMutation.variables?.id === chore.id}
                 displayPoints={chore.type === "daily" && chore.assigneeId === currentUser.id ? Math.ceil(chore.points * multiplier) : chore.points}
                 streakBonusPercent={chore.type === "daily" && chore.assigneeId === currentUser.id ? bonusPercent : 0}
                 stateLabel={getChoreBucket(chore) === "overdue" ? "Overdue" : undefined}
-                footerNote={chore.requiresApproval ? "Stars land after a parent reviews this." : undefined}
-                actionLabel={chore.requiresApproval ? "Submit for review" : "Complete now"}
+                footerNote={chore.requiresApproval && !chore.latestSubmissionStatus ? "Stars land after a parent reviews this." : undefined}
+                actionLabel={chore.latestSubmissionStatus === "rejected" ? "Try again" : (chore.requiresApproval ? "Submit for review" : "Complete now")}
               />
             </motion.div>
           ))}
@@ -325,7 +354,7 @@ export default function Dashboard() {
                   <Trophy className="w-6 h-6 text-accent" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-accent">Monthly spotlight</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Monthly spotlight</p>
                   <h2 className="font-display text-lg font-bold">{latestWinner.title}</h2>
                 </div>
               </div>

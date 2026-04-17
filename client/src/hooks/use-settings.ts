@@ -20,7 +20,7 @@ const DEFAULTS: AppSettings = {
   darkMode: false,
 };
 
-const STORAGE_KEY = "chorequest-settings";
+const STORAGE_KEY = "chorely-settings";
 
 function loadSettings(): AppSettings {
   try {

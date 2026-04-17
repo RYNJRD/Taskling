@@ -1,0 +1,229 @@
+
+> rest-express@1.0.1 dev
+> cross-env NODE_ENV=development tsx server/index.ts
+
+[1G[0K1:31:39 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+1:31:45 PM [express] GET /api/families/1/chores 304 in 6ms :: [{"id":1,"familyId":1,"title":"Empty dishwasher","description":"Put everything away before dinner.","points":20,"type":"daily","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🍽️","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.430Z"},{"id":2,"familyId":1,"title":"Tidy bedroom","description":"Quick five-minute reset.","points":15,"type":"daily","assigneeId":3,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🧸","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.434Z"},{"id":3,"familyId":1,"title":"Take out recycling","description":"Snap a quick photo if the bin is already full.","points":30,"type":"weekly","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"♻️","requiresApproval":true,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.436Z"},{"id":4,"familyId":1,"title":"Dog walk backup","description":"Anyone can jump in and help.","points":25,"type":"box","assigneeId":null,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🐶","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.439Z"}]
+1:31:45 PM [express] GET /api/families/1/leaderboard 304 in 5ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+1:31:45 PM [express] GET /api/families/1/monthly-winners 304 in 27ms :: [{"id":1,"familyId":1,"monthKey":"2026-03","awardType":"household_star","userId":1,"title":"Household Star","summary":"Jordan led the family with the strongest month.","stats":{"points":0,"streak":0,"completedChores":"0"},"createdAt":"2026-04-02T15:47:58.758Z"}]
+1:31:45 PM [express] GET /api/families/1/onboarding 304 in 23ms :: {"checklist":[{"key":"family-created","label":"Create your family","description":"Your home base is ready to go.","complete":true},{"key":"add-first-chore","label":"Add your first chore","description":"Give everyone something they can do tonight.","complete":true},{"key":"create-reward","label":"Create a reward","description":"Connect stars to something exciting.","complete":true},{"key":"invite-family","label":"Invite another family member","description":"The game gets better when more people join in.","complete":true}]}
+1:32:08 PM [express] GET /api/families/1/chores 304 in 3ms :: [{"id":1,"familyId":1,"title":"Empty dishwasher","description":"Put everything away before dinner.","points":20,"type":"daily","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🍽️","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.430Z"},{"id":2,"familyId":1,"title":"Tidy bedroom","description":"Quick five-minute reset.","points":15,"type":"daily","assigneeId":3,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🧸","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.434Z"},{"id":3,"familyId":1,"title":"Take out recycling","description":"Snap a quick photo if the bin is already full.","points":30,"type":"weekly","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"♻️","requiresApproval":true,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.436Z"},{"id":4,"familyId":1,"title":"Dog walk backup","description":"Anyone can jump in and help.","points":25,"type":"box","assigneeId":null,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🐶","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.439Z"}]
+1:32:08 PM [express] GET /api/families/1/monthly-winners 304 in 6ms :: [{"id":1,"familyId":1,"monthKey":"2026-03","awardType":"household_star","userId":1,"title":"Household Star","summary":"Jordan led the family with the strongest month.","stats":{"points":0,"streak":0,"completedChores":"0"},"createdAt":"2026-04-02T15:47:58.758Z"}]
+1:32:08 PM [express] GET /api/families/1/onboarding 304 in 12ms :: {"checklist":[{"key":"family-created","label":"Create your family","description":"Your home base is ready to go.","complete":true},{"key":"add-first-chore","label":"Add your first chore","description":"Give everyone something they can do tonight.","complete":true},{"key":"create-reward","label":"Create a reward","description":"Connect stars to something exciting.","complete":true},{"key":"invite-family","label":"Invite another family member","description":"The game gets better when more people join in.","complete":true}]}
+1:32:08 PM [express] GET /api/families/1/leaderboard 304 in 14ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+1:34:30 PM [express] GET /api/families/1/leaderboard 304 in 15ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+1:34:30 PM [express] GET /api/families/1/chores 304 in 15ms :: [{"id":1,"familyId":1,"title":"Empty dishwasher","description":"Put everything away before dinner.","points":20,"type":"daily","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🍽️","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.430Z"},{"id":2,"familyId":1,"title":"Tidy bedroom","description":"Quick five-minute reset.","points":15,"type":"daily","assigneeId":3,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🧸","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.434Z"},{"id":3,"familyId":1,"title":"Take out recycling","description":"Snap a quick photo if the bin is already full.","points":30,"type":"weekly","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"♻️","requiresApproval":true,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.436Z"},{"id":4,"familyId":1,"title":"Dog walk backup","description":"Anyone can jump in and help.","points":25,"type":"box","assigneeId":null,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🐶","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.439Z"}]
+1:34:30 PM [express] GET /api/families/1/onboarding 304 in 15ms :: {"checklist":[{"key":"family-created","label":"Create your family","description":"Your home base is ready to go.","complete":true},{"key":"add-first-chore","label":"Add your first chore","description":"Give everyone something they can do tonight.","complete":true},{"key":"create-reward","label":"Create a reward","description":"Connect stars to something exciting.","complete":true},{"key":"invite-family","label":"Invite another family member","description":"The game gets better when more people join in.","complete":true}]}
+1:34:30 PM [express] GET /api/families/1/monthly-winners 304 in 15ms :: [{"id":1,"familyId":1,"monthKey":"2026-03","awardType":"household_star","userId":1,"title":"Household Star","summary":"Jordan led the family with the strongest month.","stats":{"points":0,"streak":0,"completedChores":"0"},"createdAt":"2026-04-02T15:47:58.758Z"}]
+1:34:52 PM [express] GET /api/families/1/rewards 304 in 12ms :: [{"id":1,"familyId":1,"title":"Choose Friday movie","description":"Winner picks the family movie night pick.","costPoints":120,"emoji":"🎬","requiresApproval":false,"createdBy":1,"createdAt":"2026-04-02T15:47:58.442Z"},{"id":2,"familyId":1,"title":"Later bedtime pass","description":"Worth one extra hour on Saturday.","costPoints":220,"emoji":"🌙","requiresApproval":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.445Z"}]
+1:34:56 PM [express] POST /api/rewards/2/claim 200 in 148ms :: {"user":{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},"claim":{"id":1,"familyId":1,"rewardId":2,"userId":2,"quantity":1,"totalCost":220,"status":"submitted","note":null,"reviewNote":null,"reviewedBy":null,"reviewedAt":null,"undoneAt":null,"createdAt":"2026-04-05T13:34:56.308Z"}}
+1:34:56 PM [express] GET /api/families/1/rewards 304 in 2ms :: [{"id":1,"familyId":1,"title":"Choose Friday movie","description":"Winner picks the family movie night pick.","costPoints":120,"emoji":"🎬","requiresApproval":false,"createdBy":1,"createdAt":"2026-04-02T15:47:58.442Z"},{"id":2,"familyId":1,"title":"Later bedtime pass","description":"Worth one extra hour on Saturday.","costPoints":220,"emoji":"🌙","requiresApproval":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.445Z"}]
+1:34:59 PM [express] GET /api/families/1/users 304 in 3ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+1:34:59 PM [express] GET /api/families/1/messages 200 in 12ms :: [{"id":1,"familyId":1,"userId":1,"senderName":"Chorely","content":"Welcome to the demo family. Try completing a chore, claiming a reward, and reviewing an approval.","isSystem":true,"createdAt":"2026-04-02T15:47:58.448Z"},{"id":2,"familyId":1,"userId":2,"senderName":"Chorely","content":"📝 Alex submitted \"Take out recycling\" for review.","isSystem":true,"createdAt":"2026-04-02T15:49:09.487Z"},{"id":13,"familyId":1,"userId":2,"senderName":"Chorely","content":"🎟️ Alex requested \"Later bedtime pass\".","isSystem":true,"createdAt":"2026-04-05T13:34:56.357Z"}]
+1:35:01 PM [express] GET /api/families/1/chores 304 in 4ms :: [{"id":1,"familyId":1,"title":"Empty dishwasher","description":"Put everything away before dinner.","points":20,"type":"daily","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🍽️","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.430Z"},{"id":2,"familyId":1,"title":"Tidy bedroom","description":"Quick five-minute reset.","points":15,"type":"daily","assigneeId":3,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🧸","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.434Z"},{"id":3,"familyId":1,"title":"Take out recycling","description":"Snap a quick photo if the bin is already full.","points":30,"type":"weekly","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"♻️","requiresApproval":true,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.436Z"},{"id":4,"familyId":1,"title":"Dog walk backup","description":"Anyone can jump in and help.","points":25,"type":"box","assigneeId":null,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🐶","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.439Z"}]
+1:35:01 PM [express] GET /api/families/1/leaderboard 304 in 4ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+1:35:01 PM [express] GET /api/families/1/onboarding 304 in 16ms :: {"checklist":[{"key":"family-created","label":"Create your family","description":"Your home base is ready to go.","complete":true},{"key":"add-first-chore","label":"Add your first chore","description":"Give everyone something they can do tonight.","complete":true},{"key":"create-reward","label":"Create a reward","description":"Connect stars to something exciting.","complete":true},{"key":"invite-family","label":"Invite another family member","description":"The game gets better when more people join in.","complete":true}]}
+1:35:01 PM [express] GET /api/families/1/monthly-winners 304 in 15ms :: [{"id":1,"familyId":1,"monthKey":"2026-03","awardType":"household_star","userId":1,"title":"Household Star","summary":"Jordan led the family with the strongest month.","stats":{"points":0,"streak":0,"completedChores":"0"},"createdAt":"2026-04-02T15:47:58.758Z"}]
+1:35:56 PM [express] GET /api/families/1/chores 304 in 15ms :: [{"id":1,"familyId":1,"title":"Empty dishwasher","description":"Put everything away before dinner.","points":20,"type":"daily","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🍽️","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.430Z"},{"id":2,"familyId":1,"title":"Tidy bedroom","description":"Quick five-minute reset.","points":15,"type":"daily","assigneeId":3,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🧸","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.434Z"},{"id":3,"familyId":1,"title":"Take out recycling","description":"Snap a quick photo if the bin is already full.","points":30,"type":"weekly","assigneeId":2,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"♻️","requiresApproval":true,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.436Z"},{"id":4,"familyId":1,"title":"Dog walk backup","description":"Anyone can jump in and help.","points":25,"type":"box","assigneeId":null,"lastCompletedAt":null,"lastCompletedBy":null,"cooldownHours":null,"emoji":"🐶","requiresApproval":false,"isActive":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.439Z"}]
+1:35:56 PM [express] GET /api/families/1/leaderboard 304 in 18ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+1:35:56 PM [express] GET /api/families/1/monthly-winners 304 in 15ms :: [{"id":1,"familyId":1,"monthKey":"2026-03","awardType":"household_star","userId":1,"title":"Household Star","summary":"Jordan led the family with the strongest month.","stats":{"points":0,"streak":0,"completedChores":"0"},"createdAt":"2026-04-02T15:47:58.758Z"}]
+1:35:56 PM [express] GET /api/families/1/onboarding 304 in 14ms :: {"checklist":[{"key":"family-created","label":"Create your family","description":"Your home base is ready to go.","complete":true},{"key":"add-first-chore","label":"Add your first chore","description":"Give everyone something they can do tonight.","complete":true},{"key":"create-reward","label":"Create a reward","description":"Connect stars to something exciting.","complete":true},{"key":"invite-family","label":"Invite another family member","description":"The game gets better when more people join in.","complete":true}]}
+1:37:05 PM [express] GET /api/families/1/leaderboard 304 in 11ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+1:37:12 PM [express] GET /api/families/1/users 304 in 3ms :: [{"id":2,"familyId":1,"firebaseUid":null,"username":"Alex","role":"member","gender":"other","age":13,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"spiky\",\"top\":\"tee-green\",\"bottom\":\"shorts-coral\",\"accessory\":\"headphones\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.424Z"},{"id":1,"familyId":1,"firebaseUid":null,"username":"Jordan","role":"admin","gender":"other","age":38,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"puff\",\"top\":\"hoodie-blue\",\"bottom\":\"joggers-navy\",\"accessory\":\"star-clip\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.414Z"},{"id":3,"familyId":1,"firebaseUid":null,"username":"Mia","role":"member","gender":"female","age":10,"points":0,"streak":0,"streakLastCompletedDate":null,"avatarUrl":null,"avatarConfig":"{\"hair\":\"bob\",\"top\":\"sweater-sun\",\"bottom\":\"leggings-plum\",\"accessory\":\"glasses\"}","avatarInventory":"{}","hideFromLeaderboard":false,"createdAt":"2026-04-02T15:47:58.427Z"}]
+1:37:12 PM [express] GET /api/families/1/messages 304 in 12ms :: [{"id":1,"familyId":1,"userId":1,"senderName":"Chorely","content":"Welcome to the demo family. Try completing a chore, claiming a reward, and reviewing an approval.","isSystem":true,"createdAt":"2026-04-02T15:47:58.448Z"},{"id":2,"familyId":1,"userId":2,"senderName":"Chorely","content":"📝 Alex submitted \"Take out recycling\" for review.","isSystem":true,"createdAt":"2026-04-02T15:49:09.487Z"},{"id":13,"familyId":1,"userId":2,"senderName":"Chorely","content":"🎟️ Alex requested \"Later bedtime pass\".","isSystem":true,"createdAt":"2026-04-05T13:34:56.357Z"}]
+1:37:17 PM [express] GET /api/families/1/rewards 304 in 3ms :: [{"id":1,"familyId":1,"title":"Choose Friday movie","description":"Winner picks the family movie night pick.","costPoints":120,"emoji":"🎬","requiresApproval":false,"createdBy":1,"createdAt":"2026-04-02T15:47:58.442Z"},{"id":2,"familyId":1,"title":"Later bedtime pass","description":"Worth one extra hour on Saturday.","costPoints":220,"emoji":"🌙","requiresApproval":true,"createdBy":1,"createdAt":"2026-04-02T15:47:58.445Z"}]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:42:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Dashboard.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:42:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/ChoreCard.tsx[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:43:19 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Leaderboard.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:43:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Chat.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:44:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/BottomNav.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:45:01 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Leaderboard.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:45:07 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Leaderboard.tsx, /src/index.css[22m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m1:45:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/Chat.tsx, /src/index.css[22m

@@ -52,9 +52,9 @@ export default function Splash() {
             >
               <h1 className="font-display text-5xl font-bold mb-1">
                 <span className="logo-glow" style={{ color: "hsl(262 83% 58%)" }}>Chore</span>
-                <span className="logo-accent-glow" style={{ color: "hsl(43 96% 50%)" }}>Quest</span>
+                <span className="logo-accent-glow" style={{ color: "hsl(43 96% 50%)" }}>ly</span>
               </h1>
-              <div className="h-1 w-32 mx-auto rounded-full bg-gradient-to-r from-primary to-accent opacity-60 mt-1" />
+              <div className="h-1 w-24 mx-auto rounded-full bg-gradient-to-r from-primary to-accent opacity-60 mt-1" />
             </motion.div>
           )}
         </AnimatePresence>

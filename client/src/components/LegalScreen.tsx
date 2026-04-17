@@ -50,7 +50,7 @@ function Screen({
             <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center text-base", color)}>
               {emoji}
             </div>
-            <h1 className="font-black text-lg text-foreground tracking-tight flex-1">{title}</h1>
+            <h1 className="font-bold text-lg text-foreground tracking-tight flex-1">{title}</h1>
           </div>
 
           {/* Scrollable body */}
@@ -75,7 +75,7 @@ function DocSection({ title, children }: { title: string; children: React.ReactN
 
 function Placeholder({ tag = "REPLACE THIS TEXT" }: { tag?: string }) {
   return (
-    <span className="inline-block bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest rounded px-1.5 py-0.5 mr-1">
+    <span className="inline-block bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded px-1.5 py-0.5 mr-1">
       [{tag}]
     </span>
   );
@@ -241,7 +241,7 @@ export function DisclaimerScreen({ open, onClose }: { open: boolean; onClose: ()
 
 /* ─── Contact Support ─── */
 export function ContactScreen({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const SUPPORT_EMAIL = "support@chorequest.app"; // REPLACE with your real support email
+  const SUPPORT_EMAIL = "support@chorely.app"; // REPLACE with your real support email
 
   return (
     <Screen open={open} onClose={onClose} title="Contact Support" emoji="💬" color="bg-green-100 dark:bg-green-950/30">
@@ -255,9 +255,9 @@ export function ContactScreen({ open, onClose }: { open: boolean; onClose: () =>
       {/* Email option */}
       <div className="bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden">
         <div className="px-4 py-4 border-b border-border/40">
-          <p className="font-black text-xs uppercase tracking-widest text-muted-foreground mb-3">Email us</p>
+          <p className="font-bold text-xs uppercase tracking-widest text-muted-foreground mb-3">Email us</p>
           <a
-            href={`mailto:${SUPPORT_EMAIL}?subject=ChoreQuest Support`}
+            href={`mailto:${SUPPORT_EMAIL}?subject=Chorely Support`}
             className="flex items-center gap-3 bg-primary/8 rounded-2xl px-4 py-3.5 hover:bg-primary/14 transition-colors"
           >
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-none">
@@ -273,7 +273,7 @@ export function ContactScreen({ open, onClose }: { open: boolean; onClose: () =>
 
         {/* Response times */}
         <div className="px-4 py-4">
-          <p className="font-black text-xs uppercase tracking-widest text-muted-foreground mb-3">Response times</p>
+          <p className="font-bold text-xs uppercase tracking-widest text-muted-foreground mb-3">Response times</p>
           <div className="space-y-2">
             {[
               { type: "General questions", time: "2–3 business days", dot: "bg-green-400" },

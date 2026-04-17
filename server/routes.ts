@@ -12,7 +12,7 @@ import { createMessage } from "./services/message-service";
 import { getFamilyOnboardingChecklist } from "./services/family-service";
 import { ensurePreviousMonthWinners } from "./services/monthly-winners-service";
 import { recordActivity } from "./services/activity-service";
-import { registerSseClient, removeSseClient } from "./realtime";
+import { publishFamilyEvent, registerSseClient, removeSseClient } from "./realtime";
 
 function parseId(value: unknown): number | null {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -23,6 +23,16 @@ function parseId(value: unknown): number | null {
 
 function forbidden(res: Response, message = "Forbidden") {
   return res.status(403).json({ message });
+}
+
+function handleError(res: Response, error: unknown) {
+  if (error instanceof z.ZodError) {
+    return res.status(400).json({ message: error.errors[0]?.message || "Invalid request" });
+  }
+
+  return res.status(500).json({
+    message: error instanceof Error ? error.message : "Internal server error",
+  });
 }
 
 function sameFamilyOrReject(res: Response, currentFamilyId: number | null | undefined, targetFamilyId: number | null | undefined) {
@@ -99,7 +109,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const familyId = parseId(req.params.id);
     if (!familyId) return res.status(400).json({ message: "Invalid family id" });
     if (!sameFamilyOrReject(res, currentUser.familyId, familyId)) return;
-    return res.json(await storage.getFamilyChores(familyId));
+    return res.json(await storage.getFamilyChores(familyId, currentUser.id));
   });
 
   app.get(api.families.getLeaderboard.path, requireAuth, attachCurrentUser, async (req, res) => {
@@ -246,7 +256,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       if (!targetUser) return res.status(404).json({ message: "User not found" });
       if (!sameFamilyOrReject(res, currentUser.familyId, targetUser.familyId)) return;
       if (currentUser.id !== userId && !canManageFamily(currentUser)) return forbidden(res);
-      return res.json(await storage.updateUserLeaderboard(userId, input.hideFromLeaderboard));
+      const updated = await storage.updateUserLeaderboard(userId, input.hideFromLeaderboard);
+      if (!updated) return res.status(404).json({ message: "User not found" });
+      if (updated.familyId) {
+        publishFamilyEvent(updated.familyId, "family:user", updated);
+      }
+      return res.json(updated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0]?.message || "Invalid request" });
@@ -277,6 +292,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
           relatedEntityType: "user",
           relatedEntityId: updated.id,
         });
+        publishFamilyEvent(updated.familyId, "family:user", updated);
       }
       return res.json(updated);
     } catch (error) {

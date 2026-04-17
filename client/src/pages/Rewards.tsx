@@ -86,7 +86,7 @@ export default function Rewards() {
   };
 
   return (
-    <div className="pt-8 px-5 pb-32 min-h-screen bg-background">
+    <div className="pt-8 px-5 pb-32 min-h-screen bg-tab-rewards">
       <div className="flex justify-between items-end mb-8">
         <div>
           <div className="w-14 h-14 bg-secondary/20 rounded-[1.5rem] flex items-center justify-center mb-3 -rotate-6">
@@ -154,18 +154,18 @@ export default function Rewards() {
                           <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={() => setQuantity((value) => Math.max(1, value - 1))}>
                             <Minus size={16} />
                           </Button>
-                          <span className="min-w-8 text-center font-black text-lg">{quantity}</span>
+                          <span className="min-w-8 text-center font-bold text-lg">{quantity}</span>
                           <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={() => setQuantity((value) => value + 1)}>
                             <Plus size={16} />
                           </Button>
                         </div>
                         <div className="text-right">
-                          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">Total</p>
+                          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Total</p>
                           <p className="font-display text-lg font-bold">{totalCost} stars</p>
                         </div>
                       </div>
                       <div className="mt-3 flex gap-2">
-                        <Button className="flex-1 rounded-2xl font-black" disabled={!canAfford && !reward.requiresApproval || isSubmitting} onClick={() => handleClaim(reward.id)}>
+                        <Button className="flex-1 min-h-[48px] rounded-2xl font-bold" disabled={!canAfford && !reward.requiresApproval || isSubmitting} onClick={() => handleClaim(reward.id)}>
                           {reward.requiresApproval ? "Request reward" : "Claim reward"}
                         </Button>
                         <Button variant="outline" className="rounded-2xl" onClick={() => { setActiveRewardId(null); setQuantity(1); }}>
@@ -183,7 +183,7 @@ export default function Rewards() {
                       onClick={() => { setActiveRewardId(reward.id); setQuantity(1); }}
                       disabled={!canAfford && !reward.requiresApproval}
                       className={cn(
-                        "mt-4 w-full rounded-2xl font-black",
+                        "mt-4 w-full rounded-2xl font-bold",
                         !canAfford && !reward.requiresApproval && "opacity-60 cursor-not-allowed",
                       )}
                     >

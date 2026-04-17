@@ -58,7 +58,15 @@ export const api = {
     getChores: {
       method: "GET" as const,
       path: "/api/families/:id/chores" as const,
-      responses: { 200: z.array(z.custom<typeof chores.$inferSelect>()) },
+      responses: {
+        200: z.array(
+          z.custom<typeof chores.$inferSelect & {
+            latestSubmissionStatus?: string;
+            rejectionReason?: string;
+            submissionNote?: string;
+          }>()
+        )
+      },
     },
     getLeaderboard: {
       method: "GET" as const,

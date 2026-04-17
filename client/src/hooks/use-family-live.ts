@@ -55,6 +55,16 @@ export function useFamilyLive(familyId: number | undefined) {
         queryClient.invalidateQueries({ queryKey: [api.rewards.list.path, familyId] });
       };
 
+      source.addEventListener("family:user", (event) => {
+        const user = JSON.parse((event as MessageEvent).data);
+        const { currentUser, setCurrentUser } = useStore.getState();
+        if (user.id === currentUser?.id) {
+          setCurrentUser(user);
+        }
+        queryClient.invalidateQueries({ queryKey: [api.families.getUsers.path, familyId] });
+        queryClient.invalidateQueries({ queryKey: [api.families.getLeaderboard.path, familyId] });
+      });
+
       source.addEventListener("family:leaderboard", invalidateFamilyData);
       source.addEventListener("family:chore", invalidateFamilyData);
       source.addEventListener("family:reward", invalidateFamilyData);
