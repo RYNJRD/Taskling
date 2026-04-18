@@ -16,17 +16,22 @@ import { apiFetch } from "@/lib/apiFetch";
 type ViewState = "welcome" | "verification" | "signin";
 
 async function safeJson(res: Response) {
-  const contentType = res.headers.get("Content-Type");
-  if (contentType && contentType.includes("application/json")) {
-    try {
-      return await res.json();
-    } catch {
-      const text = await res.text();
-      return { message: text || res.statusText };
+  try {
+    const clone = res.clone();
+    const contentType = res.headers.get("Content-Type");
+    if (contentType && contentType.includes("application/json")) {
+      try {
+        return await res.json();
+      } catch {
+        // failed to parse JSON even with header — likely a crash msg with JSON header
+        return { message: await clone.text() || res.statusText };
+      }
     }
+    return { message: await res.text() || res.statusText };
+  } catch (err) {
+    console.error("[safeJson] Critical fail:", err);
+    return { message: res.statusText || "Communication error with server" };
   }
-  const text = await res.text();
-  return { message: text || res.statusText };
 }
 
 export default function AuthWelcome() {

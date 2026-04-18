@@ -1,17 +1,16 @@
+import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
 import * as schema from "@shared/schema";
 import { getEnv } from "./env";
 
 let poolInstance: Pool | null = null;
-let dbInstance: any = null;
 
 export function getPool(): Pool {
   if (poolInstance) return poolInstance;
   const env = getEnv();
   
-  if (!env.DATABASE_URL) {
-    throw new Error("Application configuration error: DATABASE_URL environment variable is missing. If you are the developer, please set this in your Vercel/environment settings.");
+  if (!env.DATABASE_URL || env.DATABASE_URL.length < 10) {
+    throw new Error("Missing or invalid DATABASE_URL. Please check your environment variables.");
   }
 
   const isProduction = env.NODE_ENV === "production" || !!process.env.VERCEL;
@@ -27,17 +26,23 @@ export function getPool(): Pool {
 }
 
 export function getDb() {
-  if (dbInstance) return dbInstance;
-  dbInstance = drizzle(getPool(), { schema });
-  return dbInstance;
+  return drizzle(getPool(), { schema });
 }
 
-// Keep exported constants for compatibility, but make them lazy (using proxies or just updating usage)
-export const pool = new Proxy({} as Pool, {
-  get: (target, prop) => (getPool() as any)[prop],
-});
+// Exported for code that hasn't been updated to use getters yet
+// We initialize these only when exported properties are accessed
+export const pool = {
+  query: (...args: any[]) => getPool().query(...args as any),
+  connect: () => getPool().connect(),
+  on: (event: string, listener: any) => getPool().on(event, listener),
+  end: () => getPool().end(),
+} as unknown as Pool;
+
 export const db = new Proxy({} as any, {
-  get: (target, prop) => (getDb() as any)[prop],
+  get: (target, prop) => {
+    const d = getDb();
+    return (d as any)[prop];
+  }
 });
 
 /**

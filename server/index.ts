@@ -8,7 +8,6 @@ import { getEnv } from "./env";
 
 const app = express();
 const httpServer = createServer(app);
-const env = getEnv();
 
 declare module "http" {
   interface IncomingMessage {
@@ -99,7 +98,7 @@ if (!process.env.VERCEL) {
     // Other ports are firewalled. Default to 5000 if not specified.
     // this serves both the API and the client.
     // It is the only port that is not firewalled.
-    const port = env.PORT || 5000;
+    const port = getEnv().PORT || 5000;
     const listenOptions =
       process.platform === "win32"
         ? { port: Number(port), host: "0.0.0.0" }
