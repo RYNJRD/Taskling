@@ -1,59 +1,38 @@
-import express, { Express } from "express";
+import express from "express";
 import { createServer } from "http";
 import { registerRoutes } from "../server/routes";
 
-let cachedApp: Express | null = null;
+const app = express();
 
-function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true,
-  });
-  console.log(`\${formattedTime} [\${source}] \${message}`);
-}
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-export default async function handler(req: any, res: any) {
-  try {
-    if (!cachedApp) {
-      console.log("[Vercel] Initializing Taskling server...");
-      const app = express();
-      
-      app.use(express.json({
-        verify: (req: any, _res, buf) => { req.rawBody = buf; },
-      }));
-      app.use(express.urlencoded({ extended: false }));
+let isReady = false;
 
-      // Logging middleware
-      app.use((req, res, next) => {
-        const start = Date.now();
-        const path = req.path;
-        res.on("finish", () => {
-          const duration = Date.now() - start;
-          if (path.startsWith("/api")) {
-            log(`\${req.method} \${path} \${res.statusCode} in \${duration}ms`);
-          }
-        });
-        next();
-      });
-
+app.use(async (req, res, next) => {
+  if (!isReady) {
+    try {
+      console.log("[Vercel] Lazy-initializing server routes...");
+      // Pass a dummy httpServer, Vercel doesn't use it but our mock/websockets might expect it
       const httpServer = createServer(app);
       await registerRoutes(httpServer, app);
-      cachedApp = app;
-    }
-
-    return cachedApp(req, res);
-  } catch (err: any) {
-    console.error("[Vercel] CRITICAL INITIALIZATION ERROR:", err);
-    if (!res.headersSent) {
-      res.setHeader("Content-Type", "application/json");
-      res.status(500).send(JSON.stringify({ 
-        message: "The Taskling server failed to initialize on Vercel.",
+      isReady = true;
+    } catch (err: any) {
+      console.error("[Vercel] SEVERE INIT ERROR:", err);
+      return res.status(500).json({ 
+        message: "The Taskling server failed to start on Vercel.",
         error: err.message || String(err),
         stack: err.stack
-      }, null, 2));
+      });
     }
   }
-}
 
+  
+  // Call the actual routing logic ONLY once the router is fully attached
+  next();
+});
 
+// Since next() continues to evaluating the rest of the Express stack,
+// the dynamically added routes inside registerRoutes will handle the current request!
 
-
+export default app;
