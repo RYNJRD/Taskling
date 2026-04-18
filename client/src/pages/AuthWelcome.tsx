@@ -115,8 +115,9 @@ export default function AuthWelcome() {
       setOtp(["", "", "", "", "", ""]);
       setOtpError("");
       setView("verification");
-    } catch {
-      toast({ title: "Network error", description: "Check your connection and try again.", variant: "destructive" });
+    } catch (err: any) {
+      console.error("[Auth] Signup error:", err);
+      toast({ title: "Request failed", description: err.message || "Check your connection and try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -145,8 +146,8 @@ export default function AuthWelcome() {
       setOtpError("");
       toast({ title: "New code sent!", description: "Check your inbox — it expires in 10 minutes." });
       otpRefs.current[0]?.focus();
-    } catch {
-      toast({ title: "Network error", description: "Check your connection and try again.", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Request failed", description: err.message || "Check your connection and try again.", variant: "destructive" });
     } finally {
       setLoading(false);
     }

@@ -510,23 +510,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
 
   // ── DB-backed OTP helpers ─────────────────────────────────────────────────────
-  async function getOtpPool() {
-    const { pool } = await import("./db");
-    // Ensure table exists — cheap no-op after first run
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS email_verification_codes (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) NOT NULL,
-        firebase_uid VARCHAR(255) NOT NULL,
-        code VARCHAR(6) NOT NULL,
-        expires_at TIMESTAMPTZ NOT NULL,
-        attempts INTEGER NOT NULL DEFAULT 0,
-        last_sent_at TIMESTAMPTZ NOT NULL,
-        created_at TIMESTAMPTZ DEFAULT NOW()
-      )
-    `).catch((e: any) => console.warn("[OTP] table init warning:", e.message));
+  async function checkOtpStorage() {
+    const { ensureOtpTable, pool } = await import("./db");
+    const ok = await ensureOtpTable();
+    if (!ok) throw new Error("Database connection failed. Please try again in a moment.");
     return pool;
   }
+
 
   // POST /api/auth/send-code
   // Client creates the Firebase user first (Firebase Auth SDK), then calls this.
@@ -538,7 +528,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ message: "Invalid email address." });
 
       // Throttle: 60-second cooldown per email
-      const pool = await getOtpPool();
+      const pool = await checkOtpStorage();
       const { rows: existing } = await pool.query(
         "SELECT last_sent_at FROM email_verification_codes WHERE email = $1 ORDER BY created_at DESC LIMIT 1",
         [email]
@@ -582,7 +572,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const { email, code } = req.body;
       if (!email || !code) return res.status(400).json({ message: "Email and code are required." });
 
-      const pool = await getOtpPool();
+      const pool = await checkOtpStorage();
       const { rows } = await pool.query(
         "SELECT * FROM email_verification_codes WHERE email = $1 ORDER BY created_at DESC LIMIT 1",
         [email]

@@ -26,8 +26,12 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
   const headers = new Headers(init.headers || {});
   const user = auth.currentUser;
   if (user) {
-    const token = await user.getIdToken(/* forceRefresh */ true);
-    headers.set("Authorization", `Bearer ${token}`);
+    try {
+      const token = await user.getIdToken();
+      headers.set("Authorization", `Bearer ${token}`);
+    } catch (err) {
+      console.warn("[apiFetch] Failed to get ID token:", err);
+    }
   } else {
     const { currentUser } = useStore.getState();
     if (currentUser?.id && !currentUser.firebaseUid) {
@@ -35,9 +39,13 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
     }
   }
 
+  console.log(`[apiFetch] Fetching ${input}`);
   return fetch(input, {
     ...init,
     headers,
     credentials: "include",
+  }).catch(err => {
+    console.error(`[apiFetch] Network error for ${input}:`, err);
+    throw err;
   });
 }
