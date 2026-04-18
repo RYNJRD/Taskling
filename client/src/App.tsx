@@ -79,8 +79,14 @@ function EmailVerificationGate() {
   return null;
 }
 
+import { Router as WouterRouter } from "wouter";
+
 function Router() {
+  // Use Vite's BASE_URL (which we set to /Chorely-2.0/)
+  const base = import.meta.env.BASE_URL || "/";
+  
   return (
+    <WouterRouter base={base === '/' ? undefined : base}>
     <Suspense fallback={<RouteFallback />}>
       <Switch>
         <Route path="/" component={Splash} />
@@ -102,6 +108,7 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
     </Suspense>
+    </WouterRouter>
   );
 }
 
