@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { getFamilyTimeZone } from "@shared/streak";
 import { apiFetch } from "@/lib/apiFetch";
-import { ChorlyMascot } from "@/components/ChorlyMascot";
+import { PenguinMascot } from "@/components/PenguinMascot";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 
@@ -170,7 +170,7 @@ export default function FamilySetup() {
               >
                 {/* Mascot */}
                 <div className="flex flex-col items-center pt-4 pb-2">
-                  <ChorlyMascot pose="think" size={110} bounce />
+                  <PenguinMascot mood="thinking" size={110} />
                   <motion.div
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -257,7 +257,7 @@ export default function FamilySetup() {
               >
                 {/* Mascot */}
                 <div className="flex flex-col items-center pt-4 pb-1">
-                  <ChorlyMascot pose={isSubmitting ? "sleep" : "wave"} size={100} bounce={!isSubmitting} />
+                  <PenguinMascot mood={isSubmitting ? "sleeping" : "waving"} size={100} />
                   <motion.div
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}

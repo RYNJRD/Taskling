@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import type { Family } from "@shared/schema";
 import { apiFetch } from "@/lib/apiFetch";
-import { ChorlyMascot } from "@/components/ChorlyMascot";
+import { PenguinMascot } from "@/components/PenguinMascot";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 
@@ -113,7 +113,7 @@ export default function JoinFamily() {
               transition={{ type: "spring", bounce: 0.5 }}
               className="mb-4"
             >
-              <ChorlyMascot pose="think" size={120} bounce={true} />
+              <PenguinMascot mood="thinking" size={120} />
             </motion.div>
 
             <motion.h1
@@ -222,7 +222,7 @@ export default function JoinFamily() {
             </div>
 
             <div className="flex justify-center">
-              <ChorlyMascot pose="celebrate" size={110} bounce={true} />
+              <PenguinMascot mood="celebrating" size={110} />
             </div>
 
             <div className="text-center">

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { useStore } from "@/store/useStore";
-import { ChorlyMascot } from "@/components/ChorlyMascot";
+import { PenguinMascot } from "@/components/PenguinMascot";
 
 export default function Splash() {
   const [, setLocation] = useLocation();
@@ -37,7 +37,7 @@ export default function Splash() {
               transition={{ type: "spring", bounce: 0.55, duration: 0.9 }}
               className="mb-4"
             >
-              <ChorlyMascot pose="wave" size={140} bounce={true} />
+              <PenguinMascot mood="idle" size={140} />
             </motion.div>
           )}
         </AnimatePresence>

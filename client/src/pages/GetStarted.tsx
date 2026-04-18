@@ -4,7 +4,7 @@ import { Users, UserPlus, Sparkles, ChevronLeft, Crown, Star, ArrowLeft } from "
 import { useLocation } from "wouter";
 import { useStore } from "@/store/useStore";
 import { useDemoSetup } from "@/hooks/use-families";
-import { ChorlyMascot } from "@/components/ChorlyMascot";
+import { PenguinMascot } from "@/components/PenguinMascot";
 import { UserAvatar } from "@/components/UserAvatar";
 import type { User, Family } from "@shared/schema";
 import { cn } from "@/lib/utils";
@@ -84,7 +84,7 @@ export default function GetStarted() {
                 transition={{ type: "spring", bounce: 0.5, duration: 0.8 }}
                 className="mb-4 relative"
               >
-                <ChorlyMascot pose="point" size={130} bounce={true} />
+                <PenguinMascot mood="waving" size={130} />
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}

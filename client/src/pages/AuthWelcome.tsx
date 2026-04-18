@@ -10,7 +10,7 @@ import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/store/useStore";
 import { handlePostAuthNavigation } from "@/lib/postAuth";
-import { ChorlyMascot } from "@/components/ChorlyMascot";
+import { PenguinMascot } from "@/components/PenguinMascot";
 
 type ViewState = "welcome" | "verification" | "signin";
 
@@ -148,7 +148,7 @@ export default function AuthWelcome() {
               className="w-full flex flex-col items-center"
             >
               <div className="mb-6 inline-block">
-                 <ChorlyMascot pose="wave" size={80} bounce={true} />
+                 <PenguinMascot mood="waving" size={80} />
               </div>
               <h2 className="font-display text-3xl font-bold text-zinc-900 mb-1 leading-tight">Create your account</h2>
               <p className="text-sm font-semibold text-zinc-500 mb-8">Get started with your family</p>
@@ -347,7 +347,7 @@ export default function AuthWelcome() {
         transition={{ delay: 1, type: "spring", bounce: 0.4 }}
         className="absolute -bottom-4 right-10 pointer-events-none"
       >
-        <ChorlyMascot pose={view === "signin" ? "peek" : "wave"} size={80} bounce={false} />
+        <PenguinMascot mood={view === "signin" ? "thinking" : "waving"} size={80} />
       </motion.div>
     </div>
   );
