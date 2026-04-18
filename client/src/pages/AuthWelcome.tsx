@@ -15,6 +15,20 @@ import { apiFetch } from "@/lib/apiFetch";
 
 type ViewState = "welcome" | "verification" | "signin";
 
+async function safeJson(res: Response) {
+  const contentType = res.headers.get("Content-Type");
+  if (contentType && contentType.includes("application/json")) {
+    try {
+      return await res.json();
+    } catch {
+      const text = await res.text();
+      return { message: text || res.statusText };
+    }
+  }
+  const text = await res.text();
+  return { message: text || res.statusText };
+}
+
 export default function AuthWelcome() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -105,7 +119,8 @@ export default function AuthWelcome() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailTrimmed, firebaseUid: uid }),
       });
-      const data = await res.json();
+      const data = await safeJson(res);
+
       if (!res.ok) {
         if (res.status === 429 && data.waitSecs) startCooldown(data.waitSecs);
         toast({ title: "Couldn't send code", description: data.message, variant: "destructive" });
@@ -135,7 +150,8 @@ export default function AuthWelcome() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), firebaseUid: uid }),
       });
-      const data = await res.json();
+      const data = await safeJson(res);
+
       if (!res.ok) {
         if (res.status === 429 && data.waitSecs) startCooldown(data.waitSecs);
         toast({ title: "Couldn't resend code", description: data.message, variant: "destructive" });
@@ -202,7 +218,7 @@ export default function AuthWelcome() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), code }),
       });
-      const data = await res.json();
+      const data = await safeJson(res);
 
       if (!res.ok) {
         const msg = data.message || "Incorrect code. Please try again.";

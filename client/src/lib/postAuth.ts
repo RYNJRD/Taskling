@@ -23,16 +23,24 @@ export async function handlePostAuthNavigation({
   try {
     const res = await apiFetch(`/api/users/firebase/${uid}`);
     if (res.ok) {
-      const user = await res.json();
-      setCurrentUser(user);
-      if (user.familyId) {
-        const famRes = await apiFetch(`/api/families/${user.familyId}`);
-        if (famRes.ok) {
-          const family = await famRes.json();
-          setFamily(family);
-          setLocation(`/family/${family.id}/dashboard`);
-          return;
+      try {
+        const user = await res.json();
+        setCurrentUser(user);
+        if (user.familyId) {
+          const famRes = await apiFetch(`/api/families/${user.familyId}`);
+          if (famRes.ok) {
+            try {
+              const family = await famRes.json();
+              setFamily(family);
+              setLocation(`/family/${family.id}/dashboard`);
+              return;
+            } catch {
+              console.warn("[PostAuth] Failed to parse family JSON");
+            }
+          }
         }
+      } catch {
+        console.warn("[PostAuth] Failed to parse user JSON");
       }
     }
   } catch {}
