@@ -1,34 +1,59 @@
-let initialized = false;
-let app: any;
-let setupApp: any;
+import express, { Express } from "express";
+import { createServer } from "http";
+import { registerRoutes } from "../server/routes";
+
+let cachedApp: Express | null = null;
+
+function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true,
+  });
+  console.log(`\${formattedTime} [\${source}] \${message}`);
+}
 
 export default async function handler(req: any, res: any) {
   try {
-    if (!initialized) {
-      console.log("[Vercel] Lazy-loading server...");
-      const serverModule = await import("../server/index");
-      app = serverModule.app;
-      setupApp = serverModule.setupApp;
+    if (!cachedApp) {
+      console.log("[Vercel] Initializing Taskling server...");
+      const app = express();
+      
+      app.use(express.json({
+        verify: (req: any, _res, buf) => { req.rawBody = buf; },
+      }));
+      app.use(express.urlencoded({ extended: false }));
 
-      await setupApp().catch((err: any) => {
-        console.error("[Vercel] setupApp failed:", err);
-        throw err;
+      // Logging middleware
+      app.use((req, res, next) => {
+        const start = Date.now();
+        const path = req.path;
+        res.on("finish", () => {
+          const duration = Date.now() - start;
+          if (path.startsWith("/api")) {
+            log(`\${req.method} \${path} \${res.statusCode} in \${duration}ms`);
+          }
+        });
+        next();
       });
-      initialized = true;
+
+      const httpServer = createServer(app);
+      await registerRoutes(httpServer, app);
+      cachedApp = app;
     }
-    return app(req, res);
+
+    return cachedApp(req, res);
   } catch (err: any) {
-    console.error("[Vercel] EMERGENCY CRASH:", err);
+    console.error("[Vercel] CRITICAL INITIALIZATION ERROR:", err);
     if (!res.headersSent) {
       res.setHeader("Content-Type", "application/json");
       res.status(500).send(JSON.stringify({ 
-        message: "The Taskling server encountered a critical error during execution.",
+        message: "The Taskling server failed to initialize on Vercel.",
         error: err.message || String(err),
-        stack: err.stack,
-        phase: initialized ? "execution" : "initialization"
+        stack: err.stack
       }, null, 2));
     }
   }
 }
+
+
 
 
