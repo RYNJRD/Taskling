@@ -7,6 +7,8 @@ import { createSystemMessage } from "./message-service";
 import { recordActivity } from "./activity-service";
 import { evaluateAchievements } from "./achievement-service";
 import { publishFamilyEvent } from "../realtime";
+import { notifyParentsOfChoreCompleted } from "./email-service";
+import { notifyParentsOfChoreCompleted } from "./email-service";
 
 async function getFamilyById(id: number | null | undefined) {
   if (!id) return undefined;
@@ -178,6 +180,8 @@ export async function completeChore(choreId: number, userId: number, note?: stri
     await createSystemMessage(user.familyId, user.id, `📝 ${user.username} submitted "${chore.title}" for review.`);
     publishFamilyEvent(user.familyId, "family:review", submission);
 
+    notifyParentsOfChoreCompleted(user.familyId, user.username, chore.title).catch(console.error);
+
     return {
       chore,
       user,
@@ -211,6 +215,8 @@ export async function completeChore(choreId: number, userId: number, note?: stri
   });
   await createSystemMessage(user.familyId, user.id, `✨ ${user.username} completed "${chore.title}" for ${finalPoints} stars.`);
   publishFamilyEvent(user.familyId, "family:chore", { choreId: chore.id, userId: user.id, awardedPoints: finalPoints });
+
+  notifyParentsOfChoreCompleted(user.familyId, user.username, chore.title).catch(console.error);
 
   return {
     chore,

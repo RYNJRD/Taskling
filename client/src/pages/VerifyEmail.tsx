@@ -8,6 +8,7 @@ import { useStore } from "@/store/useStore";
 import { Button } from "@/components/ui/button";
 import { handlePostAuthNavigation } from "@/lib/postAuth";
 import { getEmailVerificationActionSettings } from "@/lib/emailVerification";
+import { apiFetch } from "@/lib/apiFetch";
 
 function isPasswordAuthUser() {
   const user = auth.currentUser;
@@ -80,7 +81,13 @@ export default function VerifyEmail() {
 
     setIsResending(true);
     try {
-      await sendEmailVerification(user, getEmailVerificationActionSettings(user.email ?? undefined));
+      if (!user.email) throw new Error("No email on account.");
+      const res = await apiFetch("/api/auth/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email })
+      });
+      if (!res.ok) throw new Error("Failed to send verification email");
       toast({
         title: "Verification email sent",
         description: "Check your inbox and spam folder.",

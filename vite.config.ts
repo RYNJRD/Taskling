@@ -4,7 +4,7 @@ import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig({
-  base: '/Chorely-2.0/',
+  base: process.env.VERCEL ? '/' : '/Chorely-2.0/',
   envDir: path.resolve(import.meta.dirname, "client"),
   plugins: [
     react(),

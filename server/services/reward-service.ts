@@ -6,6 +6,7 @@ import { recordActivity } from "./activity-service";
 import { createSystemMessage } from "./message-service";
 import { evaluateAchievements } from "./achievement-service";
 import { publishFamilyEvent } from "../realtime";
+import { notifyParentsOfRewardClaimed } from "./email-service";
 
 async function getRewardClaim(id: number) {
   const [claim] = await db.select().from(rewardClaims).where(eq(rewardClaims.id, id));
@@ -71,6 +72,9 @@ export async function claimReward(rewardId: number, userId: number, quantity: nu
   await evaluateAchievements(updatedUser);
   publishFamilyEvent(user.familyId, "family:reward", claim);
   publishFamilyEvent(user.familyId, "family:leaderboard", { familyId: user.familyId, userId: updatedUser.id });
+  
+  notifyParentsOfRewardClaimed(user.familyId, user.username, reward.title).catch(console.error);
+
   return { user: updatedUser, claim };
 }
 

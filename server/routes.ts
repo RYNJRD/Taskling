@@ -12,6 +12,7 @@ import { createMessage } from "./services/message-service";
 import { getFamilyOnboardingChecklist } from "./services/family-service";
 import { ensurePreviousMonthWinners } from "./services/monthly-winners-service";
 import { recordActivity } from "./services/activity-service";
+import { notifyNewParentSignup } from "./services/email-service";
 import { publishFamilyEvent, registerSseClient, removeSseClient } from "./realtime";
 
 function parseId(value: unknown): number | null {
@@ -190,6 +191,11 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
           relatedEntityId: user.id,
         });
       }
+      
+      if (user.role === "parent" && user.firebaseUid) {
+        notifyNewParentSignup(user.firebaseUid, user.username).catch(console.error);
+      }
+
       return res.status(201).json(user);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -501,6 +507,37 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     const family = await storage.getOrCreateCurrentDemo();
     const users = await storage.getFamilyUsers(family.id);
     return res.status(201).json({ family, users });
+  });
+
+  app.post("/api/auth/verify-email", requireAuth, async (req, res) => {
+    try {
+      const { getAuth } = await import("firebase-admin/auth");
+      const { sendVerificationEmail } = await import("./services/email-service");
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ message: "Email required" });
+      const link = await getAuth().generateEmailVerificationLink(email);
+      await sendVerificationEmail(email, link);
+      return res.json({ success: true });
+    } catch (e: any) {
+      console.error("[Auth] verification email error", e);
+      return res.status(500).json({ message: e.message || "Failed to send email" });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { getAuth } = await import("firebase-admin/auth");
+      const { sendPasswordResetEmail } = await import("./services/email-service");
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ message: "Email required" });
+      const link = await getAuth().generatePasswordResetLink(email);
+      await sendPasswordResetEmail(email, link);
+      return res.json({ success: true });
+    } catch (e: any) {
+      console.error("[Auth] reset password email error", e);
+      // DO NOT return 404/500 if user doesn't exist to prevent email enumeration
+      return res.json({ success: true });
+    }
   });
 
   return httpServer;
