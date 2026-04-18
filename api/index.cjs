@@ -36083,265 +36083,6 @@ var init_schema2 = __esm({
   }
 });
 
-// shared/constants.ts
-var USER_ROLES;
-var init_constants = __esm({
-  "shared/constants.ts"() {
-    "use strict";
-    USER_ROLES = ["admin", "member"];
-  }
-});
-
-// shared/routes.ts
-var errorSchemas, reviewDecisionSchema, api;
-var init_routes = __esm({
-  "shared/routes.ts"() {
-    "use strict";
-    init_zod();
-    init_schema2();
-    init_constants();
-    errorSchemas = {
-      validation: external_exports.object({ message: external_exports.string(), field: external_exports.string().optional() }),
-      notFound: external_exports.object({ message: external_exports.string() }),
-      internal: external_exports.object({ message: external_exports.string() })
-    };
-    reviewDecisionSchema = external_exports.object({
-      action: external_exports.enum(["approve", "reject", "undo", "cancel"]),
-      note: external_exports.string().max(250).optional()
-    });
-    api = {
-      families: {
-        create: {
-          method: "POST",
-          path: "/api/families",
-          input: insertFamilySchema.extend({
-            starterMode: external_exports.enum(["guided", "blank"]).default("guided").optional()
-          }),
-          responses: { 201: external_exports.custom() }
-        },
-        get: {
-          method: "GET",
-          path: "/api/families/:id",
-          responses: { 200: external_exports.custom() }
-        },
-        getByCode: {
-          method: "GET",
-          path: "/api/families/code/:code",
-          responses: { 200: external_exports.custom() }
-        },
-        getUsers: {
-          method: "GET",
-          path: "/api/families/:id/users",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        getChores: {
-          method: "GET",
-          path: "/api/families/:id/chores",
-          responses: {
-            200: external_exports.array(
-              external_exports.custom()
-            )
-          }
-        },
-        getLeaderboard: {
-          method: "GET",
-          path: "/api/families/:id/leaderboard",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        getInviteInfo: {
-          method: "GET",
-          path: "/api/families/:id/invite",
-          responses: { 200: external_exports.object({ inviteCode: external_exports.string(), inviteUrl: external_exports.string() }) }
-        },
-        getActivity: {
-          method: "GET",
-          path: "/api/families/:id/activity",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        getMonthlyWinners: {
-          method: "GET",
-          path: "/api/families/:id/monthly-winners",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        getAchievements: {
-          method: "GET",
-          path: "/api/families/:id/achievements",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        getOnboarding: {
-          method: "GET",
-          path: "/api/families/:id/onboarding",
-          responses: {
-            200: external_exports.object({
-              checklist: external_exports.array(
-                external_exports.object({
-                  key: external_exports.string(),
-                  label: external_exports.string(),
-                  description: external_exports.string(),
-                  complete: external_exports.boolean()
-                })
-              )
-            })
-          }
-        }
-      },
-      users: {
-        create: {
-          method: "POST",
-          path: "/api/users",
-          input: insertUserSchema,
-          responses: { 201: external_exports.custom() }
-        },
-        get: {
-          method: "GET",
-          path: "/api/users/:id",
-          responses: { 200: external_exports.custom() }
-        },
-        getByFirebaseUid: {
-          method: "GET",
-          path: "/api/users/firebase/:uid",
-          responses: { 200: external_exports.custom() }
-        },
-        updateProfile: {
-          method: "PATCH",
-          path: "/api/users/:id/profile",
-          input: external_exports.object({ username: external_exports.string().min(1).max(40) }),
-          responses: { 200: external_exports.custom() }
-        },
-        updateAvatar: {
-          method: "PATCH",
-          path: "/api/users/:id/avatar",
-          input: external_exports.object({ avatarConfig: external_exports.string(), avatarInventory: external_exports.string().optional() }),
-          responses: { 200: external_exports.custom() }
-        },
-        toggleLeaderboard: {
-          method: "PATCH",
-          path: "/api/users/:id/leaderboard",
-          input: external_exports.object({ hideFromLeaderboard: external_exports.boolean() }),
-          responses: { 200: external_exports.custom() }
-        },
-        updateRole: {
-          method: "PATCH",
-          path: "/api/users/:id/role",
-          input: external_exports.object({ role: external_exports.enum(USER_ROLES) }),
-          responses: { 200: external_exports.custom() }
-        }
-      },
-      messages: {
-        list: {
-          method: "GET",
-          path: "/api/families/:id/messages",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        create: {
-          method: "POST",
-          path: "/api/messages",
-          input: external_exports.object({
-            familyId: external_exports.coerce.number(),
-            userId: external_exports.coerce.number(),
-            senderName: external_exports.string(),
-            content: external_exports.string().min(1).max(400)
-          }),
-          responses: { 201: external_exports.custom() }
-        }
-      },
-      chores: {
-        create: {
-          method: "POST",
-          path: "/api/chores",
-          input: insertChoreSchema,
-          responses: { 201: external_exports.custom() }
-        },
-        update: {
-          method: "PATCH",
-          path: "/api/chores/:id",
-          input: insertChoreSchema.partial(),
-          responses: { 200: external_exports.custom() }
-        },
-        complete: {
-          method: "POST",
-          path: "/api/chores/:id/complete",
-          input: external_exports.object({ userId: external_exports.coerce.number(), note: external_exports.string().max(250).optional() }),
-          responses: {
-            200: external_exports.object({
-              chore: external_exports.custom(),
-              user: external_exports.custom(),
-              submission: external_exports.custom().nullable(),
-              awardedPoints: external_exports.number()
-            })
-          }
-        }
-      },
-      reviews: {
-        chorePending: {
-          method: "GET",
-          path: "/api/families/:id/chore-submissions/pending",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        rewardPending: {
-          method: "GET",
-          path: "/api/families/:id/reward-claims/pending",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        reviewChore: {
-          method: "POST",
-          path: "/api/chore-submissions/:id/review",
-          input: reviewDecisionSchema,
-          responses: { 200: external_exports.custom() }
-        },
-        reviewReward: {
-          method: "POST",
-          path: "/api/reward-claims/:id/review",
-          input: reviewDecisionSchema,
-          responses: { 200: external_exports.custom() }
-        }
-      },
-      rewards: {
-        list: {
-          method: "GET",
-          path: "/api/families/:id/rewards",
-          responses: { 200: external_exports.array(external_exports.custom()) }
-        },
-        create: {
-          method: "POST",
-          path: "/api/rewards",
-          input: insertRewardSchema,
-          responses: { 201: external_exports.custom() }
-        },
-        claim: {
-          method: "POST",
-          path: "/api/rewards/:id/claim",
-          input: external_exports.object({ userId: external_exports.coerce.number(), quantity: external_exports.coerce.number().default(1), note: external_exports.string().max(250).optional() }),
-          responses: {
-            200: external_exports.object({
-              user: external_exports.custom(),
-              claim: external_exports.custom()
-            })
-          }
-        }
-      },
-      events: {
-        stream: {
-          method: "GET",
-          path: "/api/events/stream",
-          input: external_exports.object({
-            token: external_exports.string().min(1).optional(),
-            demoUserId: external_exports.coerce.number().optional(),
-            familyId: external_exports.coerce.number()
-          })
-        }
-      },
-      demo: {
-        setup: {
-          method: "POST",
-          path: "/api/demo/setup",
-          responses: { 201: external_exports.object({ family: external_exports.custom(), users: external_exports.array(external_exports.custom()) }) }
-        }
-      }
-    };
-  }
-});
-
 // node_modules/postgres-array/index.js
 var require_postgres_array = __commonJS({
   "node_modules/postgres-array/index.js"(exports2) {
@@ -41864,724 +41605,6 @@ var init_db2 = __esm({
   }
 });
 
-// server/storage.ts
-function generateInviteCode(familyName) {
-  const words = ["STAR", "MOON", "FIRE", "WAVE", "BOLT", "LEAF", "ROCK", "WIND", "SNOW", "RAIN"];
-  const word = words[Math.floor(Math.random() * words.length)];
-  const prefix = familyName.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3) || "FAM";
-  const number = Math.floor(1e3 + Math.random() * 9e3);
-  return `${prefix}${word}${number}`;
-}
-async function setupDemoFamily(storage2) {
-  const family = await storage2.createFamily({
-    name: "The Demo Family",
-    inviteCode: generateInviteCode("DEMO"),
-    timeZone: "Europe/London",
-    themeColor: "violet"
-  });
-  const parent = await storage2.createUser({
-    familyId: family.id,
-    username: "Jordan",
-    role: "admin",
-    gender: "other",
-    age: 38,
-    avatarConfig: JSON.stringify({})
-  });
-  const alex = await storage2.createUser({
-    familyId: family.id,
-    username: "Alex",
-    role: "member",
-    gender: "other",
-    age: 13,
-    avatarConfig: JSON.stringify({})
-  });
-  const mia = await storage2.createUser({
-    familyId: family.id,
-    username: "Mia",
-    role: "member",
-    gender: "other",
-    age: 10,
-    avatarConfig: JSON.stringify({})
-  });
-  await storage2.createChore({
-    familyId: family.id,
-    title: "Empty dishwasher",
-    description: "Put everything away before dinner.",
-    points: 20,
-    type: "daily",
-    assigneeId: alex.id,
-    requiresApproval: false,
-    createdBy: parent.id,
-    emoji: "\u{1F37D}\uFE0F"
-  });
-  await storage2.createChore({
-    familyId: family.id,
-    title: "Tidy bedroom",
-    description: "Quick five-minute reset.",
-    points: 15,
-    type: "daily",
-    assigneeId: mia.id,
-    requiresApproval: false,
-    createdBy: parent.id,
-    emoji: "\u{1F9F8}"
-  });
-  await storage2.createChore({
-    familyId: family.id,
-    title: "Take out recycling",
-    description: "Snap a quick photo if the bin is already full.",
-    points: 30,
-    type: "weekly",
-    assigneeId: alex.id,
-    requiresApproval: true,
-    createdBy: parent.id,
-    emoji: "\u267B\uFE0F"
-  });
-  await storage2.createChore({
-    familyId: family.id,
-    title: "Dog walk backup",
-    description: "Anyone can jump in and help.",
-    points: 25,
-    type: "box",
-    assigneeId: null,
-    requiresApproval: false,
-    createdBy: parent.id,
-    emoji: "\u{1F436}"
-  });
-  await storage2.createReward({
-    familyId: family.id,
-    title: "Choose Friday movie",
-    description: "Winner picks the family movie night pick.",
-    costPoints: 120,
-    emoji: "\u{1F3AC}",
-    requiresApproval: false,
-    createdBy: parent.id
-  });
-  await storage2.createReward({
-    familyId: family.id,
-    title: "Later bedtime pass",
-    description: "Worth one extra hour on Saturday.",
-    costPoints: 220,
-    emoji: "\u{1F319}",
-    requiresApproval: true,
-    createdBy: parent.id
-  });
-  await storage2.createMessage({
-    familyId: family.id,
-    userId: parent.id,
-    senderName: "Taskling",
-    content: "Welcome to the demo family. Try completing a chore, claiming a reward, and reviewing an approval.",
-    isSystem: true
-  });
-  return family;
-}
-var currentDemoFamily, lastDemoRotation, ROTATION_INTERVAL, DatabaseStorage, storage;
-var init_storage = __esm({
-  "server/storage.ts"() {
-    "use strict";
-    init_drizzle_orm();
-    init_schema2();
-    init_db2();
-    currentDemoFamily = null;
-    lastDemoRotation = 0;
-    ROTATION_INTERVAL = 5 * 60 * 1e3;
-    DatabaseStorage = class {
-      async createFamily(family) {
-        const payload = {
-          name: family.name,
-          inviteCode: family.inviteCode ?? generateInviteCode(family.name),
-          timeZone: family.timeZone ?? "UTC",
-          themeColor: family.themeColor ?? "violet"
-        };
-        const [newFamily] = await db.insert(families).values(payload).returning();
-        return newFamily;
-      }
-      async getFamily(id) {
-        const [family] = await db.select().from(families).where(eq(families.id, id));
-        return family;
-      }
-      async getFamilyByCode(code) {
-        const [family] = await db.select().from(families).where(eq(families.inviteCode, code));
-        return family;
-      }
-      async getFamilyUsers(familyId) {
-        return db.select().from(users).where(eq(users.familyId, familyId)).orderBy(desc(users.points), users.username);
-      }
-      async getFamilyChores(familyId, userId) {
-        const rawChores = await db.select().from(chores).where(and(eq(chores.familyId, familyId), eq(chores.isActive, true)));
-        if (!userId) return rawChores;
-        const submissions = await db.select().from(choreSubmissions).where(and(
-          eq(choreSubmissions.familyId, familyId),
-          eq(choreSubmissions.userId, userId)
-        )).orderBy(desc(choreSubmissions.createdAt));
-        return rawChores.map((chore) => {
-          const latest = submissions.find((s) => s.choreId === chore.id);
-          return {
-            ...chore,
-            latestSubmissionStatus: latest?.status,
-            rejectionReason: latest?.rejectionReason ?? void 0,
-            submissionNote: latest?.note ?? void 0
-          };
-        });
-      }
-      async createUser(user) {
-        const [newUser] = await db.insert(users).values({
-          avatarConfig: user.avatarConfig ?? "{}",
-          avatarInventory: user.avatarInventory ?? "{}",
-          ...user
-        }).returning();
-        return newUser;
-      }
-      async getUser(id) {
-        const [user] = await db.select().from(users).where(eq(users.id, id));
-        return user;
-      }
-      async getUserByFirebaseUid(uid) {
-        const [user] = await db.select().from(users).where(eq(users.firebaseUid, uid));
-        return user;
-      }
-      async updateUserAvatar(id, avatarConfig, avatarInventory) {
-        const [updated] = await db.update(users).set({ avatarConfig, ...avatarInventory ? { avatarInventory } : {} }).where(eq(users.id, id)).returning();
-        return updated;
-      }
-      async updateUserLeaderboard(id, hide) {
-        const [updated] = await db.update(users).set({ hideFromLeaderboard: hide }).where(eq(users.id, id)).returning();
-        return updated;
-      }
-      async updateUserRole(id, role) {
-        const [updated] = await db.update(users).set({ role }).where(eq(users.id, id)).returning();
-        return updated;
-      }
-      async updateUserProfile(id, username) {
-        const [updated] = await db.update(users).set({ username }).where(eq(users.id, id)).returning();
-        return updated;
-      }
-      async createChore(chore) {
-        const [newChore] = await db.insert(chores).values(chore).returning();
-        return newChore;
-      }
-      async getChore(id) {
-        const [chore] = await db.select().from(chores).where(eq(chores.id, id));
-        return chore;
-      }
-      async updateChore(id, updates) {
-        const [updated] = await db.update(chores).set(updates).where(eq(chores.id, id)).returning();
-        return updated;
-      }
-      async getRewards(familyId) {
-        return db.select().from(rewards).where(eq(rewards.familyId, familyId)).orderBy(rewards.costPoints);
-      }
-      async createReward(reward) {
-        const [newReward] = await db.insert(rewards).values(reward).returning();
-        return newReward;
-      }
-      async getMessages(familyId) {
-        return db.select().from(messages).where(eq(messages.familyId, familyId)).orderBy(messages.createdAt);
-      }
-      async createMessage(message) {
-        const [newMessage] = await db.insert(messages).values(message).returning();
-        return newMessage;
-      }
-      async getActivity(familyId) {
-        return db.select().from(activityEvents).where(eq(activityEvents.familyId, familyId)).orderBy(desc(activityEvents.createdAt));
-      }
-      async getAchievements(familyId) {
-        return db.select().from(userAchievements).where(eq(userAchievements.familyId, familyId)).orderBy(desc(userAchievements.earnedAt));
-      }
-      async getMonthlyWinners(familyId) {
-        return db.select().from(monthlyWinners).where(eq(monthlyWinners.familyId, familyId)).orderBy(desc(monthlyWinners.monthKey));
-      }
-      async getPendingChoreSubmissions(familyId) {
-        return db.select().from(choreSubmissions).where(and(eq(choreSubmissions.familyId, familyId), eq(choreSubmissions.status, "submitted"))).orderBy(desc(choreSubmissions.createdAt));
-      }
-      async getPendingRewardClaims(familyId) {
-        return db.select().from(rewardClaims).where(and(eq(rewardClaims.familyId, familyId), eq(rewardClaims.status, "submitted"))).orderBy(desc(rewardClaims.createdAt));
-      }
-      async getOrCreateCurrentDemo() {
-        const now = Date.now();
-        if (!currentDemoFamily || now - lastDemoRotation > ROTATION_INTERVAL) {
-          currentDemoFamily = await setupDemoFamily(this);
-          lastDemoRotation = now;
-        }
-        return currentDemoFamily;
-      }
-    };
-    storage = new DatabaseStorage();
-  }
-});
-
-// server/auth.ts
-async function getFirebasePublicKeys() {
-  const now = Date.now();
-  if (pkCache && now < pkCache.expiresAt) return pkCache.keys;
-  const res = await fetch(
-    "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
-  );
-  if (!res.ok) throw new Error("Failed to fetch Firebase public keys");
-  const cc = res.headers.get("cache-control") ?? "";
-  const maxAgeMatch = cc.match(/max-age=(\d+)/);
-  const ttl = maxAgeMatch ? parseInt(maxAgeMatch[1]) * 1e3 : 36e5;
-  const certs = await res.json();
-  pkCache = { keys: certs, expiresAt: now + ttl };
-  return certs;
-}
-async function verifyFirebaseToken(token) {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const headerJson = Buffer.from(
-      parts[0].replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - parts[0].length % 4) % 4),
-      "base64"
-    ).toString("utf8");
-    const header = JSON.parse(headerJson);
-    if (header.alg !== "RS256" || !header.kid) return null;
-    const payloadJson = Buffer.from(
-      parts[1].replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - parts[1].length % 4) % 4),
-      "base64"
-    ).toString("utf8");
-    const payload = JSON.parse(payloadJson);
-    const uid = extractUid(payload);
-    if (!uid) return null;
-    const now = Math.floor(Date.now() / 1e3);
-    if (typeof payload.exp === "number" && payload.exp < now) {
-      console.warn("[auth] Firebase token expired");
-      return null;
-    }
-    if (typeof payload.iat === "number" && payload.iat > now + 300) {
-      console.warn("[auth] Firebase token issued in the future");
-      return null;
-    }
-    const certs = await getFirebasePublicKeys();
-    const certPem = certs[header.kid];
-    if (!certPem) {
-      console.warn("[auth] No public key found for kid:", header.kid);
-      return null;
-    }
-    const signingInput = `${parts[0]}.${parts[1]}`;
-    const signature = Buffer.from(
-      parts[2].replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - parts[2].length % 4) % 4),
-      "base64"
-    );
-    const verify = crypto.createVerify("RSA-SHA256");
-    verify.update(signingInput);
-    const valid = verify.verify(certPem, signature);
-    if (!valid) {
-      console.warn("[auth] Firebase token signature invalid");
-      return null;
-    }
-    return { uid };
-  } catch (e) {
-    console.warn("[auth] verifyFirebaseToken error:", e);
-    return null;
-  }
-}
-function initializeFirebaseAdmin() {
-  if ((0, import_app.getApps)().length > 0) return;
-  const env = getEnv();
-  const privateKey = env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
-  if (env.FIREBASE_CLIENT_EMAIL && privateKey) {
-    (0, import_app.initializeApp)({
-      credential: (0, import_app.cert)({
-        projectId: env.FIREBASE_PROJECT_ID,
-        clientEmail: env.FIREBASE_CLIENT_EMAIL,
-        privateKey
-      }),
-      projectId: env.FIREBASE_PROJECT_ID
-    });
-    return;
-  }
-  (0, import_app.initializeApp)({
-    credential: (0, import_app.applicationDefault)(),
-    projectId: env.FIREBASE_PROJECT_ID
-  });
-}
-async function verifyBearerToken(token) {
-  initializeFirebaseAdmin();
-  return (0, import_auth.getAuth)().verifyIdToken(token, true);
-}
-function decodeJwtPayload(token) {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    const padded = base64 + "=".repeat((4 - base64.length % 4) % 4);
-    return JSON.parse(Buffer.from(padded, "base64").toString("utf8"));
-  } catch {
-    return null;
-  }
-}
-function extractUid(payload) {
-  for (const field of ["user_id", "sub", "uid"]) {
-    const val = payload[field];
-    if (typeof val === "string" && val.trim().length > 0) return val.trim();
-  }
-  return null;
-}
-async function requireAuth(req, res, next) {
-  if (IS_DEV) {
-    const demoUserId = Number(req.headers["x-demo-user-id"]);
-    if (Number.isFinite(demoUserId) && demoUserId > 0) {
-      req.auth = { uid: `demo:${demoUserId}`, demoUserId };
-      return next();
-    }
-  }
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Missing bearer token" });
-  }
-  const token = authHeader.slice("Bearer ".length).trim();
-  if (!token) {
-    return res.status(401).json({ message: "Missing bearer token" });
-  }
-  const verified = await verifyFirebaseToken(token);
-  if (verified) {
-    req.auth = { uid: verified.uid };
-    return next();
-  }
-  if (IS_DEV) {
-    const payload = decodeJwtPayload(token);
-    if (payload) {
-      const uid = extractUid(payload);
-      if (uid) {
-        req.auth = { uid };
-        return next();
-      }
-      console.warn("[auth] JWT payload decoded but no uid found. Keys:", Object.keys(payload));
-      return res.status(401).json({ message: "Could not extract uid from token" });
-    }
-    console.warn("[auth] Bearer token is not a valid JWT. Length:", token.length);
-    return res.status(401).json({ message: "Bearer token is not a valid JWT" });
-  }
-  try {
-    const decoded = await verifyBearerToken(token);
-    req.auth = { uid: decoded.uid };
-    return next();
-  } catch (error) {
-    const message = error instanceof Error && error.message.includes("environment variable") ? error.message : "Invalid or expired auth token";
-    console.error("[auth] All auth methods failed:", error instanceof Error ? error.message : error);
-    return res.status(message.startsWith("Missing required") ? 500 : 401).json({ message });
-  }
-}
-async function attachCurrentUser(req, res, next) {
-  if (!req.auth?.uid) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-  if (req.auth.demoUserId) {
-    const demoUser = await storage.getUser(req.auth.demoUserId);
-    if (!demoUser) {
-      return res.status(404).json({ message: "Demo user no longer exists" });
-    }
-    req.currentUser = demoUser;
-    return next();
-  }
-  const user = await storage.getUserByFirebaseUid(req.auth.uid);
-  if (!user) {
-    return res.status(404).json({ message: "User profile not found for this account" });
-  }
-  req.currentUser = user;
-  return next();
-}
-function getCurrentUser(req) {
-  if (!req.currentUser) {
-    throw new Error("Current user is not attached");
-  }
-  return req.currentUser;
-}
-var import_app, import_auth, crypto, IS_DEV, pkCache;
-var init_auth = __esm({
-  "server/auth.ts"() {
-    "use strict";
-    import_app = require("firebase-admin/app");
-    import_auth = require("firebase-admin/auth");
-    init_storage();
-    init_env();
-    crypto = __toESM(require("crypto"), 1);
-    IS_DEV = false;
-    pkCache = null;
-  }
-});
-
-// server/permissions.ts
-function isAdmin(user) {
-  return user?.role === "admin";
-}
-function canManageFamily(user) {
-  return isAdmin(user);
-}
-function canApprove(user) {
-  return isAdmin(user);
-}
-function ensureSameFamily(currentFamilyId, targetFamilyId) {
-  return !!currentFamilyId && !!targetFamilyId && currentFamilyId === targetFamilyId;
-}
-var init_permissions = __esm({
-  "server/permissions.ts"() {
-    "use strict";
-  }
-});
-
-// shared/streak.ts
-function getFamilyTimeZone(family) {
-  return family?.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-}
-function getLocalDateKey(date2, timeZone) {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(date2);
-}
-function getPreviousDateKey(dateKey) {
-  const [year, month, day] = dateKey.split("-").map(Number);
-  const d = new Date(Date.UTC(year, month - 1, day));
-  d.setUTCDate(d.getUTCDate() - 1);
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "UTC",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(d);
-}
-function getEffectiveStreakForDate(user, date2, timeZone) {
-  if (!user.streak || !user.streakLastCompletedDate) return 0;
-  const todayKey = getLocalDateKey(date2, timeZone);
-  const yesterdayKey = getPreviousDateKey(todayKey);
-  if (user.streakLastCompletedDate === yesterdayKey) {
-    return user.streak;
-  }
-  return 0;
-}
-function calculateStreakMultiplier(streakDays) {
-  if (streakDays <= 0) {
-    return { multiplier: 1, bonusPercent: 0 };
-  }
-  const multiplier = Math.min(1 + 0.2 * streakDays, 2);
-  const bonusPercent = Math.round((multiplier - 1) * 100);
-  return { multiplier, bonusPercent };
-}
-var init_streak = __esm({
-  "shared/streak.ts"() {
-    "use strict";
-  }
-});
-
-// server/realtime.ts
-function writeEvent(res, event, payload) {
-  res.write(`event: ${event}
-`);
-  res.write(`data: ${JSON.stringify(payload)}
-
-`);
-}
-function registerSseClient(id, familyId, res) {
-  clients.set(id, { id, familyId, res });
-  writeEvent(res, "family:heartbeat", { ok: true, familyId, connectedAt: (/* @__PURE__ */ new Date()).toISOString() });
-}
-function removeSseClient(id) {
-  clients.delete(id);
-}
-function publishFamilyEvent(familyId, event, payload) {
-  for (const client of clients.values()) {
-    if (client.familyId !== familyId) continue;
-    writeEvent(client.res, event, payload);
-  }
-}
-var clients;
-var init_realtime = __esm({
-  "server/realtime.ts"() {
-    "use strict";
-    clients = /* @__PURE__ */ new Map();
-  }
-});
-
-// server/services/activity-service.ts
-async function recordActivity(args) {
-  const [event] = await db.insert(activityEvents).values({
-    familyId: args.familyId,
-    userId: args.userId ?? null,
-    type: args.type,
-    title: args.title,
-    body: args.body,
-    relatedEntityType: args.relatedEntityType,
-    relatedEntityId: args.relatedEntityId,
-    metadata: args.metadata ?? {}
-  }).returning();
-  publishFamilyEvent(args.familyId, "family:activity", event);
-  return event;
-}
-var init_activity_service = __esm({
-  "server/services/activity-service.ts"() {
-    "use strict";
-    init_schema2();
-    init_db2();
-    init_realtime();
-  }
-});
-
-// server/services/message-service.ts
-async function createMessage(args) {
-  const [message] = await db.insert(messages).values(args).returning();
-  publishFamilyEvent(args.familyId, "family:message", message);
-  if (!args.isSystem) {
-    await recordActivity({
-      familyId: args.familyId,
-      userId: args.userId,
-      type: "chat_message",
-      title: `${args.senderName} sent a message`,
-      body: args.content,
-      relatedEntityType: "message",
-      relatedEntityId: message.id
-    });
-  }
-  return message;
-}
-async function createSystemMessage(familyId, userId, content) {
-  return createMessage({
-    familyId,
-    userId,
-    senderName: "Taskling",
-    content,
-    isSystem: true
-  });
-}
-var init_message_service = __esm({
-  "server/services/message-service.ts"() {
-    "use strict";
-    init_schema2();
-    init_db2();
-    init_realtime();
-    init_activity_service();
-  }
-});
-
-// shared/achievements.ts
-function getAchievementDefinition(code) {
-  return ACHIEVEMENTS.find((achievement) => achievement.code === code);
-}
-var ACHIEVEMENTS;
-var init_achievements = __esm({
-  "shared/achievements.ts"() {
-    "use strict";
-    ACHIEVEMENTS = [
-      {
-        code: "first_steps",
-        title: "First Steps",
-        description: "Complete your first chore.",
-        emoji: "\u{1F31F}"
-      },
-      {
-        code: "helper_10",
-        title: "Helping Hand",
-        description: "Complete 10 chores.",
-        emoji: "\u{1F64C}"
-      },
-      {
-        code: "streak_7",
-        title: "On A Roll",
-        description: "Reach a 7-day streak.",
-        emoji: "\u{1F525}"
-      },
-      {
-        code: "streak_30",
-        title: "Streak Superstar",
-        description: "Reach a 30-day streak.",
-        emoji: "\u{1F3C6}"
-      },
-      {
-        code: "reward_redeemer",
-        title: "Treat Time",
-        description: "Claim your first reward.",
-        emoji: "\u{1F381}"
-      },
-      {
-        code: "team_player",
-        title: "Team Player",
-        description: "Finish three shared chores.",
-        emoji: "\u{1F91D}"
-      }
-    ];
-  }
-});
-
-// server/services/achievement-service.ts
-async function hasAchievement(userId, code) {
-  const [existing] = await db.select().from(userAchievements).where(and(eq(userAchievements.userId, userId), eq(userAchievements.code, code)));
-  return !!existing;
-}
-async function awardAchievementIfMissing(user, code) {
-  const definition = getAchievementDefinition(code);
-  if (!definition || !user.familyId) return null;
-  if (await hasAchievement(user.id, code)) return null;
-  const [achievement] = await db.insert(userAchievements).values({
-    familyId: user.familyId,
-    userId: user.id,
-    code: definition.code,
-    title: definition.title,
-    description: definition.description,
-    emoji: definition.emoji
-  }).returning();
-  await recordActivity({
-    familyId: user.familyId,
-    userId: user.id,
-    type: "achievement_earned",
-    title: `${definition.emoji} ${definition.title}`,
-    body: `${user.username} earned ${definition.title}.`,
-    relatedEntityType: "achievement",
-    relatedEntityId: achievement.id,
-    metadata: { code }
-  });
-  await createSystemMessage(
-    user.familyId,
-    user.id,
-    `${definition.emoji} ${user.username} unlocked ${definition.title}!`
-  );
-  return achievement;
-}
-async function evaluateAchievements(user) {
-  const familyId = user.familyId;
-  if (!familyId) return [];
-  const [completedStats] = await db.select({ count: sql`count(*)` }).from(choreLogs).where(eq(choreLogs.userId, user.id));
-  const [sharedStats] = await db.select({ count: sql`count(*)` }).from(choreLogs).innerJoin(users, eq(users.id, choreLogs.userId)).where(eq(choreLogs.userId, user.id));
-  const [rewardStats] = await db.select({ count: sql`count(*)` }).from(rewardClaims).where(and(eq(rewardClaims.userId, user.id), eq(rewardClaims.status, "approved")));
-  const earned = [];
-  if ((completedStats?.count ?? 0) >= 1) {
-    const achievement = await awardAchievementIfMissing(user, "first_steps");
-    if (achievement) earned.push(achievement);
-  }
-  if ((completedStats?.count ?? 0) >= 10) {
-    const achievement = await awardAchievementIfMissing(user, "helper_10");
-    if (achievement) earned.push(achievement);
-  }
-  if (user.streak >= 7) {
-    const achievement = await awardAchievementIfMissing(user, "streak_7");
-    if (achievement) earned.push(achievement);
-  }
-  if (user.streak >= 30) {
-    const achievement = await awardAchievementIfMissing(user, "streak_30");
-    if (achievement) earned.push(achievement);
-  }
-  if ((rewardStats?.count ?? 0) >= 1) {
-    const achievement = await awardAchievementIfMissing(user, "reward_redeemer");
-    if (achievement) earned.push(achievement);
-  }
-  if ((sharedStats?.count ?? 0) >= 3) {
-    const achievement = await awardAchievementIfMissing(user, "team_player");
-    if (achievement) earned.push(achievement);
-  }
-  return earned;
-}
-var init_achievement_service = __esm({
-  "server/services/achievement-service.ts"() {
-    "use strict";
-    init_drizzle_orm();
-    init_achievements();
-    init_schema2();
-    init_db2();
-    init_activity_service();
-    init_message_service();
-  }
-});
-
 // server/services/email-service.ts
 var email_service_exports = {};
 __export(email_service_exports, {
@@ -42903,7 +41926,942 @@ var init_email_service = __esm({
   }
 });
 
+// server/vercel-handler.ts
+var vercel_handler_exports = {};
+__export(vercel_handler_exports, {
+  default: () => handler
+});
+module.exports = __toCommonJS(vercel_handler_exports);
+var import_express = __toESM(require_express2(), 1);
+var import_http = require("http");
+
+// server/routes.ts
+var import_crypto = require("crypto");
+init_zod();
+
+// shared/routes.ts
+init_zod();
+init_schema2();
+
+// shared/constants.ts
+var USER_ROLES = ["admin", "member"];
+
+// shared/routes.ts
+var errorSchemas = {
+  validation: external_exports.object({ message: external_exports.string(), field: external_exports.string().optional() }),
+  notFound: external_exports.object({ message: external_exports.string() }),
+  internal: external_exports.object({ message: external_exports.string() })
+};
+var reviewDecisionSchema = external_exports.object({
+  action: external_exports.enum(["approve", "reject", "undo", "cancel"]),
+  note: external_exports.string().max(250).optional()
+});
+var api = {
+  families: {
+    create: {
+      method: "POST",
+      path: "/api/families",
+      input: insertFamilySchema.extend({
+        starterMode: external_exports.enum(["guided", "blank"]).default("guided").optional()
+      }),
+      responses: { 201: external_exports.custom() }
+    },
+    get: {
+      method: "GET",
+      path: "/api/families/:id",
+      responses: { 200: external_exports.custom() }
+    },
+    getByCode: {
+      method: "GET",
+      path: "/api/families/code/:code",
+      responses: { 200: external_exports.custom() }
+    },
+    getUsers: {
+      method: "GET",
+      path: "/api/families/:id/users",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    getChores: {
+      method: "GET",
+      path: "/api/families/:id/chores",
+      responses: {
+        200: external_exports.array(
+          external_exports.custom()
+        )
+      }
+    },
+    getLeaderboard: {
+      method: "GET",
+      path: "/api/families/:id/leaderboard",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    getInviteInfo: {
+      method: "GET",
+      path: "/api/families/:id/invite",
+      responses: { 200: external_exports.object({ inviteCode: external_exports.string(), inviteUrl: external_exports.string() }) }
+    },
+    getActivity: {
+      method: "GET",
+      path: "/api/families/:id/activity",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    getMonthlyWinners: {
+      method: "GET",
+      path: "/api/families/:id/monthly-winners",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    getAchievements: {
+      method: "GET",
+      path: "/api/families/:id/achievements",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    getOnboarding: {
+      method: "GET",
+      path: "/api/families/:id/onboarding",
+      responses: {
+        200: external_exports.object({
+          checklist: external_exports.array(
+            external_exports.object({
+              key: external_exports.string(),
+              label: external_exports.string(),
+              description: external_exports.string(),
+              complete: external_exports.boolean()
+            })
+          )
+        })
+      }
+    }
+  },
+  users: {
+    create: {
+      method: "POST",
+      path: "/api/users",
+      input: insertUserSchema,
+      responses: { 201: external_exports.custom() }
+    },
+    get: {
+      method: "GET",
+      path: "/api/users/:id",
+      responses: { 200: external_exports.custom() }
+    },
+    getByFirebaseUid: {
+      method: "GET",
+      path: "/api/users/firebase/:uid",
+      responses: { 200: external_exports.custom() }
+    },
+    updateProfile: {
+      method: "PATCH",
+      path: "/api/users/:id/profile",
+      input: external_exports.object({ username: external_exports.string().min(1).max(40) }),
+      responses: { 200: external_exports.custom() }
+    },
+    updateAvatar: {
+      method: "PATCH",
+      path: "/api/users/:id/avatar",
+      input: external_exports.object({ avatarConfig: external_exports.string(), avatarInventory: external_exports.string().optional() }),
+      responses: { 200: external_exports.custom() }
+    },
+    toggleLeaderboard: {
+      method: "PATCH",
+      path: "/api/users/:id/leaderboard",
+      input: external_exports.object({ hideFromLeaderboard: external_exports.boolean() }),
+      responses: { 200: external_exports.custom() }
+    },
+    updateRole: {
+      method: "PATCH",
+      path: "/api/users/:id/role",
+      input: external_exports.object({ role: external_exports.enum(USER_ROLES) }),
+      responses: { 200: external_exports.custom() }
+    }
+  },
+  messages: {
+    list: {
+      method: "GET",
+      path: "/api/families/:id/messages",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    create: {
+      method: "POST",
+      path: "/api/messages",
+      input: external_exports.object({
+        familyId: external_exports.coerce.number(),
+        userId: external_exports.coerce.number(),
+        senderName: external_exports.string(),
+        content: external_exports.string().min(1).max(400)
+      }),
+      responses: { 201: external_exports.custom() }
+    }
+  },
+  chores: {
+    create: {
+      method: "POST",
+      path: "/api/chores",
+      input: insertChoreSchema,
+      responses: { 201: external_exports.custom() }
+    },
+    update: {
+      method: "PATCH",
+      path: "/api/chores/:id",
+      input: insertChoreSchema.partial(),
+      responses: { 200: external_exports.custom() }
+    },
+    complete: {
+      method: "POST",
+      path: "/api/chores/:id/complete",
+      input: external_exports.object({ userId: external_exports.coerce.number(), note: external_exports.string().max(250).optional() }),
+      responses: {
+        200: external_exports.object({
+          chore: external_exports.custom(),
+          user: external_exports.custom(),
+          submission: external_exports.custom().nullable(),
+          awardedPoints: external_exports.number()
+        })
+      }
+    }
+  },
+  reviews: {
+    chorePending: {
+      method: "GET",
+      path: "/api/families/:id/chore-submissions/pending",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    rewardPending: {
+      method: "GET",
+      path: "/api/families/:id/reward-claims/pending",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    reviewChore: {
+      method: "POST",
+      path: "/api/chore-submissions/:id/review",
+      input: reviewDecisionSchema,
+      responses: { 200: external_exports.custom() }
+    },
+    reviewReward: {
+      method: "POST",
+      path: "/api/reward-claims/:id/review",
+      input: reviewDecisionSchema,
+      responses: { 200: external_exports.custom() }
+    }
+  },
+  rewards: {
+    list: {
+      method: "GET",
+      path: "/api/families/:id/rewards",
+      responses: { 200: external_exports.array(external_exports.custom()) }
+    },
+    create: {
+      method: "POST",
+      path: "/api/rewards",
+      input: insertRewardSchema,
+      responses: { 201: external_exports.custom() }
+    },
+    claim: {
+      method: "POST",
+      path: "/api/rewards/:id/claim",
+      input: external_exports.object({ userId: external_exports.coerce.number(), quantity: external_exports.coerce.number().default(1), note: external_exports.string().max(250).optional() }),
+      responses: {
+        200: external_exports.object({
+          user: external_exports.custom(),
+          claim: external_exports.custom()
+        })
+      }
+    }
+  },
+  events: {
+    stream: {
+      method: "GET",
+      path: "/api/events/stream",
+      input: external_exports.object({
+        token: external_exports.string().min(1).optional(),
+        demoUserId: external_exports.coerce.number().optional(),
+        familyId: external_exports.coerce.number()
+      })
+    }
+  },
+  demo: {
+    setup: {
+      method: "POST",
+      path: "/api/demo/setup",
+      responses: { 201: external_exports.object({ family: external_exports.custom(), users: external_exports.array(external_exports.custom()) }) }
+    }
+  }
+};
+
+// server/auth.ts
+var import_app = require("firebase-admin/app");
+var import_auth = require("firebase-admin/auth");
+
+// server/storage.ts
+init_drizzle_orm();
+init_schema2();
+init_db2();
+function generateInviteCode(familyName) {
+  const words = ["STAR", "MOON", "FIRE", "WAVE", "BOLT", "LEAF", "ROCK", "WIND", "SNOW", "RAIN"];
+  const word = words[Math.floor(Math.random() * words.length)];
+  const prefix = familyName.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3) || "FAM";
+  const number = Math.floor(1e3 + Math.random() * 9e3);
+  return `${prefix}${word}${number}`;
+}
+var currentDemoFamily = null;
+var lastDemoRotation = 0;
+var ROTATION_INTERVAL = 5 * 60 * 1e3;
+var DatabaseStorage = class {
+  async createFamily(family) {
+    const payload = {
+      name: family.name,
+      inviteCode: family.inviteCode ?? generateInviteCode(family.name),
+      timeZone: family.timeZone ?? "UTC",
+      themeColor: family.themeColor ?? "violet"
+    };
+    const [newFamily] = await db.insert(families).values(payload).returning();
+    return newFamily;
+  }
+  async getFamily(id) {
+    const [family] = await db.select().from(families).where(eq(families.id, id));
+    return family;
+  }
+  async getFamilyByCode(code) {
+    const [family] = await db.select().from(families).where(eq(families.inviteCode, code));
+    return family;
+  }
+  async getFamilyUsers(familyId) {
+    return db.select().from(users).where(eq(users.familyId, familyId)).orderBy(desc(users.points), users.username);
+  }
+  async getFamilyChores(familyId, userId) {
+    const rawChores = await db.select().from(chores).where(and(eq(chores.familyId, familyId), eq(chores.isActive, true)));
+    if (!userId) return rawChores;
+    const submissions = await db.select().from(choreSubmissions).where(and(
+      eq(choreSubmissions.familyId, familyId),
+      eq(choreSubmissions.userId, userId)
+    )).orderBy(desc(choreSubmissions.createdAt));
+    return rawChores.map((chore) => {
+      const latest = submissions.find((s) => s.choreId === chore.id);
+      return {
+        ...chore,
+        latestSubmissionStatus: latest?.status,
+        rejectionReason: latest?.rejectionReason ?? void 0,
+        submissionNote: latest?.note ?? void 0
+      };
+    });
+  }
+  async createUser(user) {
+    const [newUser] = await db.insert(users).values({
+      avatarConfig: user.avatarConfig ?? "{}",
+      avatarInventory: user.avatarInventory ?? "{}",
+      ...user
+    }).returning();
+    return newUser;
+  }
+  async getUser(id) {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+  async getUserByFirebaseUid(uid) {
+    const [user] = await db.select().from(users).where(eq(users.firebaseUid, uid));
+    return user;
+  }
+  async updateUserAvatar(id, avatarConfig, avatarInventory) {
+    const [updated] = await db.update(users).set({ avatarConfig, ...avatarInventory ? { avatarInventory } : {} }).where(eq(users.id, id)).returning();
+    return updated;
+  }
+  async updateUserLeaderboard(id, hide) {
+    const [updated] = await db.update(users).set({ hideFromLeaderboard: hide }).where(eq(users.id, id)).returning();
+    return updated;
+  }
+  async updateUserRole(id, role) {
+    const [updated] = await db.update(users).set({ role }).where(eq(users.id, id)).returning();
+    return updated;
+  }
+  async updateUserProfile(id, username) {
+    const [updated] = await db.update(users).set({ username }).where(eq(users.id, id)).returning();
+    return updated;
+  }
+  async createChore(chore) {
+    const [newChore] = await db.insert(chores).values(chore).returning();
+    return newChore;
+  }
+  async getChore(id) {
+    const [chore] = await db.select().from(chores).where(eq(chores.id, id));
+    return chore;
+  }
+  async updateChore(id, updates) {
+    const [updated] = await db.update(chores).set(updates).where(eq(chores.id, id)).returning();
+    return updated;
+  }
+  async getRewards(familyId) {
+    return db.select().from(rewards).where(eq(rewards.familyId, familyId)).orderBy(rewards.costPoints);
+  }
+  async createReward(reward) {
+    const [newReward] = await db.insert(rewards).values(reward).returning();
+    return newReward;
+  }
+  async getMessages(familyId) {
+    return db.select().from(messages).where(eq(messages.familyId, familyId)).orderBy(messages.createdAt);
+  }
+  async createMessage(message) {
+    const [newMessage] = await db.insert(messages).values(message).returning();
+    return newMessage;
+  }
+  async getActivity(familyId) {
+    return db.select().from(activityEvents).where(eq(activityEvents.familyId, familyId)).orderBy(desc(activityEvents.createdAt));
+  }
+  async getAchievements(familyId) {
+    return db.select().from(userAchievements).where(eq(userAchievements.familyId, familyId)).orderBy(desc(userAchievements.earnedAt));
+  }
+  async getMonthlyWinners(familyId) {
+    return db.select().from(monthlyWinners).where(eq(monthlyWinners.familyId, familyId)).orderBy(desc(monthlyWinners.monthKey));
+  }
+  async getPendingChoreSubmissions(familyId) {
+    return db.select().from(choreSubmissions).where(and(eq(choreSubmissions.familyId, familyId), eq(choreSubmissions.status, "submitted"))).orderBy(desc(choreSubmissions.createdAt));
+  }
+  async getPendingRewardClaims(familyId) {
+    return db.select().from(rewardClaims).where(and(eq(rewardClaims.familyId, familyId), eq(rewardClaims.status, "submitted"))).orderBy(desc(rewardClaims.createdAt));
+  }
+  async getOrCreateCurrentDemo() {
+    const now = Date.now();
+    if (!currentDemoFamily || now - lastDemoRotation > ROTATION_INTERVAL) {
+      currentDemoFamily = await setupDemoFamily(this);
+      lastDemoRotation = now;
+    }
+    return currentDemoFamily;
+  }
+};
+async function setupDemoFamily(storage2) {
+  const family = await storage2.createFamily({
+    name: "The Demo Family",
+    inviteCode: generateInviteCode("DEMO"),
+    timeZone: "Europe/London",
+    themeColor: "violet"
+  });
+  const parent = await storage2.createUser({
+    familyId: family.id,
+    username: "Jordan",
+    role: "admin",
+    gender: "other",
+    age: 38,
+    avatarConfig: JSON.stringify({})
+  });
+  const alex = await storage2.createUser({
+    familyId: family.id,
+    username: "Alex",
+    role: "member",
+    gender: "other",
+    age: 13,
+    avatarConfig: JSON.stringify({})
+  });
+  const mia = await storage2.createUser({
+    familyId: family.id,
+    username: "Mia",
+    role: "member",
+    gender: "other",
+    age: 10,
+    avatarConfig: JSON.stringify({})
+  });
+  await storage2.createChore({
+    familyId: family.id,
+    title: "Empty dishwasher",
+    description: "Put everything away before dinner.",
+    points: 20,
+    type: "daily",
+    assigneeId: alex.id,
+    requiresApproval: false,
+    createdBy: parent.id,
+    emoji: "\u{1F37D}\uFE0F"
+  });
+  await storage2.createChore({
+    familyId: family.id,
+    title: "Tidy bedroom",
+    description: "Quick five-minute reset.",
+    points: 15,
+    type: "daily",
+    assigneeId: mia.id,
+    requiresApproval: false,
+    createdBy: parent.id,
+    emoji: "\u{1F9F8}"
+  });
+  await storage2.createChore({
+    familyId: family.id,
+    title: "Take out recycling",
+    description: "Snap a quick photo if the bin is already full.",
+    points: 30,
+    type: "weekly",
+    assigneeId: alex.id,
+    requiresApproval: true,
+    createdBy: parent.id,
+    emoji: "\u267B\uFE0F"
+  });
+  await storage2.createChore({
+    familyId: family.id,
+    title: "Dog walk backup",
+    description: "Anyone can jump in and help.",
+    points: 25,
+    type: "box",
+    assigneeId: null,
+    requiresApproval: false,
+    createdBy: parent.id,
+    emoji: "\u{1F436}"
+  });
+  await storage2.createReward({
+    familyId: family.id,
+    title: "Choose Friday movie",
+    description: "Winner picks the family movie night pick.",
+    costPoints: 120,
+    emoji: "\u{1F3AC}",
+    requiresApproval: false,
+    createdBy: parent.id
+  });
+  await storage2.createReward({
+    familyId: family.id,
+    title: "Later bedtime pass",
+    description: "Worth one extra hour on Saturday.",
+    costPoints: 220,
+    emoji: "\u{1F319}",
+    requiresApproval: true,
+    createdBy: parent.id
+  });
+  await storage2.createMessage({
+    familyId: family.id,
+    userId: parent.id,
+    senderName: "Taskling",
+    content: "Welcome to the demo family. Try completing a chore, claiming a reward, and reviewing an approval.",
+    isSystem: true
+  });
+  return family;
+}
+var storage = new DatabaseStorage();
+
+// server/auth.ts
+init_env();
+var crypto = __toESM(require("crypto"), 1);
+var IS_DEV = false;
+var pkCache = null;
+async function getFirebasePublicKeys() {
+  const now = Date.now();
+  if (pkCache && now < pkCache.expiresAt) return pkCache.keys;
+  const res = await fetch(
+    "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+  );
+  if (!res.ok) throw new Error("Failed to fetch Firebase public keys");
+  const cc = res.headers.get("cache-control") ?? "";
+  const maxAgeMatch = cc.match(/max-age=(\d+)/);
+  const ttl = maxAgeMatch ? parseInt(maxAgeMatch[1]) * 1e3 : 36e5;
+  const certs = await res.json();
+  pkCache = { keys: certs, expiresAt: now + ttl };
+  return certs;
+}
+async function verifyFirebaseToken(token) {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const headerJson = Buffer.from(
+      parts[0].replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - parts[0].length % 4) % 4),
+      "base64"
+    ).toString("utf8");
+    const header = JSON.parse(headerJson);
+    if (header.alg !== "RS256" || !header.kid) return null;
+    const payloadJson = Buffer.from(
+      parts[1].replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - parts[1].length % 4) % 4),
+      "base64"
+    ).toString("utf8");
+    const payload = JSON.parse(payloadJson);
+    const uid = extractUid(payload);
+    if (!uid) return null;
+    const now = Math.floor(Date.now() / 1e3);
+    if (typeof payload.exp === "number" && payload.exp < now) {
+      console.warn("[auth] Firebase token expired");
+      return null;
+    }
+    if (typeof payload.iat === "number" && payload.iat > now + 300) {
+      console.warn("[auth] Firebase token issued in the future");
+      return null;
+    }
+    const certs = await getFirebasePublicKeys();
+    const certPem = certs[header.kid];
+    if (!certPem) {
+      console.warn("[auth] No public key found for kid:", header.kid);
+      return null;
+    }
+    const signingInput = `${parts[0]}.${parts[1]}`;
+    const signature = Buffer.from(
+      parts[2].replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - parts[2].length % 4) % 4),
+      "base64"
+    );
+    const verify = crypto.createVerify("RSA-SHA256");
+    verify.update(signingInput);
+    const valid = verify.verify(certPem, signature);
+    if (!valid) {
+      console.warn("[auth] Firebase token signature invalid");
+      return null;
+    }
+    return { uid };
+  } catch (e) {
+    console.warn("[auth] verifyFirebaseToken error:", e);
+    return null;
+  }
+}
+function initializeFirebaseAdmin() {
+  if ((0, import_app.getApps)().length > 0) return;
+  const env = getEnv();
+  const privateKey = env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  if (env.FIREBASE_CLIENT_EMAIL && privateKey) {
+    (0, import_app.initializeApp)({
+      credential: (0, import_app.cert)({
+        projectId: env.FIREBASE_PROJECT_ID,
+        clientEmail: env.FIREBASE_CLIENT_EMAIL,
+        privateKey
+      }),
+      projectId: env.FIREBASE_PROJECT_ID
+    });
+    return;
+  }
+  (0, import_app.initializeApp)({
+    credential: (0, import_app.applicationDefault)(),
+    projectId: env.FIREBASE_PROJECT_ID
+  });
+}
+async function verifyBearerToken(token) {
+  initializeFirebaseAdmin();
+  return (0, import_auth.getAuth)().verifyIdToken(token, true);
+}
+function decodeJwtPayload(token) {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64 + "=".repeat((4 - base64.length % 4) % 4);
+    return JSON.parse(Buffer.from(padded, "base64").toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+function extractUid(payload) {
+  for (const field of ["user_id", "sub", "uid"]) {
+    const val = payload[field];
+    if (typeof val === "string" && val.trim().length > 0) return val.trim();
+  }
+  return null;
+}
+async function requireAuth(req, res, next) {
+  if (IS_DEV) {
+    const demoUserId = Number(req.headers["x-demo-user-id"]);
+    if (Number.isFinite(demoUserId) && demoUserId > 0) {
+      req.auth = { uid: `demo:${demoUserId}`, demoUserId };
+      return next();
+    }
+  }
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Missing bearer token" });
+  }
+  const token = authHeader.slice("Bearer ".length).trim();
+  if (!token) {
+    return res.status(401).json({ message: "Missing bearer token" });
+  }
+  const verified = await verifyFirebaseToken(token);
+  if (verified) {
+    req.auth = { uid: verified.uid };
+    return next();
+  }
+  if (IS_DEV) {
+    const payload = decodeJwtPayload(token);
+    if (payload) {
+      const uid = extractUid(payload);
+      if (uid) {
+        req.auth = { uid };
+        return next();
+      }
+      console.warn("[auth] JWT payload decoded but no uid found. Keys:", Object.keys(payload));
+      return res.status(401).json({ message: "Could not extract uid from token" });
+    }
+    console.warn("[auth] Bearer token is not a valid JWT. Length:", token.length);
+    return res.status(401).json({ message: "Bearer token is not a valid JWT" });
+  }
+  try {
+    const decoded = await verifyBearerToken(token);
+    req.auth = { uid: decoded.uid };
+    return next();
+  } catch (error) {
+    const message = error instanceof Error && error.message.includes("environment variable") ? error.message : "Invalid or expired auth token";
+    console.error("[auth] All auth methods failed:", error instanceof Error ? error.message : error);
+    return res.status(message.startsWith("Missing required") ? 500 : 401).json({ message });
+  }
+}
+async function attachCurrentUser(req, res, next) {
+  if (!req.auth?.uid) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  if (req.auth.demoUserId) {
+    const demoUser = await storage.getUser(req.auth.demoUserId);
+    if (!demoUser) {
+      return res.status(404).json({ message: "Demo user no longer exists" });
+    }
+    req.currentUser = demoUser;
+    return next();
+  }
+  const user = await storage.getUserByFirebaseUid(req.auth.uid);
+  if (!user) {
+    return res.status(404).json({ message: "User profile not found for this account" });
+  }
+  req.currentUser = user;
+  return next();
+}
+function getCurrentUser(req) {
+  if (!req.currentUser) {
+    throw new Error("Current user is not attached");
+  }
+  return req.currentUser;
+}
+
+// server/permissions.ts
+function isAdmin(user) {
+  return user?.role === "admin";
+}
+function canManageFamily(user) {
+  return isAdmin(user);
+}
+function canApprove(user) {
+  return isAdmin(user);
+}
+function ensureSameFamily(currentFamilyId, targetFamilyId) {
+  return !!currentFamilyId && !!targetFamilyId && currentFamilyId === targetFamilyId;
+}
+
 // server/services/chore-service.ts
+init_drizzle_orm();
+init_schema2();
+init_db2();
+
+// shared/streak.ts
+function getFamilyTimeZone(family) {
+  return family?.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+}
+function getLocalDateKey(date2, timeZone) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(date2);
+}
+function getPreviousDateKey(dateKey) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const d = new Date(Date.UTC(year, month - 1, day));
+  d.setUTCDate(d.getUTCDate() - 1);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "UTC",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(d);
+}
+function getEffectiveStreakForDate(user, date2, timeZone) {
+  if (!user.streak || !user.streakLastCompletedDate) return 0;
+  const todayKey = getLocalDateKey(date2, timeZone);
+  const yesterdayKey = getPreviousDateKey(todayKey);
+  if (user.streakLastCompletedDate === yesterdayKey) {
+    return user.streak;
+  }
+  return 0;
+}
+function calculateStreakMultiplier(streakDays) {
+  if (streakDays <= 0) {
+    return { multiplier: 1, bonusPercent: 0 };
+  }
+  const multiplier = Math.min(1 + 0.2 * streakDays, 2);
+  const bonusPercent = Math.round((multiplier - 1) * 100);
+  return { multiplier, bonusPercent };
+}
+
+// server/services/message-service.ts
+init_schema2();
+init_db2();
+
+// server/realtime.ts
+var clients = /* @__PURE__ */ new Map();
+function writeEvent(res, event, payload) {
+  res.write(`event: ${event}
+`);
+  res.write(`data: ${JSON.stringify(payload)}
+
+`);
+}
+function registerSseClient(id, familyId, res) {
+  clients.set(id, { id, familyId, res });
+  writeEvent(res, "family:heartbeat", { ok: true, familyId, connectedAt: (/* @__PURE__ */ new Date()).toISOString() });
+}
+function removeSseClient(id) {
+  clients.delete(id);
+}
+function publishFamilyEvent(familyId, event, payload) {
+  for (const client of clients.values()) {
+    if (client.familyId !== familyId) continue;
+    writeEvent(client.res, event, payload);
+  }
+}
+
+// server/services/activity-service.ts
+init_schema2();
+init_db2();
+async function recordActivity(args) {
+  const [event] = await db.insert(activityEvents).values({
+    familyId: args.familyId,
+    userId: args.userId ?? null,
+    type: args.type,
+    title: args.title,
+    body: args.body,
+    relatedEntityType: args.relatedEntityType,
+    relatedEntityId: args.relatedEntityId,
+    metadata: args.metadata ?? {}
+  }).returning();
+  publishFamilyEvent(args.familyId, "family:activity", event);
+  return event;
+}
+
+// server/services/message-service.ts
+async function createMessage(args) {
+  const [message] = await db.insert(messages).values(args).returning();
+  publishFamilyEvent(args.familyId, "family:message", message);
+  if (!args.isSystem) {
+    await recordActivity({
+      familyId: args.familyId,
+      userId: args.userId,
+      type: "chat_message",
+      title: `${args.senderName} sent a message`,
+      body: args.content,
+      relatedEntityType: "message",
+      relatedEntityId: message.id
+    });
+  }
+  return message;
+}
+async function createSystemMessage(familyId, userId, content) {
+  return createMessage({
+    familyId,
+    userId,
+    senderName: "Taskling",
+    content,
+    isSystem: true
+  });
+}
+
+// server/services/achievement-service.ts
+init_drizzle_orm();
+
+// shared/achievements.ts
+var ACHIEVEMENTS = [
+  {
+    code: "first_steps",
+    title: "First Steps",
+    description: "Complete your first chore.",
+    emoji: "\u{1F31F}"
+  },
+  {
+    code: "helper_10",
+    title: "Helping Hand",
+    description: "Complete 10 chores.",
+    emoji: "\u{1F64C}"
+  },
+  {
+    code: "streak_7",
+    title: "On A Roll",
+    description: "Reach a 7-day streak.",
+    emoji: "\u{1F525}"
+  },
+  {
+    code: "streak_30",
+    title: "Streak Superstar",
+    description: "Reach a 30-day streak.",
+    emoji: "\u{1F3C6}"
+  },
+  {
+    code: "reward_redeemer",
+    title: "Treat Time",
+    description: "Claim your first reward.",
+    emoji: "\u{1F381}"
+  },
+  {
+    code: "team_player",
+    title: "Team Player",
+    description: "Finish three shared chores.",
+    emoji: "\u{1F91D}"
+  }
+];
+function getAchievementDefinition(code) {
+  return ACHIEVEMENTS.find((achievement) => achievement.code === code);
+}
+
+// server/services/achievement-service.ts
+init_schema2();
+init_db2();
+async function hasAchievement(userId, code) {
+  const [existing] = await db.select().from(userAchievements).where(and(eq(userAchievements.userId, userId), eq(userAchievements.code, code)));
+  return !!existing;
+}
+async function awardAchievementIfMissing(user, code) {
+  const definition = getAchievementDefinition(code);
+  if (!definition || !user.familyId) return null;
+  if (await hasAchievement(user.id, code)) return null;
+  const [achievement] = await db.insert(userAchievements).values({
+    familyId: user.familyId,
+    userId: user.id,
+    code: definition.code,
+    title: definition.title,
+    description: definition.description,
+    emoji: definition.emoji
+  }).returning();
+  await recordActivity({
+    familyId: user.familyId,
+    userId: user.id,
+    type: "achievement_earned",
+    title: `${definition.emoji} ${definition.title}`,
+    body: `${user.username} earned ${definition.title}.`,
+    relatedEntityType: "achievement",
+    relatedEntityId: achievement.id,
+    metadata: { code }
+  });
+  await createSystemMessage(
+    user.familyId,
+    user.id,
+    `${definition.emoji} ${user.username} unlocked ${definition.title}!`
+  );
+  return achievement;
+}
+async function evaluateAchievements(user) {
+  const familyId = user.familyId;
+  if (!familyId) return [];
+  const [completedStats] = await db.select({ count: sql`count(*)` }).from(choreLogs).where(eq(choreLogs.userId, user.id));
+  const [sharedStats] = await db.select({ count: sql`count(*)` }).from(choreLogs).innerJoin(users, eq(users.id, choreLogs.userId)).where(eq(choreLogs.userId, user.id));
+  const [rewardStats] = await db.select({ count: sql`count(*)` }).from(rewardClaims).where(and(eq(rewardClaims.userId, user.id), eq(rewardClaims.status, "approved")));
+  const earned = [];
+  if ((completedStats?.count ?? 0) >= 1) {
+    const achievement = await awardAchievementIfMissing(user, "first_steps");
+    if (achievement) earned.push(achievement);
+  }
+  if ((completedStats?.count ?? 0) >= 10) {
+    const achievement = await awardAchievementIfMissing(user, "helper_10");
+    if (achievement) earned.push(achievement);
+  }
+  if (user.streak >= 7) {
+    const achievement = await awardAchievementIfMissing(user, "streak_7");
+    if (achievement) earned.push(achievement);
+  }
+  if (user.streak >= 30) {
+    const achievement = await awardAchievementIfMissing(user, "streak_30");
+    if (achievement) earned.push(achievement);
+  }
+  if ((rewardStats?.count ?? 0) >= 1) {
+    const achievement = await awardAchievementIfMissing(user, "reward_redeemer");
+    if (achievement) earned.push(achievement);
+  }
+  if ((sharedStats?.count ?? 0) >= 3) {
+    const achievement = await awardAchievementIfMissing(user, "team_player");
+    if (achievement) earned.push(achievement);
+  }
+  return earned;
+}
+
+// server/services/chore-service.ts
+init_email_service();
 async function getFamilyById(id) {
   if (!id) return void 0;
   const [family] = await db.select().from(families).where(eq(families.id, id));
@@ -43095,22 +43053,12 @@ async function reviewChoreSubmission(submissionId, reviewer, action, note) {
   }
   throw new Error("Unsupported review action");
 }
-var init_chore_service = __esm({
-  "server/services/chore-service.ts"() {
-    "use strict";
-    init_drizzle_orm();
-    init_schema2();
-    init_db2();
-    init_streak();
-    init_message_service();
-    init_activity_service();
-    init_achievement_service();
-    init_realtime();
-    init_email_service();
-  }
-});
 
 // server/services/reward-service.ts
+init_drizzle_orm();
+init_schema2();
+init_db2();
+init_email_service();
 async function getRewardClaim(id) {
   const [claim] = await db.select().from(rewardClaims).where(eq(rewardClaims.id, id));
   return claim;
@@ -43214,21 +43162,11 @@ async function reviewRewardClaim(claimId, reviewer, action, note) {
   }
   throw new Error("Unsupported review action");
 }
-var init_reward_service = __esm({
-  "server/services/reward-service.ts"() {
-    "use strict";
-    init_drizzle_orm();
-    init_schema2();
-    init_db2();
-    init_activity_service();
-    init_message_service();
-    init_achievement_service();
-    init_realtime();
-    init_email_service();
-  }
-});
 
 // server/services/family-service.ts
+init_drizzle_orm();
+init_schema2();
+init_db2();
 async function getFamilyOnboardingChecklist(familyId) {
   const [familyStats] = await db.select({
     members: sql`(select count(*) from ${users} where ${users.familyId} = ${familyId})`,
@@ -43262,16 +43200,11 @@ async function getFamilyOnboardingChecklist(familyId) {
     }
   ];
 }
-var init_family_service = __esm({
-  "server/services/family-service.ts"() {
-    "use strict";
-    init_drizzle_orm();
-    init_schema2();
-    init_db2();
-  }
-});
 
 // server/services/monthly-winners-service.ts
+init_drizzle_orm();
+init_schema2();
+init_db2();
 function getMonthKey(date2) {
   return date2.toISOString().slice(0, 7);
 }
@@ -43314,20 +43247,9 @@ async function ensurePreviousMonthWinners(familyId) {
   }).returning();
   return [created];
 }
-var init_monthly_winners_service = __esm({
-  "server/services/monthly-winners-service.ts"() {
-    "use strict";
-    init_drizzle_orm();
-    init_schema2();
-    init_db2();
-  }
-});
 
 // server/routes.ts
-var routes_exports = {};
-__export(routes_exports, {
-  registerRoutes: () => registerRoutes
-});
+init_email_service();
 function parseId(value) {
   const raw = Array.isArray(value) ? value[0] : value;
   if (typeof raw !== "string" && typeof raw !== "number") return null;
@@ -43887,75 +43809,35 @@ async function registerRoutes(httpServer, app) {
   });
   return httpServer;
 }
-var import_crypto;
-var init_routes2 = __esm({
-  "server/routes.ts"() {
-    "use strict";
-    import_crypto = require("crypto");
-    init_zod();
-    init_routes();
-    init_auth();
-    init_storage();
-    init_permissions();
-    init_chore_service();
-    init_reward_service();
-    init_message_service();
-    init_family_service();
-    init_monthly_winners_service();
-    init_activity_service();
-    init_email_service();
-    init_realtime();
-  }
-});
 
 // server/vercel-handler.ts
-var vercel_handler_exports = {};
-__export(vercel_handler_exports, {
-  default: () => handler
-});
-module.exports = __toCommonJS(vercel_handler_exports);
-var import_express = __toESM(require_express2(), 1);
-var import_http = require("http");
 async function handler(req, res) {
   try {
-    console.log(`[Vercel] Handler called for ${req.method} ${req.url}`);
-    let registerRoutes2;
-    try {
-      const routesMod = await Promise.resolve().then(() => (init_routes2(), routes_exports));
-      registerRoutes2 = routesMod.registerRoutes;
-    } catch (importErr) {
-      console.error("[Vercel] BOOTSTRAP ERROR (Import failed):", importErr);
-      return res.status(500).json({
-        message: "Taskling failed to load server modules. This usually indicates a deployment issue.",
-        error: importErr.message || String(importErr),
-        stack: importErr.stack,
-        phase: "bootstrap_import"
-      });
-    }
+    console.log(`[Vercel] Handler processing ${req.method} ${req.url}`);
     const app = (0, import_express.default)();
     app.use(import_express.default.json());
     app.use(import_express.default.urlencoded({ extended: false }));
     try {
       const httpServer = (0, import_http.createServer)(app);
-      await registerRoutes2(httpServer, app);
+      await registerRoutes(httpServer, app);
     } catch (regErr) {
-      console.error("[Vercel] BOOTSTRAP ERROR (Route registration failed):", regErr);
+      console.error("[Vercel] ROUTE_REGISTRATION_FAILED:", regErr);
       return res.status(500).json({
-        message: "Taskling failed to register server routes.",
+        message: "Failed to initialize server routes.",
         error: regErr.message || String(regErr),
         stack: regErr.stack,
-        phase: "bootstrap_routes"
+        phase: "routes_init"
       });
     }
     return app(req, res);
   } catch (err) {
-    console.error("[Vercel] CRITICAL RUNTIME ERROR:", err);
+    console.error("[Vercel] CRITICAL_HANDLER_ERROR:", err);
     if (!res.headersSent) {
       return res.status(500).json({
-        message: "Taskling encountered a critical runtime error.",
+        message: "Taskling encountered a critical error.",
         error: err.message || String(err),
         stack: err.stack,
-        phase: "unhandled_exception"
+        phase: "unhandled"
       });
     }
   }
