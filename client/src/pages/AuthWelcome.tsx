@@ -128,7 +128,8 @@ export default function AuthWelcome() {
 
       if (!res.ok) {
         if (res.status === 429 && data.waitSecs) startCooldown(data.waitSecs);
-        toast({ title: "Couldn't send code", description: data.message, variant: "destructive" });
+        const detail = data.error ? `\${data.message}: \${data.error}` : data.message;
+        toast({ title: "Couldn't send code", description: detail, variant: "destructive" });
         return;
       }
       startCooldown(60);
@@ -159,7 +160,8 @@ export default function AuthWelcome() {
 
       if (!res.ok) {
         if (res.status === 429 && data.waitSecs) startCooldown(data.waitSecs);
-        toast({ title: "Couldn't resend code", description: data.message, variant: "destructive" });
+        const detail = data.error ? `\${data.message}: \${data.error}` : data.message;
+        toast({ title: "Couldn't resend code", description: detail, variant: "destructive" });
         return;
       }
       startCooldown(60);
