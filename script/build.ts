@@ -57,9 +57,9 @@ async function buildAll() {
     format: "cjs",
     outfile: "api/index.js",
     define: { "process.env.NODE_ENV": '"production"' },
-    // Only keep true node built-ins external — bundle EVERYTHING else including
-    // all server/** code and all npm packages that Vercel might not install.
-    external: nodeBuiltins,
+    // We mark all packages as external for Vercel too.
+    // This is safer as Vercel will install the correct platform-specific versions.
+    external: serverExternals,
     logLevel: "info",
     tsconfig: "tsconfig.json",
     // Path alias for @shared/*

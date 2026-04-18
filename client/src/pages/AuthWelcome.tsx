@@ -137,8 +137,14 @@ export default function AuthWelcome() {
       setOtpError("");
       setView("verification");
     } catch (err: any) {
-      console.error("[Auth] Signup error:", err);
-      toast({ title: "Request failed", description: err.message || "Check your connection and try again.", variant: "destructive" });
+      console.error("[OTP] Send error:", err);
+      const msg = err.message || "A server error has occurred";
+      const detail = err.error || err.stack || "";
+      toast({ 
+        title: "Couldn't send code", 
+        description: detail ? `${msg}: ${detail}` : msg, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
@@ -170,7 +176,14 @@ export default function AuthWelcome() {
       toast({ title: "New code sent!", description: "Check your inbox — it expires in 10 minutes." });
       otpRefs.current[0]?.focus();
     } catch (err: any) {
-      toast({ title: "Request failed", description: err.message || "Check your connection and try again.", variant: "destructive" });
+      console.error("[OTP] Resend error:", err);
+      const msg = err.message || "A server error has occurred";
+      const detail = err.error || err.stack || "";
+      toast({ 
+        title: "Couldn't resend code", 
+        description: detail ? `${msg}: ${detail}` : msg, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
@@ -187,7 +200,14 @@ export default function AuthWelcome() {
       toast({ title: "Welcome back!", description: "Signed in successfully." });
       await handlePostAuth(result.user.uid);
     } catch (error: any) {
-      toast({ title: "Login failed", description: error.message, variant: "destructive" });
+      console.error("[Auth] Login error:", error);
+      const msg = error.message || "Login failed";
+      const detail = error.error || error.stack || "";
+      toast({ 
+        title: "Login failed", 
+        description: detail ? `${msg}: ${detail}` : msg, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
@@ -256,9 +276,14 @@ export default function AuthWelcome() {
         await handlePostAuth(uid);
       }
     } catch (error: any) {
-      const msg = error.message || "Verification failed. Please try again.";
-      setOtpError(msg);
-      toast({ title: "Verification error", description: msg, variant: "destructive" });
+      console.error("[OTP] Verify error:", error);
+      const msg = error.message || "Verification failed";
+      const detail = error.error || error.stack || "";
+      toast({ 
+        title: "Verification failed", 
+        description: detail ? `${msg}: ${detail}` : msg, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
