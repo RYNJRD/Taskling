@@ -224,3 +224,16 @@ export type CreateUserRequest = InsertUser;
 export type CreateChoreRequest = InsertChore;
 export type UpdateChoreRequest = Partial<InsertChore>;
 export type CompleteChoreRequest = { userId: number; note?: string };
+
+// ── Email verification OTP codes (DB-backed so they survive serverless cold starts) ──
+export const emailVerificationCodes = pgTable("email_verification_codes", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  firebaseUid: varchar("firebase_uid", { length: 255 }).notNull(),
+  code: varchar("code", { length: 6 }).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  attempts: integer("attempts").notNull().default(0),
+  lastSentAt: timestamp("last_sent_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+

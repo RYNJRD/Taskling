@@ -509,91 +509,114 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     return res.status(201).json({ family, users });
   });
 
-  // ── In-memory OTP store (survives serverless cold starts poorly, but fine for short-lived codes) ──
-  // Structure: email → { code, expiresAt, attempts, lastSentAt }
-  const otpStore = new Map<string, { code: string; expiresAt: number; attempts: number; lastSentAt: number }>();
+  // ── DB-backed OTP — survives Vercel serverless cold starts ───────────────────
+  const { pool } = await import("./db");
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS email_verification_codes (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR(255) NOT NULL,
+      firebase_uid VARCHAR(255) NOT NULL,
+      code VARCHAR(6) NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      last_sent_at TIMESTAMPTZ NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `).catch((e: any) => console.warn("[OTP] table init warning:", e.message));
 
-  // POST /api/auth/send-code — create Firebase user (if not exists), generate + email OTP
+  // POST /api/auth/send-code
+  // Client creates the Firebase user first (Firebase Auth SDK), then calls this
+  // to store the OTP in DB and send via Resend. No Firebase Admin needed here.
   app.post("/api/auth/send-code", async (req, res) => {
     try {
-      const { email, password } = req.body;
-      if (!email || !password) return res.status(400).json({ message: "Email and password are required." });
+      const { email, firebaseUid } = req.body;
+      if (!email || !firebaseUid) return res.status(400).json({ message: "Email and firebaseUid are required." });
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ message: "Invalid email address." });
-      if (password.length < 6) return res.status(400).json({ message: "Password must be at least 6 characters." });
 
-      // Throttle: 60 second cooldown per email
-      const existing = otpStore.get(email);
-      if (existing && Date.now() - existing.lastSentAt < 60_000) {
-        const waitSecs = Math.ceil((60_000 - (Date.now() - existing.lastSentAt)) / 1000);
-        return res.status(429).json({ message: `Please wait ${waitSecs} seconds before requesting a new code.`, waitSecs });
+      // Throttle: 60-second cooldown per email
+      const { rows: existing } = await pool.query(
+        "SELECT last_sent_at FROM email_verification_codes WHERE email = $1 ORDER BY created_at DESC LIMIT 1",
+        [email]
+      );
+      if (existing.length > 0) {
+        const lastSent = new Date(existing[0].last_sent_at).getTime();
+        const waitMs = 60_000 - (Date.now() - lastSent);
+        if (waitMs > 0) {
+          const waitSecs = Math.ceil(waitMs / 1000);
+          return res.status(429).json({ message: `Please wait ${waitSecs} seconds before requesting a new code.`, waitSecs });
+        }
       }
 
-      const { getAuth } = await import("firebase-admin/auth");
-      const adminAuth = getAuth();
-
-      // Create or look up Firebase user
-      let userRecord;
-      try {
-        userRecord = await adminAuth.getUserByEmail(email);
-      } catch {
-        // User doesn't exist yet — create them
-        userRecord = await adminAuth.createUser({ email, password });
-      }
-
-      // Generate 6-digit code
+      // Generate 6-digit code and upsert
       const code = String(Math.floor(100000 + Math.random() * 900000));
-      otpStore.set(email, { code, expiresAt: Date.now() + 10 * 60_000, attempts: 0, lastSentAt: Date.now() });
+      const expiresAt = new Date(Date.now() + 10 * 60_000);
+      const now = new Date();
+
+      // Delete old record then insert fresh (simpler than true upsert with no unique constraint)
+      await pool.query("DELETE FROM email_verification_codes WHERE email = $1", [email]);
+      await pool.query(
+        "INSERT INTO email_verification_codes (email, firebase_uid, code, expires_at, attempts, last_sent_at) VALUES ($1, $2, $3, $4, 0, $5)",
+        [email, firebaseUid, code, expiresAt, now]
+      );
 
       // Send via Resend
       const { sendOtpEmail } = await import("./services/email-service");
       await sendOtpEmail(email, code);
 
-      console.log(`[OTP] Code sent to ${email} for uid ${userRecord.uid}`);
-      return res.json({ success: true, uid: userRecord.uid });
+      console.log(`[OTP] Code sent to ${email} uid=${firebaseUid}`);
+      return res.json({ success: true });
     } catch (e: any) {
       console.error("[OTP] send-code error:", e);
-      const msg = e?.errorInfo?.code === "auth/email-already-exists"
-        ? "An account with this email already exists. Try signing in instead."
-        : e.message || "Failed to send verification code.";
-      return res.status(500).json({ message: msg });
+      return res.status(500).json({ message: e.message || "Failed to send verification code." });
     }
   });
 
-  // POST /api/auth/verify-code — validate OTP, mark Firebase email as verified, return custom token
+  // POST /api/auth/verify-code — validate OTP from DB
   app.post("/api/auth/verify-code", async (req, res) => {
     try {
       const { email, code } = req.body;
       if (!email || !code) return res.status(400).json({ message: "Email and code are required." });
 
-      const record = otpStore.get(email);
+      const { rows } = await pool.query(
+        "SELECT * FROM email_verification_codes WHERE email = $1 ORDER BY created_at DESC LIMIT 1",
+        [email]
+      );
+      const record = rows[0];
       if (!record) return res.status(400).json({ message: "No verification code found. Please request a new one." });
 
-      if (Date.now() > record.expiresAt) {
-        otpStore.delete(email);
+      if (new Date() > new Date(record.expires_at)) {
+        await pool.query("DELETE FROM email_verification_codes WHERE email = $1", [email]);
         return res.status(400).json({ message: "Your code has expired. Please request a new one.", expired: true });
       }
 
-      record.attempts += 1;
-      if (record.attempts > 5) {
-        otpStore.delete(email);
+      const newAttempts = record.attempts + 1;
+      if (newAttempts > 5) {
+        await pool.query("DELETE FROM email_verification_codes WHERE email = $1", [email]);
         return res.status(429).json({ message: "Too many incorrect attempts. Please request a new code.", tooManyAttempts: true });
       }
+      await pool.query("UPDATE email_verification_codes SET attempts = $1 WHERE email = $2", [newAttempts, email]);
 
       if (record.code !== code.trim()) {
-        const remaining = 5 - record.attempts;
+        const remaining = 5 - newAttempts;
         return res.status(400).json({ message: `Incorrect code. ${remaining} attempt${remaining !== 1 ? "s" : ""} remaining.` });
       }
 
-      // Code is correct — mark Firebase user as verified and issue custom token
-      const { getAuth } = await import("firebase-admin/auth");
-      const adminAuth = getAuth();
-      const userRecord = await adminAuth.getUserByEmail(email);
-      await adminAuth.updateUser(userRecord.uid, { emailVerified: true });
-      const customToken = await adminAuth.createCustomToken(userRecord.uid);
+      // Code correct — try Firebase Admin to mark verified + issue custom token (graceful fallback)
+      const firebaseUid: string = record.firebase_uid;
+      await pool.query("DELETE FROM email_verification_codes WHERE email = $1", [email]);
+      console.log(`[OTP] Code verified for ${email} uid=${firebaseUid}`);
 
-      otpStore.delete(email);
-      console.log(`[OTP] Verified email for ${email} uid=${userRecord.uid}`);
-      return res.json({ success: true, customToken, uid: userRecord.uid });
+      try {
+        const { getAuth } = await import("firebase-admin/auth");
+        const adminAuth = getAuth();
+        await adminAuth.updateUser(firebaseUid, { emailVerified: true });
+        const customToken = await adminAuth.createCustomToken(firebaseUid);
+        return res.json({ success: true, customToken, uid: firebaseUid });
+      } catch (adminErr: any) {
+        // No service account — client already has a Firebase session from createUserWithEmailAndPassword
+        console.warn("[OTP] Admin SDK unavailable, returning uid only:", adminErr.message);
+        return res.json({ success: true, uid: firebaseUid });
+      }
     } catch (e: any) {
       console.error("[OTP] verify-code error:", e);
       return res.status(500).json({ message: e.message || "Verification failed." });

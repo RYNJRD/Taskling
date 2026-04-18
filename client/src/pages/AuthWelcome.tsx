@@ -6,7 +6,7 @@ import { useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { auth, googleProvider } from "@/lib/firebase";
-import { signInWithPopup, signInWithEmailAndPassword, signInWithCustomToken } from "firebase/auth";
+import { signInWithPopup, signInWithEmailAndPassword, signInWithCustomToken, createUserWithEmailAndPassword } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/store/useStore";
 import { handlePostAuthNavigation } from "@/lib/postAuth";
@@ -72,7 +72,7 @@ export default function AuthWelcome() {
     toast({ title: "Coming soon", description: "Apple ID login will be available soon!" });
   };
 
-  // Step 1: validate inputs, create Firebase user + send OTP
+  // Step 1: create Firebase user client-side, then call server just to send the email
   const handleEmailSignupContinue = async () => {
     const emailTrimmed = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
@@ -85,10 +85,25 @@ export default function AuthWelcome() {
     }
     setLoading(true);
     try {
+      // Create Firebase user client-side (no Admin SDK needed)
+      let uid: string;
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, emailTrimmed, password);
+        uid = cred.user.uid;
+      } catch (fbErr: any) {
+        if (fbErr.code === "auth/email-already-in-use") {
+          toast({ title: "Account exists", description: "An account with this email already exists. Try signing in instead.", variant: "destructive" });
+        } else {
+          toast({ title: "Account creation failed", description: fbErr.message, variant: "destructive" });
+        }
+        return;
+      }
+
+      // Ask server to generate + email the OTP
       const res = await apiFetch("/api/auth/send-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: emailTrimmed, password }),
+        body: JSON.stringify({ email: emailTrimmed, firebaseUid: uid }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -107,15 +122,17 @@ export default function AuthWelcome() {
     }
   };
 
-  // Resend code (same endpoint, server handles throttle)
+  // Resend — user already exists in Firebase, just send a new OTP
   const handleResend = async () => {
     if (cooldown > 0) return;
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
     setLoading(true);
     try {
       const res = await apiFetch("/api/auth/send-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({ email: email.trim(), firebaseUid: uid }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -197,10 +214,23 @@ export default function AuthWelcome() {
         return;
       }
 
-      // Sign in with the custom token issued by the server
-      const userCred = await signInWithCustomToken(auth, data.customToken);
-      toast({ title: "Email verified! 🎉", description: "Welcome to Taskling." });
-      await handlePostAuth(userCred.user.uid);
+      // If Firebase Admin issued a custom token, sign in with it
+      // Otherwise the user is already signed in via createUserWithEmailAndPassword
+      if (data.customToken) {
+        const userCred = await signInWithCustomToken(auth, data.customToken);
+        toast({ title: "Email verified! 🎉", description: "Welcome to Taskling." });
+        await handlePostAuth(userCred.user.uid);
+      } else {
+        // Client already has a session — just navigate
+        const uid = data.uid || auth.currentUser?.uid;
+        if (!uid) {
+          toast({ title: "Sign-in error", description: "Please sign in again.", variant: "destructive" });
+          setView("signin");
+          return;
+        }
+        toast({ title: "Email verified! 🎉", description: "Welcome to Taskling." });
+        await handlePostAuth(uid);
+      }
     } catch (error: any) {
       const msg = error.message || "Verification failed. Please try again.";
       setOtpError(msg);
