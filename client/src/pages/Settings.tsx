@@ -11,11 +11,11 @@ import {
 import { useStore } from "../store/useStore";
 import { useSettings, type PointsResetCycle } from "../hooks/use-settings";
 import { isParent } from "../lib/permissions";
-import type { UserRole } from "../../shared/constants";
+import type { UserRole } from "../../../shared/constants";
 import { apiFetch } from "../lib/apiFetch";
 import { queryClient } from "../lib/queryClient";
 import { useToast } from "../hooks/use-toast";
-import { api, buildUrl } from "../../shared/routes";
+import { api, buildUrl } from "../../../shared/routes";
 import { cn } from "../lib/utils";
 import {
   TermsScreen, PrivacyScreen, DisclaimerScreen, ContactScreen,
@@ -24,9 +24,9 @@ import {
 
 const APP_VERSION = "1.0.1";
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Premium Design Components
-   ──────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 /**
  * Section Header: Small, subtle, and widely tracked
@@ -171,9 +171,9 @@ function RefinedConfirmDialog({
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Main Redesign
-   ──────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export default function Settings() {
   const [, setLocation] = useLocation();
@@ -286,7 +286,7 @@ export default function Settings() {
   return (
     <>
       <div className="flex flex-col h-[100dvh] bg-slate-50 dark:bg-zinc-950 font-sans">
-        {/* ── Top Bar (Premium Static) ── */}
+        {/* â”€â”€ Top Bar (Premium Static) â”€â”€ */}
         <div className="flex-none flex items-center justify-between px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-6 bg-slate-50 dark:bg-zinc-950 sticky top-0 z-10">
           <button
             onClick={() => setLocation(`/family/${familyId}/profile`)}
@@ -308,7 +308,7 @@ export default function Settings() {
           <div className="w-9" /> {/* Spacer */}
         </div>
 
-        {/* ── Formatted Lists ── */}
+        {/* â”€â”€ Formatted Lists â”€â”€ */}
         <div className="flex-1 overflow-y-auto pb-32">
           
           <SectionHeader title="Account" />
@@ -467,8 +467,8 @@ export default function Settings() {
           )}
 
           <div className="py-12 px-6 text-center space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Taskling · Built for Families</p>
-            <p className="text-[10px] font-medium text-muted-foreground/35 italic">v{APP_VERSION} · Stability build</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Taskling Â· Built for Families</p>
+            <p className="text-[10px] font-medium text-muted-foreground/35 italic">v{APP_VERSION} Â· Stability build</p>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { forwardRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Clock3, ShieldCheck, Star, Users, AlertCircle, MessageCircle } from "lucide-react";
-import type { Chore } from "../../shared/schema";
+import type { Chore } from "../../../shared/schema";
 import { cn } from "../lib/utils";
 
 interface ChoreCardProps {
@@ -22,7 +22,7 @@ const TYPE_LABELS: Record<string, string> = {
   daily: "Daily", weekly: "Weekly", monthly: "Monthly", box: "Shared",
 };
 const TYPE_EMOJIS: Record<string, string> = {
-  daily: "☀️", weekly: "📅", monthly: "🗓️", box: "🤝",
+  daily: "â˜€ï¸", weekly: "ðŸ“…", monthly: "ðŸ—“ï¸", box: "ðŸ¤",
 };
 
 export const ChoreCard = forwardRef<HTMLDivElement, ChoreCardProps>(
@@ -148,7 +148,7 @@ export const ChoreCard = forwardRef<HTMLDivElement, ChoreCardProps>(
               )}
               {streakBonusPercent ? (
                 <span className="rounded-full bg-orange-100 dark:bg-orange-950/30 px-2.5 py-1 text-[11px] font-bold text-orange-600 dark:text-orange-400">
-                  🔥 +{streakBonusPercent}% streak
+                  ðŸ”¥ +{streakBonusPercent}% streak
                 </span>
               ) : null}
               {stateLabel && stateLabel !== "Overdue" && !isPending && (

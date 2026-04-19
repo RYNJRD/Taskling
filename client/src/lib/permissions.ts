@@ -1,4 +1,4 @@
-import type { UserRole } from "../../shared/constants";
+import type { UserRole } from "../../../shared/constants";
 
 export type AppFeature =
   | "manage_chores"        // create / edit / delete chores
@@ -39,8 +39,8 @@ export function getRoleLabel(role: UserRole): string {
 
 /** Emoji indicator for the role. */
 export function getRoleEmoji(role: UserRole): string {
-  return role === "admin" ? "👑" : "⭐";
+  return role === "admin" ? "ðŸ‘‘" : "â­";
 }
 
 /** Friendly message shown when a child tries a parent-only action. */
-export const PARENT_ONLY_MSG = "Only parents can do this 😊";
+export const PARENT_ONLY_MSG = "Only parents can do this ðŸ˜Š";

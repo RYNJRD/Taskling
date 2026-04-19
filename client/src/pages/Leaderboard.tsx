@@ -7,12 +7,12 @@ import { cn } from "../lib/utils";
 import { UserAvatar } from "../components/UserAvatar";
 import { Dialog, DialogContent } from "../components/ui/dialog";
 import { useState } from "react";
-import type { User } from "../../shared/schema";
+import type { User } from "../../../shared/schema";
 
 const RANK_META = [
-  { emoji: "🥇", label: "1st", gradient: "from-yellow-400 to-amber-500", glow: "shadow-amber-300/50", size: "scale-110", border: "border-amber-300" },
-  { emoji: "🥈", label: "2nd", gradient: "from-slate-300 to-slate-400", glow: "shadow-slate-200/50", size: "scale-100", border: "border-slate-300" },
-  { emoji: "🥉", label: "3rd", gradient: "from-amber-600 to-orange-600", glow: "shadow-orange-300/50", size: "scale-100", border: "border-orange-400" },
+  { emoji: "ðŸ¥‡", label: "1st", gradient: "from-yellow-400 to-amber-500", glow: "shadow-amber-300/50", size: "scale-110", border: "border-amber-300" },
+  { emoji: "ðŸ¥ˆ", label: "2nd", gradient: "from-slate-300 to-slate-400", glow: "shadow-slate-200/50", size: "scale-100", border: "border-slate-300" },
+  { emoji: "ðŸ¥‰", label: "3rd", gradient: "from-amber-600 to-orange-600", glow: "shadow-orange-300/50", size: "scale-100", border: "border-orange-400" },
 ];
 
 export default function Leaderboard() {
@@ -35,7 +35,7 @@ export default function Leaderboard() {
 
   return (
     <div className="min-h-screen bg-tab-leaderboard pb-32">
-      {/* ── Gradient header ── */}
+      {/* â”€â”€ Gradient header â”€â”€ */}
       <div className="relative overflow-hidden pt-8 pb-6 px-5">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/8 via-primary/4 to-transparent" />
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full bg-accent/8 blur-3xl -translate-y-1/2 translate-x-1/4" />
@@ -69,7 +69,7 @@ export default function Leaderboard() {
       </div>
 
       <div className="px-5">
-        {/* ── Podium (top 3) ── */}
+        {/* â”€â”€ Podium (top 3) â”€â”€ */}
         {topThree.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -113,7 +113,7 @@ export default function Leaderboard() {
                     </div>
                     {user.role === "admin" && (
                       <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center shadow-sm text-[10px]">
-                        👑
+                        ðŸ‘‘
                       </div>
                     )}
                   </div>
@@ -148,7 +148,7 @@ export default function Leaderboard() {
           </motion.div>
         )}
 
-        {/* ── Rest of leaderboard ── */}
+        {/* â”€â”€ Rest of leaderboard â”€â”€ */}
         {rest.length > 0 && (
           <div className="space-y-3">
             {rest.map((user, index) => {
@@ -176,7 +176,7 @@ export default function Leaderboard() {
                     <UserAvatar user={user} size="sm" />
                     {user.role === "admin" && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center text-[8px]">
-                        👑
+                        ðŸ‘‘
                       </div>
                     )}
                   </div>
@@ -200,7 +200,7 @@ export default function Leaderboard() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-16"
           >
-            <div className="text-5xl mb-4">🏆</div>
+            <div className="text-5xl mb-4">ðŸ†</div>
             <h3 className="font-display text-xl font-bold mb-2">No one's ranked yet</h3>
             <p className="text-sm text-muted-foreground max-w-[240px] mx-auto">
               Complete chores to earn stars and climb to the top of the leaderboard!
@@ -218,10 +218,10 @@ export default function Leaderboard() {
           >
             <p className="text-sm text-muted-foreground">
               {currentUser.points === 0
-                ? "✨ Complete your first chore to get on the board!"
+                ? "âœ¨ Complete your first chore to get on the board!"
                 : myRank === 1
-                  ? "🥇 You're leading — keep it up!"
-                  : "💪 Every chore brings you closer to the top!"}
+                  ? "ðŸ¥‡ You're leading â€” keep it up!"
+                  : "ðŸ’ª Every chore brings you closer to the top!"}
             </p>
           </motion.div>
         )}
@@ -236,7 +236,7 @@ export default function Leaderboard() {
               </div>
               <h2 className="font-display text-2xl font-bold">{selectedUser.username}</h2>
               <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mt-1 mb-5">
-                {selectedUser.role === 'admin' ? 'Parent' : 'Child'} • Rank #{visibleUsers.findIndex(u => u.id === selectedUser.id) + 1}
+                {selectedUser.role === 'admin' ? 'Parent' : 'Child'} â€¢ Rank #{visibleUsers.findIndex(u => u.id === selectedUser.id) + 1}
               </p>
 
               <div className="grid grid-cols-2 gap-3 mb-6">
@@ -246,7 +246,7 @@ export default function Leaderboard() {
                   <span className="text-[10px] text-amber-900/60 font-bold uppercase mt-1">Stars</span>
                 </div>
                 <div className="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900 rounded-2xl py-3 px-2 flex flex-col items-center">
-                  <div className="text-lg leading-none mb-1 mt-0.5">🔥</div>
+                  <div className="text-lg leading-none mb-1 mt-0.5">ðŸ”¥</div>
                   <span className="font-bold text-lg leading-none">{selectedUser.streak}</span>
                   <span className="text-[10px] text-orange-900/60 font-bold uppercase mt-1">Day Streak</span>
                 </div>

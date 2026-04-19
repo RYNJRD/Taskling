@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, MessageSquare, Camera, X, Check, Image as ImageIcon, Palette } from "lucide-react";
-import { api, buildUrl } from "../../shared/routes";
-import type { Message, User } from "../../shared/schema";
+import { api, buildUrl } from "../../../shared/routes";
+import type { Message, User } from "../../../shared/schema";
 import { useStore } from "../store/useStore";
 import { apiFetch } from "../lib/apiFetch";
 import { ScrollArea } from "../components/ui/scroll-area";
@@ -130,7 +130,7 @@ export default function Chat() {
   return (
     <div className={cn("flex flex-col relative transition-colors duration-500", chatBg || "bg-tab-chat")} style={{ height: 'calc(100% - 5.5rem)' }}>
       
-      {/* ── Background Picker Popover ── */}
+      {/* â”€â”€ Background Picker Popover â”€â”€ */}
       <AnimatePresence>
         {showBgPicker && (
           <>
@@ -164,7 +164,7 @@ export default function Chat() {
         )}
       </AnimatePresence>
 
-      {/* ── Image Preview Modal ── */}
+      {/* â”€â”€ Image Preview Modal â”€â”€ */}
       <AnimatePresence>
         {previewOpen && selectedImage && (
           <motion.div 
@@ -192,7 +192,7 @@ export default function Chat() {
         )}
       </AnimatePresence>
 
-      {/* ── Lightbox Modal ── */}
+      {/* â”€â”€ Lightbox Modal â”€â”€ */}
       <AnimatePresence>
         {lightboxImage && (
           <motion.div 
@@ -208,7 +208,7 @@ export default function Chat() {
         )}
       </AnimatePresence>
 
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <div className="flex-none px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-4 border-b-2 border-slate-200/80 dark:border-slate-800/60 bg-card/95 dark:bg-zinc-950/95 backdrop-blur-md z-10 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -242,7 +242,7 @@ export default function Chat() {
         </div>
       </div>
 
-      {/* ── Messages ── */}
+      {/* â”€â”€ Messages â”€â”€ */}
       <ScrollArea className="flex-1 px-4" ref={scrollRef} onScroll={handleScroll}>
         <div className="flex flex-col py-4">
           <AnimatePresence initial={false}>
@@ -302,7 +302,7 @@ export default function Chat() {
                   <div className={cn("flex flex-col min-w-0", isMe ? "items-end" : "items-start")}>
                     {!isSameAsPrev && (
                       <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1 px-1">
-                        {isMe ? "You" : message.senderName} · {format(new Date(message.createdAt), "HH:mm")}
+                        {isMe ? "You" : message.senderName} Â· {format(new Date(message.createdAt), "HH:mm")}
                       </span>
                     )}
                     <div className={cn(
@@ -336,7 +336,7 @@ export default function Chat() {
           {messages.length === 0 && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center flex-1 py-20 text-center">
               <div className="w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center mb-6 inner-shadow">
-                <span className="text-6xl text-primary">🐧</span>
+                <span className="text-6xl text-primary">ðŸ§</span>
               </div>
               <p className="font-display text-2xl font-bold mb-2 text-foreground">Quiet in here!</p>
               <p className="text-sm text-muted-foreground font-medium w-64 max-w-full mx-auto">Say hi to your family or drop a quick emoji to get started.</p>
@@ -345,7 +345,7 @@ export default function Chat() {
         </div>
       </ScrollArea>
 
-      {/* ── Floating input bar ── */}
+      {/* â”€â”€ Floating input bar â”€â”€ */}
       <div className={cn(
         "flex-none px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] border-t transition-all z-20 relative",
         chatBg ? "bg-white/20 dark:bg-black/20 backdrop-blur-xl border-white/10" : "border-slate-200/60 dark:border-slate-800/60 bg-white/95 dark:bg-zinc-950/95 shadow-[0_-8px_30px_rgba(0,0,0,0.03)]"
@@ -370,7 +370,7 @@ export default function Chat() {
               onChange={(e) => setContent(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder="Type a message…"
+              placeholder="Type a messageâ€¦"
               className="w-full h-12 px-4 bg-transparent text-sm font-medium placeholder:text-muted-foreground/60 outline-none"
             />
           </motion.div>

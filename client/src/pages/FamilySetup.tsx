@@ -6,7 +6,7 @@ import { Input } from "../components/ui/input";
 import { useStore } from "../store/useStore";
 import { useToast } from "../hooks/use-toast";
 import { cn } from "../lib/utils";
-import { getFamilyTimeZone } from "../../shared/streak";
+import { getFamilyTimeZone } from "../../../shared/streak";
 import { apiFetch } from "../lib/apiFetch";
 import { PenguinMascot } from "../components/PenguinMascot";
 
@@ -99,7 +99,7 @@ export default function FamilySetup() {
       setFamily(family);
       setCurrentUser(createdUser);
       toast({
-        title: "Family created! 🎉",
+        title: "Family created! ðŸŽ‰",
         description: starterMode === "guided"
           ? `Welcome to ${family.name}. Starter chores are ready!`
           : `Welcome to ${family.name}! Find your invite code in Admin.`,
@@ -158,7 +158,7 @@ export default function FamilySetup() {
         <div className="max-w-md mx-auto px-5 pb-8">
           <AnimatePresence mode="wait">
 
-            {/* ── STEP 0: Family Name ── */}
+            {/* â”€â”€ STEP 0: Family Name â”€â”€ */}
             {step === 0 && (
               <motion.div
                 key="step-0"
@@ -219,7 +219,7 @@ export default function FamilySetup() {
                   transition={{ delay: 0.3 }}
                   className="flex gap-2 flex-wrap justify-center"
                 >
-                  {["The Johnsons ⚡", "Team Taskling 🏆", "Squad Goals 🎯"].map(name => (
+                  {["The Johnsons âš¡", "Team Taskling ðŸ†", "Squad Goals ðŸŽ¯"].map(name => (
                     <button
                       key={name}
                       onClick={() => setFamilyName(name.split(" ").slice(0, -1).join(" "))}
@@ -245,7 +245,7 @@ export default function FamilySetup() {
               </motion.div>
             )}
 
-            {/* ── STEP 1: Your Profile ── */}
+            {/* â”€â”€ STEP 1: Your Profile â”€â”€ */}
             {step === 1 && (
               <motion.div
                 key="step-1"
@@ -348,7 +348,7 @@ export default function FamilySetup() {
                       {starterMode === "guided" && (
                         <div className="mt-2 flex">
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ background: "hsl(262 83% 58%)" }}>
-                            ✓ Selected
+                            âœ“ Selected
                           </span>
                         </div>
                       )}
@@ -369,11 +369,11 @@ export default function FamilySetup() {
                         <Zap className="w-4 h-4" style={{ color: "hsl(262 83% 58%)" }} />
                       </div>
                       <p className="font-bold text-sm text-foreground">Start fresh</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">Empty slate — you set up everything</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">Empty slate â€” you set up everything</p>
                       {starterMode === "blank" && (
                         <div className="mt-2 flex">
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ background: "hsl(262 83% 58%)" }}>
-                            ✓ Selected
+                            âœ“ Selected
                           </span>
                         </div>
                       )}
@@ -395,7 +395,7 @@ export default function FamilySetup() {
                   {isSubmitting ? (
                     <><Loader2 className="w-5 h-5 animate-spin" /> Setting up your family...</>
                   ) : (
-                    <><Check className="w-5 h-5" /> Launch Taskling 🚀</>
+                    <><Check className="w-5 h-5" /> Launch Taskling ðŸš€</>
                   )}
                 </motion.button>
               </motion.div>

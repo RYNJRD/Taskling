@@ -4,8 +4,8 @@ import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { useParams } from "wouter";
 import { Flame, Sparkles, Star, Trophy, Zap, CheckCircle2, TrendingUp } from "lucide-react";
-import { calculateStreakMultiplier, getEffectiveStreakForDate, getFamilyTimeZone } from "../../shared/streak";
-import type { Chore } from "../../shared/schema";
+import { calculateStreakMultiplier, getEffectiveStreakForDate, getFamilyTimeZone } from "../../../shared/streak";
+import type { Chore } from "../../../shared/schema";
 import { ChoreCard } from "../components/ChoreCard";
 import { UserAvatar } from "../components/UserAvatar";
 import { useToast } from "../hooks/use-toast";
@@ -37,7 +37,7 @@ function getChoreBucket(chore: Chore & { latestSubmissionStatus?: string }): Cho
   return "today";
 }
 
-/* ─── Calendar strip (14 days centred on today) ─── */
+/* â”€â”€â”€ Calendar strip (14 days centred on today) â”€â”€â”€ */
 function CalendarStrip() {
   const today = startOfToday();
   const days = Array.from({ length: 14 }, (_, i) => addDays(today, i - 3));
@@ -118,9 +118,9 @@ export default function Dashboard() {
       if (result.user) setCurrentUser(result.user);
 
       if (result.submission?.status === "submitted") {
-        toast({ title: "Submitted for review ✓", description: `${chore.title} is waiting for approval.` });
+        toast({ title: "Submitted for review âœ“", description: `${chore.title} is waiting for approval.` });
       } else {
-        toast({ title: `+${result.awardedPoints} stars ⭐`, description: `Great job on ${chore.title}!` });
+        toast({ title: `+${result.awardedPoints} stars â­`, description: `Great job on ${chore.title}!` });
       }
 
       confetti({
@@ -141,7 +141,7 @@ export default function Dashboard() {
   return (
     <div className="pt-6 px-5 pb-32 min-h-screen">
 
-      {/* ── Hero Card ── */}
+      {/* â”€â”€ Hero Card â”€â”€ */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -159,10 +159,10 @@ export default function Dashboard() {
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">Welcome back</p>
                 <h1 className="font-display text-xl font-bold text-white leading-tight">
-                  Hi, {currentUser.username}! 👋
+                  Hi, {currentUser.username}! ðŸ‘‹
                 </h1>
                 <p className="text-sm text-white/70 mt-0.5">
-                  {rank === 1 ? "🥇 You're leading the family!" : `Rank #${rank || 1} in your family`}
+                  {rank === 1 ? "ðŸ¥‡ You're leading the family!" : `Rank #${rank || 1} in your family`}
                 </p>
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function Dashboard() {
             <div className="flex justify-between items-center mb-1">
               <p className="text-[9px] font-bold uppercase tracking-widest text-white/60 flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                {userAbove ? `Progress to rank #${rank - 1}` : "You're #1 — keep it up!"}
+                {userAbove ? `Progress to rank #${rank - 1}` : "You're #1 â€” keep it up!"}
               </p>
               <p className="text-[9px] font-bold text-white/70">{progressToNext}%</p>
             </div>
@@ -212,7 +212,7 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      {/* ── Calendar strip ── */}
+      {/* â”€â”€ Calendar strip â”€â”€ */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -226,7 +226,7 @@ export default function Dashboard() {
         <CalendarStrip />
       </motion.div>
 
-      {/* ── Onboarding checklist (admin only) ── */}
+      {/* â”€â”€ Onboarding checklist (admin only) â”€â”€ */}
       {checklist.some((item) => !item.complete) && currentUser.role === "admin" && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -246,7 +246,7 @@ export default function Dashboard() {
                   <p className="text-xs text-muted-foreground">{item.description}</p>
                 </div>
                 <span className={cn("text-[10px] font-bold uppercase tracking-widest shrink-0", item.complete ? "text-green-500" : "text-primary")}>
-                  {item.complete ? "✓ Done" : "Next"}
+                  {item.complete ? "âœ“ Done" : "Next"}
                 </span>
               </div>
             ))}
@@ -254,7 +254,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* ── Pending Review ── */}
+      {/* â”€â”€ Pending Review â”€â”€ */}
       {bucketed.pending.length > 0 && (
         <motion.section
           initial={{ opacity: 0, y: 8 }}
@@ -282,7 +282,7 @@ export default function Dashboard() {
         </motion.section>
       )}
 
-      {/* ── Today's chores ── */}
+      {/* â”€â”€ Today's chores â”€â”€ */}
       <motion.section
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -330,7 +330,7 @@ export default function Dashboard() {
               animate={{ opacity: 1 }}
               className="rounded-[2rem] border-2 border-dashed border-border bg-card p-8 text-center"
             >
-              <div className="text-4xl mb-3">🎉</div>
+              <div className="text-4xl mb-3">ðŸŽ‰</div>
               <h3 className="font-display text-lg font-bold mb-1">You&apos;re all clear!</h3>
               <p className="text-sm text-muted-foreground">No chores pressing right now. Check back later or chat with your family.</p>
             </motion.div>
@@ -338,7 +338,7 @@ export default function Dashboard() {
         </div>
       </motion.section>
 
-      {/* ── Monthly Spotlight ── */}
+      {/* â”€â”€ Monthly Spotlight â”€â”€ */}
       {latestWinner && (
         <motion.section
           initial={{ opacity: 0, y: 8 }}

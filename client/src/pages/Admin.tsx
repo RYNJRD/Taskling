@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy, Gift, Link as LinkIcon, Plus, Search, Settings, Shield, ShieldCheck, ShieldOff, Star, Trophy, Users as UsersIcon, X } from "lucide-react";
 import { useParams } from "wouter";
-import { api, buildUrl } from "../../shared/routes";
-import type { User } from "../../shared/schema";
+import { api, buildUrl } from "../../../shared/routes";
+import type { User } from "../../../shared/schema";
 import { queryClient, apiRequest } from "../lib/queryClient";
 import { apiFetch } from "../lib/apiFetch";
 import { useCreateChore } from "../hooks/use-chores";
@@ -60,10 +60,10 @@ export default function Admin() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center gap-6 pb-32">
         <div className="w-24 h-24 rounded-[2rem] bg-amber-100 dark:bg-amber-950/30 flex items-center justify-center text-5xl shadow-lg">
-          👑
+          ðŸ‘‘
         </div>
         <div>
-          <h2 className="font-display text-2xl font-bold mb-2">Parents only 😊</h2>
+          <h2 className="font-display text-2xl font-bold mb-2">Parents only ðŸ˜Š</h2>
           <p className="text-sm text-muted-foreground max-w-[260px]">
             This area is for parents. You can still complete chores and claim rewards from the other tabs!
           </p>
@@ -71,10 +71,10 @@ export default function Admin() {
         <div className="bg-primary/8 rounded-2xl px-5 py-4 border border-primary/20 max-w-[280px]">
           <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">What you can do</p>
           <ul className="text-sm text-muted-foreground space-y-1 text-left">
-            <li>✅ Complete your chores</li>
-            <li>✅ Earn stars &amp; climb the leaderboard</li>
-            <li>✅ Claim rewards you've earned</li>
-            <li>✅ Chat with your family</li>
+            <li>âœ… Complete your chores</li>
+            <li>âœ… Earn stars &amp; climb the leaderboard</li>
+            <li>âœ… Claim rewards you've earned</li>
+            <li>âœ… Chat with your family</li>
           </ul>
         </div>
       </div>
@@ -217,7 +217,7 @@ export default function Admin() {
           </div>
 
           <div className="space-y-3">
-            {/* ── Chore submissions ── */}
+            {/* â”€â”€ Chore submissions â”€â”€ */}
             {(pendingChores as any[]).map((submission) => {
               const submitter: User | undefined = submission.user;
               const chore = submission.chore;
@@ -233,7 +233,7 @@ export default function Admin() {
                       <p className="text-[11px] text-muted-foreground font-medium">Chore completion request</p>
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-amber-600 bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400 px-2 py-1 rounded-xl">
-                      ✔ Chore
+                      âœ” Chore
                     </span>
                   </div>
 
@@ -258,7 +258,7 @@ export default function Admin() {
                       onClick={async () => {
                         try {
                           await reviewChoreMutation.mutateAsync({ id: submission.id, action: "approve" });
-                          toast({ title: "Chore approved! 🌟", description: `${submitter?.username ?? "They"} earned ${chore?.points ?? 0} stars.` });
+                          toast({ title: "Chore approved! ðŸŒŸ", description: `${submitter?.username ?? "They"} earned ${chore?.points ?? 0} stars.` });
                         } catch {
                           toast({ title: "Could not approve chore", variant: "destructive" });
                         }
@@ -286,7 +286,7 @@ export default function Admin() {
               );
             })}
 
-            {/* ── Reward claims ── */}
+            {/* â”€â”€ Reward claims â”€â”€ */}
             {(pendingRewards as any[]).map((claim) => {
               const requester: User | undefined = claim.user;
               const reward = claim.reward;
@@ -302,7 +302,7 @@ export default function Admin() {
                       <p className="text-[11px] text-muted-foreground font-medium">Reward request</p>
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-pink-600 bg-pink-100 dark:bg-pink-950/40 dark:text-pink-400 px-2 py-1 rounded-xl">
-                      🎁 Reward
+                      ðŸŽ Reward
                     </span>
                   </div>
 
@@ -320,7 +320,7 @@ export default function Admin() {
                         <span className="text-sm font-bold">{claim.totalCost} stars</span>
                       </div>
                       {claim.quantity > 1 && (
-                        <span className="text-xs text-muted-foreground font-medium">× {claim.quantity}</span>
+                        <span className="text-xs text-muted-foreground font-medium">Ã— {claim.quantity}</span>
                       )}
                     </div>
                   </div>
@@ -332,7 +332,7 @@ export default function Admin() {
                       onClick={async () => {
                         try {
                           await reviewRewardMutation.mutateAsync({ id: claim.id, action: "approve" });
-                          toast({ title: "Reward approved! 🎉", description: `${requester?.username ?? "They"} can now enjoy ${reward?.title ?? "their reward"}.` });
+                          toast({ title: "Reward approved! ðŸŽ‰", description: `${requester?.username ?? "They"} can now enjoy ${reward?.title ?? "their reward"}.` });
                         } catch {
                           toast({ title: "Could not approve reward", variant: "destructive" });
                         }
@@ -360,7 +360,7 @@ export default function Admin() {
 
             {pendingChores.length === 0 && pendingRewards.length === 0 && (
               <div className="text-center py-8">
-                <div className="text-3xl mb-2">✅</div>
+                <div className="text-3xl mb-2">âœ…</div>
                 <p className="font-bold text-sm">All caught up!</p>
                 <p className="text-xs text-muted-foreground mt-1">Nothing is waiting for review.</p>
               </div>

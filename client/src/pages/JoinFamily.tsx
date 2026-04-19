@@ -7,7 +7,7 @@ import { Button } from "../components/ui/button";
 import { useStore } from "../store/useStore";
 import { useToast } from "../hooks/use-toast";
 import { cn } from "../lib/utils";
-import type { Family } from "../../shared/schema";
+import type { Family } from "../../../shared/schema";
 import { apiFetch } from "../lib/apiFetch";
 import { PenguinMascot } from "../components/PenguinMascot";
 
@@ -81,7 +81,7 @@ export default function JoinFamily() {
       const createdUser = await userRes.json();
       setFamily(foundFamily);
       setCurrentUser(createdUser);
-      toast({ title: "Welcome! 🎉", description: `You've joined ${foundFamily.name}`, duration: 3000 });
+      toast({ title: "Welcome! ðŸŽ‰", description: `You've joined ${foundFamily.name}`, duration: 3000 });
       setLocation(`/family/${foundFamily.id}/dashboard`);
     } catch {
       toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
@@ -257,7 +257,7 @@ export default function JoinFamily() {
               {isCreating ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Joining...</>
               ) : (
-                <><Check className="w-4 h-4 mr-2" /> Join Family! 🎉</>
+                <><Check className="w-4 h-4 mr-2" /> Join Family! ðŸŽ‰</>
               )}
             </Button>
           </motion.div>

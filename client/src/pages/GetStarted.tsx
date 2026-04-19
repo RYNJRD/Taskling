@@ -6,7 +6,7 @@ import { useStore } from "../store/useStore";
 import { useDemoSetup } from "../hooks/use-families";
 import { PenguinMascot } from "../components/PenguinMascot";
 import { UserAvatar } from "../components/UserAvatar";
-import type { User, Family } from "../../shared/schema";
+import type { User, Family } from "../../../shared/schema";
 import { cn } from "../lib/utils";
 
 type DemoData = { family: Family; users: User[] };
@@ -48,8 +48,8 @@ export default function GetStarted() {
 
   function getRoleBadge(user: User) {
     if (user.role === "admin") return { label: "Parent", icon: Crown, color: "bg-amber-100 text-amber-700 border-amber-200" };
-    if ((user.age ?? 0) >= 12) return { label: `Kid · ${user.age}`, icon: Star, color: "bg-violet-100 text-violet-700 border-violet-200" };
-    return { label: `Kid · ${user.age}`, icon: Star, color: "bg-sky-100 text-sky-700 border-sky-200" };
+    if ((user.age ?? 0) >= 12) return { label: `Kid Â· ${user.age}`, icon: Star, color: "bg-violet-100 text-violet-700 border-violet-200" };
+    return { label: `Kid Â· ${user.age}`, icon: Star, color: "bg-sky-100 text-sky-700 border-sky-200" };
   }
 
   return (
@@ -91,7 +91,7 @@ export default function GetStarted() {
                   transition={{ delay: 0.5, type: "spring", bounce: 0.6 }}
                   className="absolute -top-2 -right-1 bg-primary text-primary-foreground text-xs font-bold px-2.5 py-1 rounded-full shadow-md"
                 >
-                  Pick one! 👇
+                  Pick one! ðŸ‘‡
                 </motion.div>
               </motion.div>
 
@@ -102,7 +102,7 @@ export default function GetStarted() {
               </motion.div>
 
               <motion.p initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="text-muted-foreground font-semibold mb-8 text-sm max-w-[260px]">
-                Make chores fun — reward your whole family! ⭐
+                Make chores fun â€” reward your whole family! â­
               </motion.p>
 
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.28 }} className="w-full space-y-3">
@@ -158,7 +158,7 @@ export default function GetStarted() {
                 transition={{ type: "spring", bounce: 0.4 }}
                 className="mb-2 text-5xl"
               >
-                🐧
+                ðŸ§
               </motion.div>
 
               <h2 className="font-display text-3xl font-bold text-foreground mb-1">Pick a character</h2>

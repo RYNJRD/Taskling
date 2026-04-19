@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Users, X, Crown, Star, ChevronRight } from "lucide-react";
 import { useStore } from "../store/useStore";
 import { UserAvatar } from "./UserAvatar";
-import type { User } from "../../shared/schema";
+import type { User } from "../../../shared/schema";
 import { cn } from "../lib/utils";
 
 function getRoleBadge(user: User) {
   if (user.role === "admin") return { label: "Parent", icon: Crown, color: "bg-amber-100 text-amber-700 border-amber-200" };
-  if ((user.age ?? 0) >= 12) return { label: `Kid · ${user.age}`, icon: Star, color: "bg-violet-100 text-violet-700 border-violet-200" };
-  return { label: `Kid · ${user.age}`, icon: Star, color: "bg-sky-100 text-sky-700 border-sky-200" };
+  if ((user.age ?? 0) >= 12) return { label: `Kid Â· ${user.age}`, icon: Star, color: "bg-violet-100 text-violet-700 border-violet-200" };
+  return { label: `Kid Â· ${user.age}`, icon: Star, color: "bg-sky-100 text-sky-700 border-sky-200" };
 }
 
 export function DemoSwitcher() {
@@ -61,7 +61,7 @@ export function DemoSwitcher() {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h3 className="font-bold text-lg text-foreground">Switch Character</h3>
-                  <p className="text-xs text-muted-foreground font-medium">Demo mode — dev only</p>
+                  <p className="text-xs text-muted-foreground font-medium">Demo mode â€” dev only</p>
                 </div>
                 <button
                   onClick={() => setOpen(false)}

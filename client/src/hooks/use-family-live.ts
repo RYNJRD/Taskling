@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { auth } from "../lib/firebase";
 import { queryClient } from "../lib/queryClient";
-import { api, buildUrl } from "../../shared/routes";
-import type { ActivityEvent, Message } from "../../shared/schema";
+import { api, buildUrl } from "../../../shared/routes";
+import type { ActivityEvent, Message } from "../../../shared/schema";
 import { useStore } from "../store/useStore";
 
 function upsertById<T extends { id: number }>(list: T[] | undefined, incoming: T): T[] {

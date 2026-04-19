@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Settings as SettingsIcon, Check } from "lucide-react";
 import { useLocation } from "wouter";
-import { api, buildUrl } from "../../shared/routes";
+import { api, buildUrl } from "../../../shared/routes";
 import { queryClient } from "../lib/queryClient";
 import { useStore } from "../store/useStore";
 import { apiFetch } from "../lib/apiFetch";
@@ -62,7 +62,7 @@ export default function Profile() {
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden bg-tab-profile">
 
-      {/* ── Top bar ── */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Top bar Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div className="flex-none flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-2">
         <div className="flex items-center gap-2">
           <h1 className="text-base font-bold text-primary tracking-tight">Taskling</h1>
@@ -70,7 +70,7 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ── Character preview ── */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Character preview Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div
         className="flex-none relative flex items-end justify-center bg-gradient-to-b from-primary/8 via-background/50 to-background overflow-hidden"
         style={{ height: "38vh" }}
@@ -91,7 +91,7 @@ export default function Profile() {
         </AnimatePresence>
       </div>
 
-      {/* ── Outfit picker panel ── */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Outfit picker panel Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div className="flex-1 min-h-0 flex flex-col bg-card rounded-t-[2rem] shadow-2xl border-t-2 border-x-2 border-slate-300/70 dark:border-slate-700/70 overflow-hidden">
         <div className="flex-none px-4 pt-4 pb-3">
           <h2 className="font-bold text-sm text-foreground uppercase tracking-widest">Choose Your Penguin</h2>

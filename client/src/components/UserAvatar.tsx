@@ -1,4 +1,4 @@
-import type { User } from "../../shared/schema";
+import type { User } from "../../../shared/schema";
 import { cn } from "../lib/utils";
 import { getOutfitImage } from "../lib/avatar";
 

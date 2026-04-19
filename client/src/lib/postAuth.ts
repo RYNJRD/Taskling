@@ -1,4 +1,4 @@
-import type { Family, User } from "../../shared/schema";
+import type { Family, User } from "../../../shared/schema";
 import { apiFetch } from "../lib/apiFetch";
 
 type PostAuthArgs = {
