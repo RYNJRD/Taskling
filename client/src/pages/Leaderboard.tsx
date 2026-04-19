@@ -22,7 +22,18 @@ export default function Leaderboard() {
   const { currentUser } = useStore();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  if (isLoading || !leaderboard || !currentUser) return null;
+  if (isLoading || !leaderboard || !currentUser) {
+    return (
+      <div className="min-h-screen bg-tab-leaderboard flex items-center justify-center p-6 text-center">
+        <div className="space-y-4">
+          <div className="w-16 h-16 bg-primary/10 rounded-[1.5rem] flex items-center justify-center mx-auto animate-pulse">
+            <Trophy className="w-8 h-8 text-primary/40" />
+          </div>
+          <p className="text-sm font-bold text-muted-foreground animate-pulse">Loading ranking...</p>
+        </div>
+      </div>
+    );
+  }
 
   const visibleUsers = leaderboard
     .filter((u) => !u.hideFromLeaderboard)
