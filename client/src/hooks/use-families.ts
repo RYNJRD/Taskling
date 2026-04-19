@@ -1,4 +1,4 @@
-﻿import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { api, buildUrl } from "../../../shared/routes";
 import { apiFetch } from "../lib/apiFetch";
 
@@ -51,10 +51,15 @@ export function useFamilyLeaderboard(id: number | undefined) {
       if (!id) throw new Error("No id provided");
       const url = buildUrl(api.families.getLeaderboard.path, { id });
       const res = await apiFetch(url);
-      if (!res.ok) throw new Error("Failed to fetch leaderboard");
+      if (!res.ok) {
+        if (res.status === 403) throw new Error("Access Denied: You don't have permission to view this family's leaderboard.");
+        if (res.status === 404) throw new Error("Leaderboard not found: This family may not exist.");
+        throw new Error(`Failed to fetch leaderboard (Status: ${res.status})`);
+      }
       return api.families.getLeaderboard.responses[200].parse(await res.json());
     },
     enabled: !!id,
+    retry: 1, // Minimize retries for auth errors
   });
 }
 
