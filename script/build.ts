@@ -54,11 +54,9 @@ async function buildAll() {
     entryPoints: ["server/vercel-handler.ts"],
     platform: "node",
     bundle: true,
-    format: "cjs",
+    format: "esm",
     outfile: "api/index.js",
-    footer: {
-      js: "module.exports = exports.default;",
-    },
+
     define: { "process.env.NODE_ENV": '"production"' },
     // We mark all packages as external for Vercel too.
     // This is safer as Vercel will install the correct platform-specific versions.
