@@ -46,20 +46,17 @@ export function useFamilyChores(id: number | undefined) {
 
 export function useFamilyLeaderboard(id: number | undefined) {
   return useQuery({
-    queryKey: [api.families.getLeaderboard.path, id],
+    queryKey: [api.families.getLeaderboard.path, "robust"],
     queryFn: async () => {
-      if (!id) throw new Error("No id provided");
-      const url = buildUrl(api.families.getLeaderboard.path, { id });
-      const res = await apiFetch(url);
+      const res = await apiFetch("/api/my-family/leaderboard");
       if (!res.ok) {
-        if (res.status === 403) throw new Error("Access Denied: You don't have permission to view this family's leaderboard.");
-        if (res.status === 404) throw new Error("Leaderboard not found: This family may not exist.");
+        if (res.status === 403) throw new Error("Access Denied: You don't have permission to view high-scores.");
+        if (res.status === 404) throw new Error("Leaderboard not found.");
         throw new Error(`Failed to fetch leaderboard (Status: ${res.status})`);
       }
       return api.families.getLeaderboard.responses[200].parse(await res.json());
     },
-    enabled: !!id,
-    retry: 1, // Minimize retries for auth errors
+    retry: 1,
   });
 }
 

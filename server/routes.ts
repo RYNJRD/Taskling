@@ -121,6 +121,13 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     return res.json(await storage.getFamilyUsers(familyId));
   });
 
+  // Robust parameter-less leaderboard for the current user's family
+  app.get("/api/my-family/leaderboard", requireAuth, attachCurrentUser, async (req, res) => {
+    const currentUser = getCurrentUser(req);
+    if (!currentUser.familyId) return res.status(400).json({ message: "User is not in a family" });
+    return res.json(await storage.getFamilyUsers(currentUser.familyId));
+  });
+
   app.get(api.families.getInviteInfo.path, requireAuth, attachCurrentUser, async (req, res) => {
     const currentUser = getCurrentUser(req);
     const familyId = parseId(req.params.id);
