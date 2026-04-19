@@ -39,13 +39,19 @@ export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {})
     }
   }
 
-  console.log(`[apiFetch] Fetching ${input}`);
+  const resolvedUrl = typeof input === "string" && input.startsWith("/") 
+    ? `${window.location.origin}${input}` 
+    : String(input);
+
+  console.log(`[apiFetch] Origin: ${window.location.origin}`);
+  console.log(`[apiFetch] Calling: ${resolvedUrl}`);
+  
   return fetch(input, {
     ...init,
     headers,
     credentials: "include",
   }).catch(err => {
-    console.error(`[apiFetch] Network error for ${input}:`, err);
+    console.error(`[apiFetch] Network error for ${resolvedUrl}:`, err);
     throw err;
   });
 }

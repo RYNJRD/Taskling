@@ -1,0 +1,3 @@
+- [x] Add transparent logging to `apiFetch.ts`
+- [x] Verify `vercel.json` for `www` compatibility
+- [x] Final production build and push (v1.2.3)
