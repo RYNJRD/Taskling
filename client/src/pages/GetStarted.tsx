@@ -2,12 +2,12 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, UserPlus, Sparkles, ChevronLeft, Crown, Star, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
-import { useStore } from "@/store/useStore";
-import { useDemoSetup } from "@/hooks/use-families";
-import { PenguinMascot } from "@/components/PenguinMascot";
-import { UserAvatar } from "@/components/UserAvatar";
-import type { User, Family } from "@shared/schema";
-import { cn } from "@/lib/utils";
+import { useStore } from "../store/useStore";
+import { useDemoSetup } from "../hooks/use-families";
+import { PenguinMascot } from "../components/PenguinMascot";
+import { UserAvatar } from "../components/UserAvatar";
+import type { User, Family } from "../../shared/schema";
+import { cn } from "../lib/utils";
 
 type DemoData = { family: Family; users: User[] };
 

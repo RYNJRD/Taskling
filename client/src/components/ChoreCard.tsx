@@ -1,8 +1,8 @@
 import { forwardRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Clock3, ShieldCheck, Star, Users, AlertCircle, MessageCircle } from "lucide-react";
-import type { Chore } from "@shared/schema";
-import { cn } from "@/lib/utils";
+import type { Chore } from "../../shared/schema";
+import { cn } from "../lib/utils";
 
 interface ChoreCardProps {
   chore: Chore;

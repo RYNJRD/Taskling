@@ -3,15 +3,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, Mail, ArrowRight, Loader2, KeyRound, Eye, EyeOff, RefreshCw } from "lucide-react";
 import { SiGoogle, SiApple } from "react-icons/si";
 import { useLocation } from "wouter";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { auth, googleProvider } from "@/lib/firebase";
+import { Input } from "../components/ui/input";
+import { cn } from "../lib/utils";
+import { auth, googleProvider } from "../lib/firebase";
 import { signInWithPopup, signInWithEmailAndPassword, signInWithCustomToken, createUserWithEmailAndPassword } from "firebase/auth";
-import { useToast } from "@/hooks/use-toast";
-import { useStore } from "@/store/useStore";
-import { handlePostAuthNavigation } from "@/lib/postAuth";
-import { PenguinMascot } from "@/components/PenguinMascot";
-import { apiFetch } from "@/lib/apiFetch";
+import { useToast } from "../hooks/use-toast";
+import { useStore } from "../store/useStore";
+import { handlePostAuthNavigation } from "../lib/postAuth";
+import { PenguinMascot } from "../components/PenguinMascot";
+import { apiFetch } from "../lib/apiFetch";
 
 type ViewState = "welcome" | "verification" | "signin";
 

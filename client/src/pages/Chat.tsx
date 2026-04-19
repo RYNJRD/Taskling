@@ -3,13 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, MessageSquare, Camera, X, Check, Image as ImageIcon, Palette } from "lucide-react";
-import { api, buildUrl } from "@shared/routes";
-import type { Message, User } from "@shared/schema";
-import { useStore } from "@/store/useStore";
-import { apiFetch } from "@/lib/apiFetch";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { UserAvatar } from "@/components/UserAvatar";
-import { cn } from "@/lib/utils";
+import { api, buildUrl } from "../../shared/routes";
+import type { Message, User } from "../../shared/schema";
+import { useStore } from "../store/useStore";
+import { apiFetch } from "../lib/apiFetch";
+import { ScrollArea } from "../components/ui/scroll-area";
+import { UserAvatar } from "../components/UserAvatar";
+import { cn } from "../lib/utils";
 
 export default function Chat() {
   const queryClient = useQueryClient();

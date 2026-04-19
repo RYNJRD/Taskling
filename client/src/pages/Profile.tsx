@@ -3,16 +3,16 @@ import { useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Settings as SettingsIcon, Check } from "lucide-react";
 import { useLocation } from "wouter";
-import { api, buildUrl } from "@shared/routes";
-import { queryClient } from "@/lib/queryClient";
-import { useStore } from "@/store/useStore";
-import { apiFetch } from "@/lib/apiFetch";
+import { api, buildUrl } from "../../shared/routes";
+import { queryClient } from "../lib/queryClient";
+import { useStore } from "../store/useStore";
+import { apiFetch } from "../lib/apiFetch";
 import {
   PENGUIN_OUTFITS,
   parseAvatarConfig,
   type AvatarConfig,
-} from "@/lib/avatar";
-import { cn } from "@/lib/utils";
+} from "../lib/avatar";
+import { cn } from "../lib/utils";
 
 export default function Profile() {
   const { currentUser, setCurrentUser, family } = useStore();

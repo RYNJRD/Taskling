@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, X, Crown, Star, ChevronRight } from "lucide-react";
-import { useStore } from "@/store/useStore";
+import { useStore } from "../store/useStore";
 import { UserAvatar } from "./UserAvatar";
-import type { User } from "@shared/schema";
-import { cn } from "@/lib/utils";
+import type { User } from "../../shared/schema";
+import { cn } from "../lib/utils";
 
 function getRoleBadge(user: User) {
   if (user.role === "admin") return { label: "Parent", icon: Crown, color: "bg-amber-100 text-amber-700 border-amber-200" };

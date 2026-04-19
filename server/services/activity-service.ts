@@ -1,5 +1,5 @@
-import { activityEvents } from "@shared/schema";
-import type { ActivityEventType } from "@shared/constants";
+import { activityEvents } from "../../shared/schema";
+import type { ActivityEventType } from "../../shared/constants";
 import { db } from "../db";
 import { publishFamilyEvent } from "../realtime";
 

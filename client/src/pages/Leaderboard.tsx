@@ -1,13 +1,13 @@
 import { useParams } from "wouter";
-import { useFamilyLeaderboard } from "@/hooks/use-families";
-import { useStore } from "@/store/useStore";
+import { useFamilyLeaderboard } from "../hooks/use-families";
+import { useStore } from "../store/useStore";
 import { Trophy, Star, MessageCircle, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { UserAvatar } from "@/components/UserAvatar";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { cn } from "../lib/utils";
+import { UserAvatar } from "../components/UserAvatar";
+import { Dialog, DialogContent } from "../components/ui/dialog";
 import { useState } from "react";
-import type { User } from "@shared/schema";
+import type { User } from "../../shared/schema";
 
 const RANK_META = [
   { emoji: "🥇", label: "1st", gradient: "from-yellow-400 to-amber-500", glow: "shadow-amber-300/50", size: "scale-110", border: "border-amber-300" },

@@ -6,10 +6,10 @@ import {
   Users, ClipboardList, Gift, Star, Flame, CheckCircle2,
   TrendingUp, Clock, ChevronRight, Shield, AlertCircle,
 } from "lucide-react";
-import { useFamilyChores, useFamilyLeaderboard, useFamilyActivity, useFamilyUsers } from "@/hooks/use-families";
-import { UserAvatar } from "@/components/UserAvatar";
-import { useStore } from "@/store/useStore";
-import { cn } from "@/lib/utils";
+import { useFamilyChores, useFamilyLeaderboard, useFamilyActivity, useFamilyUsers } from "../hooks/use-families";
+import { UserAvatar } from "../components/UserAvatar";
+import { useStore } from "../store/useStore";
+import { cn } from "../lib/utils";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ParentDashboard() {

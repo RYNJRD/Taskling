@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { applicationDefault, cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import type { User } from "@shared/schema";
+import type { User } from "../shared/schema";
 import { storage } from "./storage";
 import { getEnv } from "./env";
 import * as crypto from "crypto";

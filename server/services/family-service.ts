@@ -1,5 +1,5 @@
 import { eq, sql } from "drizzle-orm";
-import { chores, families, rewards, users } from "@shared/schema";
+import { chores, families, rewards, users } from "../../shared/schema";
 import { db } from "../db";
 
 export async function getFamilyOnboardingChecklist(familyId: number) {

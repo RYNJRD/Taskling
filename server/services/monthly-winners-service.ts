@@ -1,5 +1,5 @@
 import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
-import { choreLogs, monthlyWinners, users } from "@shared/schema";
+import { choreLogs, monthlyWinners, users } from "../../shared/schema";
 import { db } from "../db";
 
 function getMonthKey(date: Date) {

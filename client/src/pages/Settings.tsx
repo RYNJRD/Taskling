@@ -8,19 +8,19 @@ import {
   Pencil, RefreshCw, Shield, ShieldCheck, Smartphone,
   Sun, Trash2, Users, X, AlertTriangle, UserX, TrendingUp
 } from "lucide-react";
-import { useStore } from "@/store/useStore";
-import { useSettings, type PointsResetCycle } from "@/hooks/use-settings";
-import { isParent } from "@/lib/permissions";
-import type { UserRole } from "@shared/constants";
-import { apiFetch } from "@/lib/apiFetch";
-import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { api, buildUrl } from "@shared/routes";
-import { cn } from "@/lib/utils";
+import { useStore } from "../store/useStore";
+import { useSettings, type PointsResetCycle } from "../hooks/use-settings";
+import { isParent } from "../lib/permissions";
+import type { UserRole } from "../../shared/constants";
+import { apiFetch } from "../lib/apiFetch";
+import { queryClient } from "../lib/queryClient";
+import { useToast } from "../hooks/use-toast";
+import { api, buildUrl } from "../../shared/routes";
+import { cn } from "../lib/utils";
 import {
   TermsScreen, PrivacyScreen, DisclaimerScreen, ContactScreen,
   type LegalScreenId,
-} from "@/components/LegalScreen";
+} from "../components/LegalScreen";
 
 const APP_VERSION = "1.0.1";
 

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { handlePostAuthNavigation } from "@/lib/postAuth";
+import { handlePostAuthNavigation } from "../lib/postAuth";
 
 const apiFetchMock = vi.fn();
 
-vi.mock("@/lib/apiFetch", () => ({
+vi.mock("../lib/apiFetch", () => ({
   apiFetch: (...args: unknown[]) => apiFetchMock(...args),
 }));
 

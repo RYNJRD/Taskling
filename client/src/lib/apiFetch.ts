@@ -1,6 +1,6 @@
-import { auth } from "@/lib/firebase";
+import { auth } from "../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useStore } from "@/store/useStore";
+import { useStore } from "../store/useStore";
 
 let authResolved = false;
 let authReadyPromise: Promise<void> | null = null;

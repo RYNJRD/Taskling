@@ -1,8 +1,8 @@
 import * as ToastPrimitives from "@radix-ui/react-toast";
 import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import type { ToastProps } from "@/components/ui/toast";
+import { useToast } from "../../hooks/use-toast";
+import { cn } from "../../lib/utils";
+import type { ToastProps } from "../../components/ui/toast";
 
 function ToastIcon({ variant }: { variant?: ToastProps["variant"] }) {
   if (variant === "destructive") {

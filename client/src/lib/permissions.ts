@@ -1,4 +1,4 @@
-import type { UserRole } from "@shared/constants";
+import type { UserRole } from "../../shared/constants";
 
 export type AppFeature =
   | "manage_chores"        // create / edit / delete chores

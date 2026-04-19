@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import type { SseEventType } from "@shared/constants";
+import type { SseEventType } from "../shared/constants";
 
 type Client = {
   id: string;

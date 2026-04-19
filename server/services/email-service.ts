@@ -242,7 +242,7 @@ export async function sendWeeklySummaryEmail(to: string, parentName: string, chi
 import { getApps, initializeApp, cert, applicationDefault } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../db";
-import { users } from "@shared/schema";
+import { users } from "../../shared/schema";
 import { and, eq } from "drizzle-orm";
 
 function ensureFirebase() {

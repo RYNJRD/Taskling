@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Mail, ExternalLink } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 /* ─── Types ─── */
 export type LegalScreenId = "tos" | "privacy" | "disclaimer" | "contact";

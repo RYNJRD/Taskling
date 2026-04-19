@@ -1,5 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/apiFetch";
+import { apiFetch } from "../lib/apiFetch";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {

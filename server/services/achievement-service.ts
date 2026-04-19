@@ -1,7 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
-import { ACHIEVEMENTS, getAchievementDefinition } from "@shared/achievements";
-import { choreLogs, rewardClaims, userAchievements, users } from "@shared/schema";
-import type { User } from "@shared/schema";
+import { ACHIEVEMENTS, getAchievementDefinition } from "../../shared/achievements";
+import { choreLogs, rewardClaims, userAchievements, users } from "../../shared/schema";
+import type { User } from "../../shared/schema";
 import { db } from "../db";
 import { recordActivity } from "./activity-service";
 import { createSystemMessage } from "./message-service";

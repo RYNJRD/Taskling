@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { api, buildUrl } from "@shared/routes";
-import { apiFetch } from "@/lib/apiFetch";
+import { api, buildUrl } from "../../shared/routes";
+import { apiFetch } from "../lib/apiFetch";
 
 export function useFamily(id: number | undefined) {
   return useQuery({

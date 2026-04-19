@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
-import { useStore } from "@/store/useStore";
-import { PenguinMascot } from "@/components/PenguinMascot";
+import { useStore } from "../store/useStore";
+import { PenguinMascot } from "../components/PenguinMascot";
 
 export default function Splash() {
   const [, setLocation] = useLocation();

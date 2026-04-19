@@ -10,7 +10,7 @@ import type {
   RewardClaim,
   User,
   UserAchievement,
-} from "@shared/schema";
+} from "../shared/schema";
 
 type DemoState = {
   families: Family[];

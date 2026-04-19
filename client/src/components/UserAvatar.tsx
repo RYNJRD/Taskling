@@ -1,6 +1,6 @@
-import type { User } from "@shared/schema";
-import { cn } from "@/lib/utils";
-import { getOutfitImage } from "@/lib/avatar";
+import type { User } from "../../shared/schema";
+import { cn } from "../lib/utils";
+import { getOutfitImage } from "../lib/avatar";
 
 interface UserAvatarProps {
   user: Pick<User, "username" | "avatarConfig">;

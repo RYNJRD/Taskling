@@ -1,8 +1,8 @@
 import { and, eq, inArray } from "drizzle-orm";
-import { choreLogs, choreSubmissions, chores, families, users } from "@shared/schema";
-import type { ChoreSubmission, User } from "@shared/schema";
+import { choreLogs, choreSubmissions, chores, families, users } from "../../shared/schema";
+import type { ChoreSubmission, User } from "../../shared/schema";
 import { db } from "../db";
-import { calculateStreakMultiplier, getEffectiveStreakForDate, getFamilyTimeZone, getLocalDateKey } from "@shared/streak";
+import { calculateStreakMultiplier, getEffectiveStreakForDate, getFamilyTimeZone, getLocalDateKey } from "../../shared/streak";
 import { createSystemMessage } from "./message-service";
 import { recordActivity } from "./activity-service";
 import { evaluateAchievements } from "./achievement-service";

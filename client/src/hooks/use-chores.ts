@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type CreateChoreRequest, type UpdateChoreRequest } from "@shared/routes";
-import { apiFetch } from "@/lib/apiFetch";
+import { api, buildUrl, type CreateChoreRequest, type UpdateChoreRequest } from "../../shared/routes";
+import { apiFetch } from "../lib/apiFetch";
 
 export function useCreateChore() {
   const queryClient = useQueryClient();

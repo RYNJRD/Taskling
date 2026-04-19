@@ -4,10 +4,10 @@ import {
   X, Settings, Home, Trophy, Star, MessageCircle, 
   LogOut, Shield, Moon, Sun, User, LayoutDashboard
 } from "lucide-react";
-import { useStore } from "@/store/useStore";
-import { auth } from "@/lib/firebase";
-import { useSettings } from "@/hooks/use-settings";
-import { cn } from "@/lib/utils";
+import { useStore } from "../store/useStore";
+import { auth } from "../lib/firebase";
+import { useSettings } from "../hooks/use-settings";
+import { cn } from "../lib/utils";
 import { UserAvatar } from "./UserAvatar";
 
 interface NavigationDrawerProps {

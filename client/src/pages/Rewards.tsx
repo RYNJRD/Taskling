@@ -3,14 +3,14 @@ import { motion } from "framer-motion";
 import { Gift, Lock, Minus, Plus, ShieldCheck, Star } from "lucide-react";
 import { useParams } from "wouter";
 import confetti from "canvas-confetti";
-import { api, buildUrl } from "@shared/routes";
-import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { useRewards } from "@/hooks/use-rewards";
-import { useStore } from "@/store/useStore";
-import { apiFetch } from "@/lib/apiFetch";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { api, buildUrl } from "../../shared/routes";
+import { queryClient } from "../lib/queryClient";
+import { useToast } from "../hooks/use-toast";
+import { useRewards } from "../hooks/use-rewards";
+import { useStore } from "../store/useStore";
+import { apiFetch } from "../lib/apiFetch";
+import { Button } from "../components/ui/button";
+import { cn } from "../lib/utils";
 
 const EMOJI_MAP: Record<string, string> = {
   robux: "🎮",

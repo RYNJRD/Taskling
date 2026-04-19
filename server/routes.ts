@@ -2,7 +2,7 @@ import type { Express, Response } from "express";
 import type { Server } from "http";
 import { randomUUID } from "crypto";
 import { z } from "zod";
-import { api } from "@shared/routes";
+import { api } from "../shared/routes";
 import { attachCurrentUser, getCurrentUser, requireAuth, verifyBearerToken } from "./auth";
 import { storage } from "./storage";
 import { canApprove, canManageFamily, ensureSameFamily } from "./permissions";

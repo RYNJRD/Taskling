@@ -23,7 +23,7 @@ import {
   type User,
   userAchievements,
   users,
-} from "@shared/schema";
+} from "../shared/schema";
 import { db } from "./db";
 
 function generateInviteCode(familyName: string): string {

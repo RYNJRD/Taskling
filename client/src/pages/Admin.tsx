@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy, Gift, Link as LinkIcon, Plus, Search, Settings, Shield, ShieldCheck, ShieldOff, Star, Trophy, Users as UsersIcon, X } from "lucide-react";
 import { useParams } from "wouter";
-import { api, buildUrl } from "@shared/routes";
-import type { User } from "@shared/schema";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import { apiFetch } from "@/lib/apiFetch";
-import { useCreateChore } from "@/hooks/use-chores";
-import { useFamilyUsers } from "@/hooks/use-families";
-import { useCreateReward } from "@/hooks/use-rewards";
-import { usePendingChoreReviews, usePendingRewardReviews, useReviewChore, useReviewReward } from "@/hooks/use-reviews";
-import { UserAvatar } from "@/components/UserAvatar";
-import { useStore } from "@/store/useStore";
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
+import { api, buildUrl } from "../../shared/routes";
+import type { User } from "../../shared/schema";
+import { queryClient, apiRequest } from "../lib/queryClient";
+import { apiFetch } from "../lib/apiFetch";
+import { useCreateChore } from "../hooks/use-chores";
+import { useFamilyUsers } from "../hooks/use-families";
+import { useCreateReward } from "../hooks/use-rewards";
+import { usePendingChoreReviews, usePendingRewardReviews, useReviewChore, useReviewReward } from "../hooks/use-reviews";
+import { UserAvatar } from "../components/UserAvatar";
+import { useStore } from "../store/useStore";
+import { useToast } from "../hooks/use-toast";
+import { cn } from "../lib/utils";
 
 export default function Admin() {
   const { familyId } = useParams();

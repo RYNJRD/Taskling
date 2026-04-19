@@ -2,13 +2,13 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check, Loader2, Home, User, Sparkles, Zap } from "lucide-react";
 import { useLocation } from "wouter";
-import { Input } from "@/components/ui/input";
-import { useStore } from "@/store/useStore";
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { getFamilyTimeZone } from "@shared/streak";
-import { apiFetch } from "@/lib/apiFetch";
-import { PenguinMascot } from "@/components/PenguinMascot";
+import { Input } from "../components/ui/input";
+import { useStore } from "../store/useStore";
+import { useToast } from "../hooks/use-toast";
+import { cn } from "../lib/utils";
+import { getFamilyTimeZone } from "../../shared/streak";
+import { apiFetch } from "../lib/apiFetch";
+import { PenguinMascot } from "../components/PenguinMascot";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 

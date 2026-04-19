@@ -1,4 +1,4 @@
-import { messages } from "@shared/schema";
+import { messages } from "../../shared/schema";
 import { db } from "../db";
 import { publishFamilyEvent } from "../realtime";
 import { recordActivity } from "./activity-service";

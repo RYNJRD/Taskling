@@ -4,20 +4,20 @@ import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { useParams } from "wouter";
 import { Flame, Sparkles, Star, Trophy, Zap, CheckCircle2, TrendingUp } from "lucide-react";
-import { calculateStreakMultiplier, getEffectiveStreakForDate, getFamilyTimeZone } from "@shared/streak";
-import type { Chore } from "@shared/schema";
-import { ChoreCard } from "@/components/ChoreCard";
-import { UserAvatar } from "@/components/UserAvatar";
-import { useToast } from "@/hooks/use-toast";
+import { calculateStreakMultiplier, getEffectiveStreakForDate, getFamilyTimeZone } from "../../shared/streak";
+import type { Chore } from "../../shared/schema";
+import { ChoreCard } from "../components/ChoreCard";
+import { UserAvatar } from "../components/UserAvatar";
+import { useToast } from "../hooks/use-toast";
 import {
   useFamilyChores,
   useFamilyLeaderboard,
   useFamilyMonthlyWinners,
   useFamilyOnboarding,
-} from "@/hooks/use-families";
-import { useCompleteChore } from "@/hooks/use-chores";
-import { useStore } from "@/store/useStore";
-import { cn } from "@/lib/utils";
+} from "../hooks/use-families";
+import { useCompleteChore } from "../hooks/use-chores";
+import { useStore } from "../store/useStore";
+import { cn } from "../lib/utils";
 import ParentDashboard from "./ParentDashboard";
 
 type ChoreBucket = "today" | "upcoming" | "overdue" | "recent" | "pending";

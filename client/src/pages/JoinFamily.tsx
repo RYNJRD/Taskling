@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronLeft, Loader2, Users, Link as LinkIcon, Check, User } from "lucide-react";
 import { useLocation, useParams } from "wouter";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useStore } from "@/store/useStore";
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import type { Family } from "@shared/schema";
-import { apiFetch } from "@/lib/apiFetch";
-import { PenguinMascot } from "@/components/PenguinMascot";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { useStore } from "../store/useStore";
+import { useToast } from "../hooks/use-toast";
+import { cn } from "../lib/utils";
+import type { Family } from "../../shared/schema";
+import { apiFetch } from "../lib/apiFetch";
+import { PenguinMascot } from "../components/PenguinMascot";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 

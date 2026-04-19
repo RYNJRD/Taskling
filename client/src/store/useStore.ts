@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User, Family } from '@shared/schema';
+import type { User, Family } from '../../shared/schema';
 
 interface AppState {
   family: Family | null;

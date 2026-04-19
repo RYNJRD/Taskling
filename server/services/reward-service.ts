@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { rewardClaims, rewards, users } from "@shared/schema";
-import type { User } from "@shared/schema";
+import { rewardClaims, rewards, users } from "../../shared/schema";
+import type { User } from "../../shared/schema";
 import { db } from "../db";
 import { recordActivity } from "./activity-service";
 import { createSystemMessage } from "./message-service";
