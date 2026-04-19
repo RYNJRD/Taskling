@@ -143,6 +143,35 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     });
   });
 
+  // Robust parameter-less invite for the current user's family
+  app.get("/api/my-family/invite", requireAuth, attachCurrentUser, async (req, res) => {
+    const currentUser = getCurrentUser(req);
+    if (!currentUser.familyId) return res.status(400).json({ message: "User is not in a family" });
+    if (!canManageFamily(currentUser)) return forbidden(res, "Admins only");
+
+    const family = await storage.getFamily(currentUser.familyId);
+    if (!family) return res.status(404).json({ message: "Family not found" });
+    return res.json({
+      inviteCode: family.inviteCode,
+      inviteUrl: `${req.protocol}://${req.get("host")}/join/${family.inviteCode}`,
+    });
+  });
+
+  // Regenerate invite code (spawning a new one)
+  app.post("/api/my-family/invite/regenerate", requireAuth, attachCurrentUser, async (req, res) => {
+    const currentUser = getCurrentUser(req);
+    if (!currentUser.familyId) return res.status(400).json({ message: "User is not in a family" });
+    if (!canManageFamily(currentUser)) return forbidden(res, "Admins only");
+
+    const newCode = randomUUID().slice(0, 8).toUpperCase();
+    const updated = await storage.updateFamilyInviteCode(currentUser.familyId, newCode);
+    
+    return res.json({
+      inviteCode: updated.inviteCode,
+      inviteUrl: `${req.protocol}://${req.get("host")}/join/${updated.inviteCode}`,
+    });
+  });
+
   app.get(api.families.getActivity.path, requireAuth, attachCurrentUser, async (req, res) => {
     const currentUser = getCurrentUser(req);
     const familyId = parseId(req.params.id);

@@ -29,6 +29,7 @@ export default function Admin() {
 
   const [inviteCode, setInviteCode] = useState("");
   const [inviteUrl, setInviteUrl] = useState("");
+  const [isSpawning, setIsSpawning] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const pendingRef = useRef<Set<number>>(new Set());
@@ -72,14 +73,35 @@ export default function Admin() {
   useEffect(() => {
     if (!currentUser || currentUser.role !== "admin") return;
     const fetchInvite = async () => {
-      const res = await apiFetch(buildUrl(api.families.getInviteInfo.path, { id }));
-      if (!res.ok) return;
+      try {
+        const res = await apiFetch("/api/my-family/invite");
+        if (!res.ok) return;
+        const data = await res.json();
+        setInviteCode(data.inviteCode);
+        setInviteUrl(data.inviteUrl);
+      } catch (err) {
+        console.error("Invite fetch error:", err);
+      }
+    };
+    void fetchInvite();
+  }, [currentUser]);
+
+  const handleRegenerateInvite = async () => {
+    if (isSpawning) return;
+    setIsSpawning(true);
+    try {
+      const res = await apiFetch("/api/my-family/invite/regenerate", { method: "POST" });
+      if (!res.ok) throw new Error("Spawn error");
       const data = await res.json();
       setInviteCode(data.inviteCode);
       setInviteUrl(data.inviteUrl);
-    };
-    void fetchInvite();
-  }, [currentUser, id]);
+      toast({ title: "New link spawned! 🚀", description: "The old link will no longer work." });
+    } catch {
+      toast({ title: "Could not spawn link", variant: "destructive" });
+    } finally {
+      setTimeout(() => setIsSpawning(false), 800);
+    }
+  };
 
   useEffect(() => {
     if (window.location.hash === '#members') {
@@ -213,10 +235,23 @@ export default function Admin() {
 
       <div className="space-y-8">
         <section className="rounded-[1.75rem] border-2 border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 p-5">
-          <h2 className="font-display text-lg font-bold mb-3 flex items-center gap-2">
-            <UsersIcon className="w-5 h-5 text-primary" />
-            Family invite
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-display text-lg font-bold flex items-center gap-2">
+              <UsersIcon className="w-5 h-5 text-primary" />
+              Family invite
+            </h2>
+            <button 
+              onClick={handleRegenerateInvite}
+              disabled={isSpawning}
+              className={cn(
+                "text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl border-2 border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all flex items-center gap-1.5",
+                isSpawning && "animate-pulse scale-95 opacity-50"
+              )}
+            >
+              <RefreshCw className={cn("w-3 h-3", isSpawning && "animate-spin")} />
+              {isSpawning ? "Spawning..." : "Regenerate"}
+            </button>
+          </div>
           <div className="space-y-3">
             <div className="rounded-2xl bg-background/80 p-3 border-2 border-primary/20 flex items-center justify-between gap-3">
               <div>

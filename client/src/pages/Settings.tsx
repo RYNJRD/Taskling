@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -195,9 +195,9 @@ export default function Settings() {
   const parent = isParent(role);
 
   const { data: inviteData } = useQuery({
-    queryKey: [api.families.getInviteInfo.path, familyId],
-    queryFn: () => apiFetch(buildUrl(api.families.getInviteInfo.path, { id: familyId })).then((r) => r.json()),
-    enabled: !!familyId && parent,
+    queryKey: [api.families.getInviteInfo.path, "robust"],
+    queryFn: () => apiFetch("/api/my-family/invite").then((r) => r.json()),
+    enabled: parent,
   });
 
   const nameMutation = useMutation({

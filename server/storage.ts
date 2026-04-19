@@ -60,6 +60,7 @@ export interface IStorage {
   getPendingChoreSubmissions(familyId: number): Promise<ChoreSubmission[]>;
   getPendingRewardClaims(familyId: number): Promise<RewardClaim[]>;
   getOrCreateCurrentDemo(): Promise<Family>;
+  updateFamilyInviteCode(familyId: number, code: string): Promise<Family>;
 }
 
 let currentDemoFamily: Family | null = null;
@@ -231,11 +232,19 @@ export class DatabaseStorage implements IStorage {
 
   async getOrCreateCurrentDemo(): Promise<Family> {
     const now = Date.now();
-    if (!currentDemoFamily || now - lastDemoRotation > ROTATION_INTERVAL) {
-      currentDemoFamily = await setupDemoFamily(this);
-      lastDemoRotation = now;
+    if (currentDemoFamily && now - lastDemoRotation < ROTATION_INTERVAL) {
+      return currentDemoFamily;
     }
+    
+    currentDemoFamily = await setupDemoFamily(this);
+    lastDemoRotation = now;
     return currentDemoFamily;
+  }
+
+  async updateFamilyInviteCode(familyId: number, code: string): Promise<Family> {
+    const [updated] = await db.update(families).set({ inviteCode: code }).where(eq(families.id, familyId)).returning();
+    if (!updated) throw new Error("Family not found");
+    return updated;
   }
 }
 
