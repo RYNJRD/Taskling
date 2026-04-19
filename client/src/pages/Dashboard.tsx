@@ -3,7 +3,7 @@ import { addDays, format, isSameDay, startOfToday } from "date-fns";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { useParams } from "wouter";
-import { Flame, Sparkles, Star, Trophy, Zap, CheckCircle2, TrendingUp } from "lucide-react";
+import { Flame, Sparkles, Star, Trophy, Zap, CheckCircle2, TrendingUp, Menu, Shield } from "lucide-react";
 import { calculateStreakMultiplier, getEffectiveStreakForDate, getFamilyTimeZone } from "../../../shared/streak";
 import type { Chore } from "../../../shared/schema";
 import { ChoreCard } from "../components/ChoreCard";
@@ -73,7 +73,7 @@ export default function Dashboard() {
   const { familyId } = useParams();
   const id = Number(familyId || 0);
   const { toast } = useToast();
-  const { family, currentUser, setCurrentUser } = useStore();
+  const { family, currentUser, setCurrentUser, setIsDrawerOpen } = useStore();
   const { data: chores = [] } = useFamilyChores(id);
   const { data: leaderboard = [] } = useFamilyLeaderboard(id);
   const { data: winners = [] } = useFamilyMonthlyWinners(id);
@@ -139,7 +139,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="pt-6 px-5 pb-32 min-h-screen">
+    <div className="pt-6 px-5 pb-32 min-h-screen bg-tab-home">
 
       {/* ── Hero Card ── */}
       <motion.div
@@ -151,21 +151,34 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-violet-600 to-indigo-600" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
 
-        <div className="relative px-4 pr-14 pt-3 pb-2">
-          {/* Top row: avatar + greeting + stars */}
-          <div className="flex items-start justify-between mb-2.5 pr-14">
+        <div className="relative px-4 pt-3 pb-2">
+          {/* Top row: avatar + greeting + stars + menu */}
+          <div className="flex items-start justify-between mb-2.5">
             <div className="flex items-center gap-2.5">
               <UserAvatar user={currentUser} size="sm" className="border-2 border-white/40 shadow-lg" />
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">Welcome back</p>
-                <h1 className="font-display text-xl font-bold text-white leading-tight">
-                  Hi, {currentUser.username}! 👋
-                </h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="font-display text-xl font-bold text-white leading-tight">
+                    Hi, {currentUser.username}! 👋
+                  </h1>
+                </div>
                 <p className="text-sm text-white/70 mt-0.5">
                   {rank === 1 ? "🥇 You're leading the family!" : `Rank #${rank || 1} in your family`}
                 </p>
               </div>
             </div>
+            {/* Action Buttons Top Right */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsDrawerOpen(true)}
+                className="w-10 h-10 flex items-center justify-center rounded-xl bg-black/20 backdrop-blur-md border border-white/20 shadow-lg text-white hover:bg-black/30 transition-colors"
+                aria-label="Open menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
             {/* Stars counter */}
             <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 text-right border border-white/20">
               <p className="text-[9px] font-bold uppercase tracking-widest text-white/60">Stars</p>

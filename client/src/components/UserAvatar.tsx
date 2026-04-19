@@ -1,4 +1,4 @@
-﻿import type { User } from "../../../shared/schema";
+import type { User } from "../../../shared/schema";
 import { cn } from "../lib/utils";
 import { getOutfitImage } from "../lib/avatar";
 
@@ -23,7 +23,7 @@ export function UserAvatar({ user, size = "md", className }: UserAvatarProps) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden shrink-0 border-2 border-white/80 shadow-sm bg-gradient-to-b from-violet-50 to-sky-50",
+        "relative overflow-hidden shrink-0 border-2 border-white/80 dark:border-white/10 shadow-sm bg-gradient-to-b from-violet-50 to-sky-50 dark:from-violet-950/40 dark:to-sky-950/40",
         isSmall ? "rounded-full" : "rounded-[28px]",
         sizeClasses[size],
         className,

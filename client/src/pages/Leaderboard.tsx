@@ -36,7 +36,7 @@ export default function Leaderboard() {
   return (
     <div className="min-h-screen bg-tab-leaderboard pb-32">
       {/* ── Gradient header ── */}
-      <div className="relative overflow-hidden pt-8 pb-6 px-5 pr-14">
+      <div className="relative overflow-hidden pt-8 pb-6 px-5">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/8 via-primary/4 to-transparent" />
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full bg-accent/8 blur-3xl -translate-y-1/2 translate-x-1/4" />
         <div className="relative text-center">

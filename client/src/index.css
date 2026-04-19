@@ -209,7 +209,7 @@
     background: radial-gradient(ellipse at 20% 10%, hsl(262 83% 58% / 0.18) 0%, transparent 55%),
                 radial-gradient(ellipse at 85% 80%, hsl(43 96% 56% / 0.15) 0%, transparent 55%),
                 radial-gradient(ellipse at 60% 40%, hsl(189 71% 73% / 0.1) 0%, transparent 50%),
-                hsl(210 40% 98%);
+                hsl(var(--background));
     min-height: 100vh;
     min-height: 100dvh;
     width: 100%;
@@ -264,21 +264,44 @@
 
   /* ── Per-tab background gradients ── */
   .bg-tab-home {
-    background: linear-gradient(180deg, hsl(216 30% 95%) 0%, hsl(210 40% 98%) 100%);
+    background: linear-gradient(180deg, hsl(216 30% 95%) 0%, hsl(var(--background)) 100%);
   }
+  .dark .bg-tab-home {
+    background: linear-gradient(180deg, hsl(222 47% 15%) 0%, hsl(var(--background)) 100%);
+  }
+
   .bg-tab-leaderboard {
-    background: linear-gradient(180deg, hsl(43 80% 96%) 0%, hsl(210 40% 98%) 100%);
+    background: linear-gradient(180deg, hsl(43 80% 96%) 0%, hsl(var(--background)) 100%);
   }
+  .dark .bg-tab-leaderboard {
+    background: linear-gradient(180deg, hsl(43 96% 10%) 0%, hsl(var(--background)) 100%);
+  }
+
   .bg-tab-chat {
-    background: linear-gradient(180deg, hsl(230 40% 96%) 0%, hsl(210 40% 98%) 100%);
+    background: linear-gradient(180deg, hsl(230 40% 96%) 0%, hsl(var(--background)) 100%);
   }
+  .dark .bg-tab-chat {
+    background: linear-gradient(180deg, hsl(230 50% 12%) 0%, hsl(var(--background)) 100%);
+  }
+
   .bg-tab-rewards {
-    background: linear-gradient(180deg, hsl(30 60% 97%) 0%, hsl(210 40% 98%) 100%);
+    background: linear-gradient(180deg, hsl(30 60% 97%) 0%, hsl(var(--background)) 100%);
   }
+  .dark .bg-tab-rewards {
+    background: linear-gradient(180deg, hsl(30 70% 10%) 0%, hsl(var(--background)) 100%);
+  }
+
   .bg-tab-profile {
-    background: linear-gradient(180deg, hsl(0 0% 97%) 0%, hsl(210 40% 98%) 100%);
+    background: linear-gradient(180deg, hsl(0 0% 97%) 0%, hsl(var(--background)) 100%);
   }
+  .dark .bg-tab-profile {
+    background: linear-gradient(180deg, hsl(222 47% 15%) 0%, hsl(var(--background)) 100%);
+  }
+
   .bg-tab-admin {
-    background: linear-gradient(180deg, hsl(210 30% 96%) 0%, hsl(210 40% 98%) 100%);
+    background: linear-gradient(180deg, hsl(210 30% 96%) 0%, hsl(var(--background)) 100%);
+  }
+  .dark .bg-tab-admin {
+    background: linear-gradient(180deg, hsl(210 40% 12%) 0%, hsl(var(--background)) 100%);
   }
 }

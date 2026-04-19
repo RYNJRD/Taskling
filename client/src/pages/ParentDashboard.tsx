@@ -4,19 +4,22 @@ import { useParams } from "wouter";
 import { useLocation } from "wouter";
 import {
   Users, ClipboardList, Gift, Star, Flame, CheckCircle2,
-  TrendingUp, Clock, ChevronRight, Shield, AlertCircle,
+  TrendingUp, Clock, ChevronRight, Shield, AlertCircle, Menu
 } from "lucide-react";
 import { useFamilyChores, useFamilyLeaderboard, useFamilyActivity, useFamilyUsers } from "../hooks/use-families";
 import { UserAvatar } from "../components/UserAvatar";
 import { useStore } from "../store/useStore";
 import { cn } from "../lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
+import { QuickActionModals } from "../components/QuickActionModals";
 
 export default function ParentDashboard() {
   const { familyId } = useParams();
   const id = Number(familyId || 0);
   const [, setLocation] = useLocation();
-  const { currentUser, family } = useStore();
+  const { currentUser, family, setIsDrawerOpen } = useStore();
+  const [activeModal, setActiveModal] = useState<'chore' | 'reward' | null>(null);
 
   const { data: allChores = [] } = useFamilyChores(id);
   const { data: leaderboard = [] } = useFamilyLeaderboard(id);
@@ -47,9 +50,9 @@ export default function ParentDashboard() {
   const adminPath = family?.id ? `/family/${family.id}/admin` : "/";
 
   const quickActions = [
-    { icon: ClipboardList, label: "Assign Chore", color: "bg-primary/10 text-primary border-primary/20", path: adminPath },
-    { icon: Gift, label: "Create Reward", color: "bg-amber-100 text-amber-700 border-amber-200", path: adminPath },
-    { icon: Users, label: "Manage Family", color: "bg-green-100 text-green-700 border-green-200", path: adminPath },
+    { icon: ClipboardList, label: "Assign Chore", color: "bg-primary/10 text-primary border-primary/20", action: () => setActiveModal('chore') },
+    { icon: Gift, label: "Create Reward", color: "bg-amber-100 text-amber-700 border-amber-200", action: () => setActiveModal('reward') },
+    { icon: Users, label: "Manage Family", color: "bg-green-100 text-green-700 border-green-200", action: () => setLocation(`${adminPath}#members`) },
   ];
 
   if (!currentUser) return null;
@@ -61,7 +64,7 @@ export default function ParentDashboard() {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-6 flex items-center justify-between pr-14"
+        className="mb-6 flex items-center justify-between"
       >
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -84,6 +87,13 @@ export default function ParentDashboard() {
           <div className="w-10 h-10 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
             <Shield className="w-5 h-5 text-primary" strokeWidth={2.5} />
           </div>
+          <button
+            onClick={() => setIsDrawerOpen(true)}
+            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-black/20 backdrop-blur-md border border-white/20 shadow-sm text-foreground hover:bg-black/30 transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
         </div>
       </motion.div>
 
@@ -96,11 +106,11 @@ export default function ParentDashboard() {
       >
         <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Quick Actions</p>
         <div className="grid grid-cols-3 gap-3">
-          {quickActions.map(({ icon: Icon, label, color, path }) => (
+          {quickActions.map(({ icon: Icon, label, color, action }) => (
             <motion.button
               key={label}
               whileTap={{ scale: 0.94 }}
-              onClick={() => setLocation(path)}
+              onClick={action}
               className={cn(
                 "flex flex-col items-center gap-2 rounded-2xl border-2 p-3.5 shadow-sm transition-all active:scale-95",
                 color
@@ -112,6 +122,13 @@ export default function ParentDashboard() {
           ))}
         </div>
       </motion.div>
+
+      <QuickActionModals
+        familyId={id}
+        isOpen={!!activeModal}
+        type={activeModal || 'chore'}
+        onClose={() => setActiveModal(null)}
+      />
 
       {/* ── Family Overview ── */}
       <motion.div
@@ -238,7 +255,7 @@ export default function ParentDashboard() {
         <div className="flex items-center justify-between mb-3">
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Recent Activity</p>
           <button
-            onClick={() => setLocation(adminPath)}
+            onClick={() => setLocation(`/family/${id}/activity`)}
             className="flex items-center gap-0.5 text-[11px] font-bold text-primary"
           >
             See all <ChevronRight className="w-3 h-3" />

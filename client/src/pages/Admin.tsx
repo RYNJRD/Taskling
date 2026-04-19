@@ -81,6 +81,17 @@ export default function Admin() {
     void fetchInvite();
   }, [currentUser, id]);
 
+  useEffect(() => {
+    if (window.location.hash === '#members') {
+      const el = document.getElementById('members-section');
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+      }
+    }
+  }, []);
+
   if (!currentUser || currentUser.role !== "admin") {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center gap-6 pb-32">
@@ -189,7 +200,7 @@ export default function Admin() {
   const inputClass = "w-full rounded-2xl border-2 border-border bg-input px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-primary/50";
 
   return (
-    <div className="pt-[max(2rem,env(safe-area-inset-top))] px-5 pr-14 pb-32 min-h-screen bg-tab-admin">
+    <div className="pt-[max(2rem,env(safe-area-inset-top))] px-5 pb-32 min-h-screen bg-tab-admin">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center">
           <Settings className="text-foreground" />
@@ -424,25 +435,42 @@ export default function Admin() {
           </div>
         </section>
 
-        <section className="rounded-[1.75rem] border-2 border-slate-300 dark:border-slate-600 bg-card p-5 shadow-md">
-          <h2 className="font-display text-lg font-bold mb-3 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-primary" />
-            Member roles
-          </h2>
-          <div className="space-y-2">
+        <section id="members-section" className="rounded-[1.75rem] border-2 border-slate-300 dark:border-slate-600 bg-card p-5 shadow-md">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-lg font-bold flex items-center gap-2">
+              <Shield className="w-5 h-5 text-primary" />
+              Member management
+            </h2>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+              {familyUsers.length} total
+            </span>
+          </div>
+          <div className="space-y-3">
             {familyUsers.map((user) => (
-              <div key={user.id} className="rounded-2xl bg-muted/50 px-3 py-3 flex items-center justify-between gap-3 border-2 border-transparent">
-                <div>
-                  <p className="font-bold text-sm">
-                    {user.username} {user.id === currentUser.id ? "(you)" : ""}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{user.role}</p>
+              <div key={user.id} className="rounded-2xl bg-muted/30 p-4 flex items-center justify-between gap-4 border-2 border-transparent hover:border-primary/10 transition-all">
+                <div className="flex items-center gap-3">
+                  <UserAvatar user={user} size="md" />
+                  <div>
+                    <p className="font-bold text-sm">
+                      {user.username} {user.id === currentUser.id ? "(You)" : ""}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                       <span className={cn(
+                         "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md",
+                         user.role === 'admin' ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"
+                       )}>
+                         {user.role === 'admin' ? 'Parent' : 'Child'}
+                       </span>
+                    </div>
+                  </div>
                 </div>
                 {user.id !== currentUser.id && (
                   <button
                     className={cn(
-                      "rounded-xl px-3 py-2 text-sm font-bold",
-                      user.role === "admin" ? "border border-border" : "bg-primary text-primary-foreground",
+                      "rounded-xl px-4 py-2 text-xs font-bold transition-all active:scale-95",
+                      user.role === "admin" 
+                        ? "bg-slate-100 text-slate-600 hover:bg-slate-200" 
+                        : "bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20",
                     )}
                     onClick={async () => {
                       try {
@@ -452,14 +480,14 @@ export default function Admin() {
                         queryClient.setQueryData<User[]>([...usersQueryKey], (old = []) => old.map((entry) => (entry.id === updated.id ? updated : entry)));
                         toast({
                           title: newRole === "admin" ? "Promoting to parent" : "Role updated",
-                          description: newRole === "admin" ? `${user.username} is now a parent and can manage the family` : `${user.username} is now a regular member`,
+                          description: newRole === "admin" ? `${user.username} is now a parent` : `${user.username} is now a regular member`,
                         });
                       } catch {
                         toast({ title: "Could not update role", variant: "destructive" });
                       }
                     }}
                   >
-                    {user.role === "admin" ? <><ShieldOff className="w-4 h-4 inline mr-1" />Demote</> : <><Shield className="w-4 h-4 inline mr-1" />Promote</>}
+                    {user.role === "admin" ? <><ShieldOff className="w-3.5 h-3.5 inline mr-1" />Demote</> : <><Shield className="w-3.5 h-3.5 inline mr-1" />Promote</>}
                   </button>
                 )}
               </div>
