@@ -1,16 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Settings as SettingsIcon, Check } from "lucide-react";
-import { useLocation } from "wouter";
-import { api, buildUrl } from "../../../shared/routes";
-import { queryClient } from "../lib/queryClient";
-import { useStore } from "../store/useStore";
-import { apiFetch } from "../lib/apiFetch";
-import {
-import { useEffect, useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Settings as SettingsIcon, Check, Trophy, Star } from "lucide-react";
 import { useLocation } from "wouter";
 import { api, buildUrl } from "../../../shared/routes";
@@ -26,11 +16,7 @@ import { cn } from "../lib/utils";
 
 export default function Profile() {
   const { currentUser, setCurrentUser, family } = useStore();
-  const [, setLocation] = useLocation();
-
-  const [config, setConfig] = useState<AvatarConfig>(() =>
-    parseAvatarConfig(currentUser?.avatarConfig),
-  );
+  const [config, setConfig] = useState<AvatarConfig>(() => parseAvatarConfig(currentUser?.avatarConfig));
 
   useEffect(() => {
     setConfig(parseAvatarConfig(currentUser?.avatarConfig));
@@ -51,9 +37,7 @@ export default function Profile() {
     },
     onSuccess: (user) => {
       setCurrentUser(user);
-      queryClient.invalidateQueries({
-        queryKey: [api.families.getUsers.path, user.familyId],
-      });
+      queryClient.invalidateQueries({ queryKey: [api.families.getUsers.path, user.familyId] });
     },
   });
 
@@ -186,17 +170,14 @@ export default function Profile() {
                       : "bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20 active:scale-95"
                   )}
                 >
-                  {/* Item Image */}
-                  <img src={outfit.image} className="w-full h-full object-contain pointer-events-none drop-shadow-md" />
+                   <img src={outfit.image} className="w-full h-full object-contain pointer-events-none drop-shadow-md" />
                   
-                  {/* Selected Badge */}
                   {isSelected && (
                     <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-lg border border-white/20">
                       <Check className="w-3 h-3 text-white" strokeWidth={4} />
                     </div>
                   )}
 
-                  {/* Gradient Glow on selection */}
                   {isSelected && (
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none" />
                   )}
