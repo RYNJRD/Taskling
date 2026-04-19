@@ -520,23 +520,24 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   // POST /api/auth/send-code
   app.post("/api/auth/send-code", async (req, res) => {
-    console.log("[OTP] POST /api/auth/send-code entry");
+    const { email, firebaseUid } = req.body;
+    console.log(`[OTP] Request received for email: ${email}`);
+
     try {
-      const { email, firebaseUid } = req.body;
       if (!email || !firebaseUid) {
         console.error("[OTP] Missing payload:", { email: !!email, firebaseUid: !!firebaseUid });
         return res.status(400).json({ message: "Email and firebaseUid are required." });
       }
 
-      console.log(`[OTP] Step 1: Payload valid for ${email}`);
+      console.log("[OTP] validation passed");
       
       // 1. Initialize DB Storage
       let pool;
       try {
         pool = await checkOtpStorage();
-        console.log("[OTP] Step 2: DB connection successful");
+        console.log("[OTP] DB connection successful");
       } catch (dbErr: any) {
-        console.error("[OTP] DB connection/init failed:", dbErr);
+        console.error("[OTP] DB connection/init failed. Full error:", dbErr);
         throw new Error(`Database unavailable: ${dbErr.message}`);
       }
 
@@ -551,13 +552,12 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
           const waitMs = 60_000 - (Date.now() - lastSent);
           if (waitMs > 0) {
             const waitSecs = Math.ceil(waitMs / 1000);
-            console.warn(`[OTP] Step 3: Throttled for ${email}. Wait ${waitSecs}s`);
+            console.warn(`[OTP] Throttled for ${email}. Wait ${waitSecs}s`);
             return res.status(429).json({ message: `Please wait ${waitSecs} seconds before requesting a new code.`, waitSecs });
           }
         }
-        console.log("[OTP] Step 3: Throttling check passed");
       } catch (throttleErr: any) {
-        console.error("[OTP] Throttle check failed (Table might be missing):", throttleErr);
+        console.error("[OTP] Throttle check failed. Full error:", throttleErr);
         throw new Error(`Failed to check cooldown: ${throttleErr.message}`);
       }
 
@@ -565,7 +565,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const code = String(Math.floor(100000 + Math.random() * 900000));
       const expiresAt = new Date(Date.now() + 10 * 60_000);
       const now = new Date();
-      console.log("[OTP] Step 4: Code generated");
+      console.log("[OTP] code generated");
 
       // 4. Persistence
       try {
@@ -574,30 +574,37 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
           "INSERT INTO email_verification_codes (email, firebase_uid, code, expires_at, attempts, last_sent_at) VALUES ($1, $2, $3, $4, 0, $5)",
           [email, firebaseUid, code, expiresAt, now]
         );
-        console.log("[OTP] Step 5: Code saved to Neon DB");
+        console.log("[OTP] saved to db");
       } catch (saveErr: any) {
-        console.error("[OTP] Save failed:", saveErr);
+        console.error("[OTP] DB save failed. Full error:", saveErr);
         throw new Error(`Failed to save code to database: ${saveErr.message}`);
       }
 
       // 5. Email Sending
       try {
         const { sendOtpEmail } = await import("./services/email-service");
-        console.log("[OTP] Step 6: email-service loaded");
+        console.log("[OTP] resend called");
         const emailResult = await sendOtpEmail(email, code);
         if (!emailResult) {
-          console.error("[OTP] Step 7: Resend call returned null/false");
+          console.error("[OTP] Resend call returned null/false");
           throw new Error("Resend service returned an empty response. Check your domain verification.");
         }
-        console.log("[OTP] Step 7: Email sent signal received from Resend");
+        console.log("[OTP] resend success");
       } catch (emailErr: any) {
-        console.error("[OTP] Email transmission failed:", emailErr);
+        console.error("[OTP] Email transmission failed. Full error:", emailErr);
         throw new Error(`Failed to deliver email: ${emailErr.message}`);
       }
 
       return res.json({ success: true });
     } catch (e: any) {
-      console.error("[OTP] FINAL_FAILURE:", e);
+      console.error("[OTP] FINAL_FAILURE. Full error:", e);
+      return res.status(500).json({ 
+        message: e.message || "Failed to send verification code.",
+        error: e.message,
+        phase: e.message.split(":")[0] 
+      });
+    }
+  });
       return res.status(500).json({ 
         message: e.message || "Failed to send verification code.",
         error: e.message,
