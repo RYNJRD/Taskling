@@ -130,17 +130,25 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ── Wardrobe Drawer (Fixed Base Height) ── */}
+      {/* ── Wardrobe Section (Strictly Limited Drawer) ── */}
       <motion.div 
-        initial={{ y: "54%" }}
+        initial={{ y: "50dvh" }}
         drag="y"
-        dragConstraints={{ top: -600, bottom: 0 }} // Corrected: allow 600px UP, and 0px DOWN
-        dragElastic={0.01}
+        // Constraints: 
+        // 1/2 screen = 50dvh.
+        // 2/3 screen = 66.6dvh total (meaning it moves up by ~16.6% of the screen).
+        // We handle this by using a fixed travel distance.
+        dragConstraints={{ 
+          top: -Math.round(typeof window !== 'undefined' ? window.innerHeight * 0.17 : 140), 
+          bottom: 0 
+        }}
+        dragElastic={0} // ABSOLUTE LOCK at those values
+        dragMomentum={false} // No "shooting" behavior
         className="absolute inset-x-0 top-0 h-[100dvh] z-30 flex flex-col bg-white border-t-[5px] border-black rounded-t-[3.5rem] shadow-[0_-30px_80px_rgba(0,0,0,0.25)] overflow-hidden"
       >
-        {/* Drag Handle Area */}
+        {/* Compact Drag Handle Area */}
         <div 
-          className="flex-none flex flex-col items-center pt-5 pb-5 group cursor-grab select-none active:cursor-grabbing"
+          className="flex-none flex flex-col items-center pt-5 pb-5 group select-none cursor-grab active:cursor-grabbing"
           style={{ touchAction: "none" }}
         >
           <div className="w-16 h-2 bg-black/10 rounded-full mb-5" />
