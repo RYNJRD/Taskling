@@ -310,7 +310,7 @@ export default function AuthWelcome() {
       </button>
 
       {/* Main content — fixed width, no scroll */}
-      <div className="relative z-10 w-full max-w-sm px-5 flex flex-col items-center">
+      <div className="relative z-10 w-full px-4 flex flex-col items-center">
         <AnimatePresence mode="wait">
 
           {/* ── Welcome / Sign Up ── */}
