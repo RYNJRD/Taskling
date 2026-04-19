@@ -605,13 +605,6 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       });
     }
   });
-      return res.status(500).json({ 
-        message: e.message || "Failed to send verification code.",
-        error: e.message,
-        phase: e.message.split(":")[0] 
-      });
-    }
-  });
 
   // POST /api/auth/verify-code — validate OTP from DB
   app.post("/api/auth/verify-code", async (req, res) => {
