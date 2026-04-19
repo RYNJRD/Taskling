@@ -24,6 +24,17 @@ const Profile = lazy(() => import("@/pages/Profile"));
 const Settings = lazy(() => import("@/pages/Settings"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
+function RouteFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6 text-center">
+      <div>
+        <p className="font-display text-2xl font-bold text-primary">Taskling</p>
+        <p className="mt-2 text-sm text-muted-foreground">Loading your family dashboard...</p>
+      </div>
+    </div>
+  );
+}
+
 import { Router as WouterRouter } from "wouter";
 
 function Router() {
