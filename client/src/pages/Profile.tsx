@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings as SettingsIcon, Check, Trophy, Star, Flame } from "lucide-react";
-import { useLocation } from "wouter";
+import { Check } from "lucide-react";
 import { api, buildUrl } from "../../../shared/routes";
 import { queryClient } from "../lib/queryClient";
 import { useStore } from "../store/useStore";
@@ -11,13 +10,19 @@ import {
   PENGUIN_OUTFITS,
   parseAvatarConfig,
   type AvatarConfig,
-  RARITY_META,
   type Rarity,
 } from "../lib/avatar";
 import { cn } from "../lib/utils";
 
+const RARITY_COLORS: Record<Rarity, string> = {
+  legendary: "#C9A84C",
+  mythic: "#9B6FD4",
+  rare: "#5B9BD5",
+  common: "#AAAAAA",
+};
+
 export default function Profile() {
-  const { currentUser, setCurrentUser, family, setIsDrawerOpen } = useStore();
+  const { currentUser, setCurrentUser } = useStore();
   const [config, setConfig] = useState<AvatarConfig>(() => parseAvatarConfig(currentUser?.avatarConfig));
 
   useEffect(() => {
@@ -51,118 +56,77 @@ export default function Profile() {
     [selectedId],
   );
 
-  // Sort outfits by rarity rarity: legendary > mythic > rare > common
   const sortedOutfits = useMemo(() => {
     const weights: Record<Rarity, number> = { legendary: 3, mythic: 2, rare: 1, common: 0 };
     return [...PENGUIN_OUTFITS].sort((a, b) => weights[b.rarity] - weights[a.rarity]);
   }, []);
 
-  const meta = RARITY_META[selectedOutfit.rarity];
-
   return (
-    <div className={cn(
-      "h-full transition-colors duration-700 overflow-hidden select-none flex flex-col font-sans pb-32",
-      selectedOutfit.rarity === "legendary" ? "bg-amber-50/50" :
-      selectedOutfit.rarity === "mythic" ? "bg-purple-50/50" :
-      selectedOutfit.rarity === "rare" ? "bg-blue-50/50" : "bg-slate-50/50"
-    )}>
-      
-      {/* ── Top Section (flex: 3) ── */}
-      <div className="flex-[3] flex flex-col pt-6 px-5 min-h-0">
-        {/* Top Header */}
-        <div className="flex items-center justify-between h-10 mb-5">
-          <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white border-[2.5px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center flex-none">
-                <Trophy className="w-5 h-5 text-black" />
-              </div>
-              <div className="flex flex-col justify-center">
-                <h1 className="text-xl font-black leading-none text-black">{currentUser.username}</h1>
-                <p className="text-[9px] font-black uppercase tracking-wider text-black/50 mt-1">Explorer Level 1</p>
-              </div>
-          </div>
-          <button 
-            onClick={() => setIsDrawerOpen(true)}
-            className="w-10 h-10 rounded-xl bg-white border-[2.5px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex-none"
-          >
-              <SettingsIcon className="w-5 h-5 text-black" />
-          </button>
-        </div>
-
-        {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-2 mb-4 shrink-0">
-            <div className="bg-white border-[2.5px] border-black rounded-xl py-2 flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-              <span className="font-display font-black text-sm text-black">{currentUser.points}</span>
-            </div>
-            <div className="bg-white border-[2.5px] border-black rounded-xl py-2 flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-600" />
-              <span className="font-display font-black text-sm text-black">{currentUser.streak || 0}</span>
-            </div>
-            <div className="bg-white border-[2.5px] border-black rounded-xl py-2 flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <span className="text-[10px] font-black text-black opacity-35">#</span>
-              <span className="font-display font-black text-sm text-black">1</span>
-            </div>
-        </div>
-
-        {/* Character Display Area (Proportional) */}
-        <div className="flex-1 relative flex flex-col items-center justify-center min-h-0 pointer-events-none">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={selectedOutfit.rarity}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.35 }}
-              className={cn(
-                "absolute w-[180%] aspect-square blur-[120px] rounded-full z-0",
-                selectedOutfit.rarity === "legendary" ? "bg-amber-400/40" :
-                selectedOutfit.rarity === "mythic" ? "bg-purple-500/40" :
-                selectedOutfit.rarity === "rare" ? "bg-blue-400/40" : "bg-slate-400/40"
-              )}
-            />
-          </AnimatePresence>
-          <div className="relative w-full h-[92%] flex items-center justify-center z-10">
+    <div className="flex flex-col h-full bg-white font-sans overflow-hidden select-none">
+      {/* ── Character Area (flex: 3) ── */}
+      <div 
+        className="flex-[3] relative flex items-center justify-center overflow-hidden"
+        style={{
+          background: "radial-gradient(circle, #FFF9F2 0%, #F3F1FF 70%, #E8EBF2 100%)"
+        }}
+      >
+        <div className="relative flex flex-col items-center">
+          {/* Character Image with Cross-fade */}
+          <div className="relative w-[180px] h-[180px] flex items-center justify-center z-10">
             <AnimatePresence mode="wait">
               <motion.img
                 key={selectedId}
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
                 src={selectedOutfit.image}
-                className="max-h-full w-auto object-contain drop-shadow-xl"
+                className="w-full h-full object-contain"
+                alt="Character"
               />
             </AnimatePresence>
           </div>
-          <div className="w-32 h-4 bg-black/5 rounded-[100%] blur-[2px] -mt-4" />
+          
+          {/* Soft Ellipse Shadow */}
+          <div 
+            className="w-[120px] h-[24px] bg-white rounded-[100%] opacity-30 mt-[-12px]" 
+            style={{ filter: "blur(12px)" }}
+          />
         </div>
       </div>
 
-      {/* ── Bottom Section (flex: 2) ── */}
-      <div className="flex-[2] relative bg-white border-t-[5px] border-x-[5px] border-black rounded-t-[3.5rem] shadow-[0_-15px_60px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden mx-1 mb-[-4px]">
-        {/* Inside Trace */}
-        <div className={cn(
-          "absolute inset-[6px] border-[2.5px] rounded-t-[3.1rem] pointer-events-none z-10 transition-colors duration-500",
-          meta.border,
-          "opacity-40"
-        )} />
-        {/* Panel Header */}
-        <div className="px-8 pt-6 pb-4 shrink-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-black uppercase tracking-[0.1em] text-black">Wardrobe</h2>
-              <div className="h-1.5 w-8 bg-black rounded-full mt-1" />
-            </div>
-            <p className="text-[10px] font-black text-black/25 uppercase tracking-widest">{PENGUIN_OUTFITS.length} Items</p>
-          </div>
+      {/* ── Wardrobe Panel (flex: 2) ── */}
+      <div 
+        className="flex-[2] relative bg-white rounded-t-[28px] flex flex-col overflow-hidden z-20"
+        style={{
+          boxShadow: "0 -8px 16px rgba(0, 0, 0, 0.06)"
+        }}
+      >
+        {/* Drag Indicator */}
+        <div className="flex justify-center pt-[10px] pb-[4px]">
+          <div className="w-[36px] h-[4px] bg-[#E0E0E0] rounded-[2px]" />
         </div>
 
-        {/* Costume Grid (Internally Scrollable ViewPort) */}
-        <div className="flex-1 overflow-y-auto px-6 pb-10 no-scrollbar">
-          <div className="grid grid-cols-3 gap-4 pt-4">
+        {/* Panel Header */}
+        <div className="px-6 pt-2 pb-3">
+          <div className="flex items-baseline justify-between mb-2">
+            <h2 className="text-[11px] font-bold tracking-[1.5px] text-[#111] uppercase">Wardrobe</h2>
+            <span className="text-[10px] text-[#AAAAAA]">{PENGUIN_OUTFITS.length} ITEMS</span>
+          </div>
+          <div className="h-[1px] bg-[#F0F0F0] w-full" />
+        </div>
+
+        {/* Costume Grid */}
+        <div className="flex-1 overflow-y-auto px-6 pb-8 no-scrollbar">
+          <div className="grid grid-cols-3 gap-3 pt-2">
             {sortedOutfits.map((outfit) => {
               const isSelected = selectedId === outfit.id;
-              const outfitMeta = RARITY_META[outfit.rarity];
+              
               return (
-                <button
+                <motion.button
                   key={outfit.id}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   onClick={() => {
                     if (!outfit.comingSoon) {
                       const nextConfig = { outfit: outfit.id };
@@ -171,54 +135,38 @@ export default function Profile() {
                     }
                   }}
                   className={cn(
-                    "group relative aspect-square rounded-[1.5rem] border-[4px] transition-all duration-200 flex flex-col items-center justify-center p-2.5 overflow-hidden",
-                    isSelected 
-                      ? "border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] scale-[1.02] z-10" 
-                      : "border-black/10 bg-slate-50/50 hover:border-black/20",
-                    isSelected 
-                      ? (outfit.rarity === "legendary" ? "bg-amber-100" : outfit.rarity === "mythic" ? "bg-purple-100" : outfit.rarity === "rare" ? "bg-blue-100" : "bg-white")
-                      : "bg-slate-50/50"
+                    "group relative aspect-square rounded-[16px] border bg-[#FAFAFA] p-2.5 flex flex-col items-center justify-between transition-colors duration-150 overflow-hidden",
+                    isSelected ? "border-[#111] border-[2px]" : "border-[#F0F0F0]"
                   )}
                 >
-                  {/* Internal rarity border */}
-                  <div className={cn(
-                      "absolute inset-0 border-[3.5px] rounded-[inherit] pointer-events-none opacity-60",
-                      outfitMeta.border
-                  )} />
-
-                  {/* Item Image */}
-                  <div className="relative w-[88%] h-[88%] flex items-center justify-center">
-                    <img 
-                      src={outfit.image} 
-                      className={cn(
-                        "w-full h-full object-contain pointer-events-none drop-shadow-md transition-transform duration-300",
-                        isSelected && "scale-110"
-                      )} 
-                    />
-                  </div>
-
-                  {/* Selection Badge */}
+                  {/* Luxury Selection Indicator */}
                   {isSelected && (
                     <motion.div 
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className={cn(
-                        "absolute top-2 right-2 w-6 h-6 rounded-xl border-[2.5px] border-black flex items-center justify-center shadow-sm z-20",
-                        outfitMeta.bg
-                      )}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="absolute top-2 right-2 w-[16px] h-[16px] bg-[#111] rounded-full flex items-center justify-center z-10"
                     >
-                      <Check className="w-3.5 h-3.5 text-white" strokeWidth={5} />
+                      <Check className="w-[10px] h-[10px] text-white" strokeWidth={4} />
                     </motion.div>
                   )}
 
-                  {/* Rarity Label (Bottom) */}
-                  <div className={cn(
-                    "absolute bottom-0 w-full py-1 text-[8px] font-black uppercase tracking-widest text-center backdrop-blur-sm",
-                    isSelected ? "bg-black text-white" : cn("bg-black/5 opacity-50", outfitMeta.color)
-                  )}>
-                    {outfit.rarity}
+                  {/* Outfit Image */}
+                  <div className="flex-1 w-full flex items-center justify-center">
+                    <img 
+                      src={outfit.image} 
+                      className="max-w-full max-h-full object-contain"
+                      alt={outfit.label}
+                    />
                   </div>
-                </button>
+
+                  {/* Rarity Label */}
+                  <span 
+                    className="text-[9px] font-semibold tracking-[0.8px] uppercase mt-1"
+                    style={{ color: RARITY_COLORS[outfit.rarity] }}
+                  >
+                    {outfit.rarity}
+                  </span>
+                </motion.button>
               );
             })}
           </div>
@@ -227,4 +175,3 @@ export default function Profile() {
     </div>
   );
 }
-
