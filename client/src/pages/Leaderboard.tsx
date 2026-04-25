@@ -88,8 +88,14 @@ export default function Leaderboard() {
             <motion.div
               key={user.id}
               initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.06 }}
+              animate={index === 0 
+                ? { opacity: 1, y: 0, rotate: [0, -1, 1, -0.5, 0] }
+                : { opacity: 1, y: 0 }
+              }
+              transition={index === 0 
+                ? { delay: 0.3, rotate: { repeat: Infinity, repeatDelay: 3, duration: 0.5, ease: "easeInOut" } }
+                : { delay: index * 0.06 }
+              }
               onClick={() => setSelectedUser(user)}
               className={cn(
                 "flex items-center gap-3 rounded-2xl p-4 transition-all duration-300 cursor-pointer active:scale-[0.97]",
