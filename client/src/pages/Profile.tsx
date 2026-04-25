@@ -74,7 +74,7 @@ export default function Profile() {
   const meta = RARITY_META[selectedOutfit.rarity];
 
   return (
-    <div className="h-full transition-colors duration-700 overflow-hidden select-none flex flex-col font-sans pb-32 bg-tab-profile">
+    <div className="h-full transition-colors duration-700 overflow-hidden select-none flex flex-col font-sans bg-tab-profile">
       
       {/* ── Top Section (flex: 3) ── */}
       <div className="flex-[3] flex flex-col pt-6 px-5 min-h-0">
@@ -183,7 +183,7 @@ export default function Profile() {
         </div>
 
         {/* Costume Grid (Internally Scrollable ViewPort) */}
-        <div className="flex-1 overflow-y-auto px-6 pb-10 no-scrollbar">
+        <div className="flex-1 overflow-y-auto px-6 pb-28 no-scrollbar mask-bottom-fade">
           <div className="grid grid-cols-3 gap-3 pt-4">
             {sortedOutfits.map((outfit) => {
               const isSelected = selectedId === outfit.id;

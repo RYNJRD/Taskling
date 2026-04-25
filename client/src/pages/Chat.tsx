@@ -128,7 +128,7 @@ export default function Chat() {
   };
 
   return (
-    <div className={cn("flex flex-col relative transition-colors duration-500", chatBg || "bg-tab-chat")} style={{ height: 'calc(100% - 5.5rem)' }}>
+    <div className={cn("flex flex-col h-full relative transition-colors duration-500 pb-[88px]", chatBg || "bg-tab-chat")}>
       
       {/* ── Background Picker Popover ── */}
       <AnimatePresence>
@@ -248,7 +248,7 @@ export default function Chat() {
       </div>
 
       {/* ── Messages ── */}
-      <ScrollArea className="flex-1 px-4" ref={scrollRef} onScroll={handleScroll}>
+      <ScrollArea className="flex-1 px-4 mask-bottom-fade" ref={scrollRef} onScroll={handleScroll}>
         <div className="flex flex-col py-4">
           <AnimatePresence initial={false}>
             {messages.map((message, index) => {

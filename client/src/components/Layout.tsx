@@ -25,14 +25,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
       >
         <NavigationDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
 
-        <main className={cn(
-          "flex-1 relative no-scrollbar rounded-[inherit]",
-          (location.includes("/profile") || location.includes("/me")) ? "overflow-hidden touch-none" : "overflow-y-auto",
-          isOnboarding && "flex flex-col overflow-hidden touch-none h-full",
-          showNav && "mask-bottom-fade pb-[110px]"
-        )}>
-          {children}
-        </main>
+        <div className="flex-1 min-h-0 relative flex flex-col rounded-[inherit]">
+          <main className={cn(
+            "flex-1 relative no-scrollbar rounded-[inherit]",
+            (location.includes("/profile") || location.includes("/me") || location.includes("/chat")) ? "overflow-hidden touch-none" : "overflow-y-auto pb-28 mask-bottom-fade",
+            isOnboarding && "flex flex-col overflow-hidden touch-none h-full !pb-0"
+          )}>
+            {children}
+          </main>
+        </div>
         {showNav && <BottomNav />}
         {showNav && <DemoSwitcher />}
       </div>
