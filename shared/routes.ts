@@ -165,7 +165,7 @@ export const api = {
         familyId: z.coerce.number(),
         userId: z.coerce.number(),
         senderName: z.string(),
-        content: z.string().min(1).max(400),
+        content: z.string().min(1).max(10000000), // Support large base64 images
       }),
       responses: { 201: z.custom<typeof messages.$inferSelect>() },
     },
