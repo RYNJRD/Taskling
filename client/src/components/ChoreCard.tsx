@@ -54,7 +54,7 @@ export const ChoreCard = forwardRef<HTMLDivElement, ChoreCardProps>(
         exit={{ opacity: 0, scale: 0.97 }}
         whileHover={!isDone ? { y: -2 } : undefined}
         className={cn(
-          "rounded-[1.75rem] p-4 transition-all duration-300",
+          "rounded-[1.75rem] p-4 transition-all duration-300 relative overflow-visible",
           isDone || isPending ? "opacity-70" : "",
         )}
         style={{
@@ -71,6 +71,32 @@ export const ChoreCard = forwardRef<HTMLDivElement, ChoreCardProps>(
           else setConfirming(false);
         }}
       >
+        {/* Outer card green border-draw when completing */}
+        {isCompleting && (
+          <>
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" preserveAspectRatio="none" viewBox="0 0 200 100" fill="none">
+              <motion.rect
+                x="1" y="1" width="198" height="98" rx="14"
+                fill="none"
+                stroke="#4ade80"
+                strokeWidth="2"
+                strokeLinecap="round"
+                pathLength={100}
+                initial={{ strokeDasharray: '50 50', strokeDashoffset: 50, opacity: 0 }}
+                animate={{ strokeDashoffset: 0, opacity: 1 }}
+                transition={{ strokeDashoffset: { delay: 0.5, duration: 0.55, ease: "easeInOut" }, opacity: { delay: 0.45, duration: 0.05 } }}
+              />
+            </svg>
+            {/* Outer green pulse */}
+            <motion.div
+              className="absolute inset-[-2px] rounded-[1.75rem] pointer-events-none z-10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0, 0.6, 0] }}
+              transition={{ duration: 1.4, times: [0, 0.73, 0.8, 1], ease: "easeOut" }}
+              style={{ boxShadow: '0 0 24px rgba(74, 222, 128, 0.5), inset 0 0 20px rgba(74, 222, 128, 0.15)' }}
+            />
+          </>
+        )}
         <div className="flex gap-3">
           {/* Check button */}
           <motion.button
@@ -115,7 +141,14 @@ export const ChoreCard = forwardRef<HTMLDivElement, ChoreCardProps>(
           >
             {isCompleting ? (
               <>
-                <Star className="w-5 h-5 animate-spin" style={{ zIndex: 2 }} />
+                <motion.div
+                  initial={{ color: 'hsl(262, 83%, 65%)' }}
+                  animate={{ color: ['hsl(262, 83%, 65%)', 'hsl(262, 83%, 65%)', '#4ade80'] }}
+                  transition={{ duration: 0.6, times: [0, 0.8, 1], delay: 0.45 }}
+                  style={{ zIndex: 2 }}
+                >
+                  <Star className="w-5 h-5 animate-spin" />
+                </motion.div>
                 {/* SVG border draw: two green paths from top-center */}
                 <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 48 48" fill="none" style={{ zIndex: 3 }}>
                   {/* CW path: top-center → right → bottom-center */}
