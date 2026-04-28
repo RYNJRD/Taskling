@@ -1,18 +1,212 @@
-import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { useParams } from "wouter";
 import { useLocation } from "wouter";
 import {
   Users, ClipboardList, Gift, Star, Flame, CheckCircle2,
-  TrendingUp, Clock, ChevronRight, Shield, AlertCircle, Menu
+  TrendingUp, Clock, ChevronRight, Shield, AlertCircle, Menu,
+  ChevronLeft
 } from "lucide-react";
 import { useFamilyChores, useFamilyLeaderboard, useFamilyActivity, useFamilyUsers } from "../hooks/use-families";
 import { UserAvatar } from "../components/UserAvatar";
 import { useStore } from "../store/useStore";
 import { cn } from "../lib/utils";
-import { formatDistanceToNow } from "date-fns";
-import { useState } from "react";
+import { formatDistanceToNow, isToday, isThisWeek } from "date-fns";
 import { QuickActionModals } from "../components/QuickActionModals";
+
+/* ─── Auto-rotating Child Activity Carousel ─── */
+function ChildActivityCarousel({
+  children: childUsers,
+  allChores,
+  leaderboard,
+}: {
+  children: any[];
+  allChores: any[];
+  leaderboard: any[];
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const slideCount = childUsers.length;
+
+  // Clear all timers helper
+  const clearTimers = useCallback(() => {
+    if (autoTimerRef.current) clearInterval(autoTimerRef.current);
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+  }, []);
+
+  // Start auto-rotation
+  const startAutoRotation = useCallback(() => {
+    clearTimers();
+    setIsPaused(false);
+    autoTimerRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % slideCount);
+    }, 5000);
+  }, [slideCount, clearTimers]);
+
+  // On user interaction: pause for 5 seconds then resume
+  const handleUserInteraction = useCallback((newIndex: number) => {
+    clearTimers();
+    setIsPaused(true);
+    setActiveIndex(newIndex);
+    pauseTimerRef.current = setTimeout(() => {
+      startAutoRotation();
+    }, 5000);
+  }, [clearTimers, startAutoRotation]);
+
+  // Initial auto-rotation
+  useEffect(() => {
+    if (slideCount > 1) startAutoRotation();
+    return clearTimers;
+  }, [slideCount, startAutoRotation, clearTimers]);
+
+  // Swipe handling
+  const handleDragEnd = (_: any, info: PanInfo) => {
+    const threshold = 50;
+    if (info.offset.x < -threshold && activeIndex < slideCount - 1) {
+      handleUserInteraction(activeIndex + 1);
+    } else if (info.offset.x > threshold && activeIndex > 0) {
+      handleUserInteraction(activeIndex - 1);
+    }
+  };
+
+  if (childUsers.length === 0) {
+    return (
+      <div className="rounded-2xl p-6 text-center glass-card" style={{ border: '1px dashed rgba(255,255,255,0.1)' }}>
+        <p className="text-sm text-muted-foreground font-medium">No children added yet. Invite your family!</p>
+      </div>
+    );
+  }
+
+  const child = childUsers[activeIndex];
+  if (!child) return null;
+
+  // Compute real stats for this child
+  const childChores = allChores.filter((c: any) => c.assigneeId === child.id);
+  const completedToday = childChores.filter((c: any) => {
+    if (!c.lastCompletedAt) return false;
+    return isToday(new Date(c.lastCompletedAt));
+  });
+  const completedThisWeek = childChores.filter((c: any) => {
+    if (!c.lastCompletedAt) return false;
+    return isThisWeek(new Date(c.lastCompletedAt), { weekStartsOn: 1 });
+  });
+  const starsEarnedToday = completedToday.reduce((sum: number, c: any) => sum + (c.points || 0), 0);
+  const sorted = [...leaderboard].sort((a: any, b: any) => b.points - a.points);
+  const rank = sorted.findIndex((u: any) => u.id === child.id) + 1;
+  const totalChores = childChores.length || 1;
+  const weeklyPct = Math.min(100, Math.round((completedThisWeek.length / totalChores) * 100));
+
+  return (
+    <div className="relative">
+      {/* Dot indicators */}
+      {slideCount > 1 && (
+        <div className="flex items-center justify-center gap-1.5 mb-3">
+          {childUsers.map((_: any, i: number) => (
+            <button
+              key={i}
+              onClick={() => handleUserInteraction(i)}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300",
+                i === activeIndex ? "w-6 bg-white" : "w-1.5 bg-white/30"
+              )}
+            />
+          ))}
+        </div>
+      )}
+
+      <motion.div
+        key={child.id}
+        drag={slideCount > 1 ? "x" : false}
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+        className="rounded-2xl glass-card p-4 cursor-grab active:cursor-grabbing select-none"
+      >
+        {/* Child header */}
+        <div className="flex items-center gap-3 mb-4">
+          <UserAvatar user={child} size="lg" className="border-2 border-white/30 shadow-lg" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <p className="font-display font-bold text-lg text-white truncate">{child.username}</p>
+              <div className="flex items-center gap-1 bg-white/10 rounded-xl px-2.5 py-1">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span className="text-sm font-bold text-white tabular-nums">{child.points}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 mt-1">
+              <span className="text-[11px] font-medium text-white/60">Rank #{rank || "–"}</span>
+              {child.streak > 0 && (
+                <span className="text-[11px] font-bold text-orange-400 flex items-center gap-0.5">
+                  <Flame className="w-3 h-3" />{child.streak}d streak
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Today's activity */}
+        <div className="bg-white/5 rounded-xl p-3 mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-2">Today</p>
+          {completedToday.length === 0 ? (
+            <p className="text-sm text-white/40 italic">No chores completed today yet.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {completedToday.slice(0, 4).map((chore: any) => (
+                <div key={chore.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="text-sm text-white/90 font-medium truncate">{chore.title}</span>
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0 ml-2">
+                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                    <span className="text-xs font-bold text-amber-400">+{chore.points}</span>
+                  </div>
+                </div>
+              ))}
+              {completedToday.length > 4 && (
+                <p className="text-xs text-white/40 text-center mt-1">+{completedToday.length - 4} more</p>
+              )}
+            </div>
+          )}
+          {completedToday.length > 0 && (
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
+              <span className="text-[11px] font-bold text-white/50">Stars earned today</span>
+              <span className="text-sm font-bold text-amber-400">{starsEarnedToday} ⭐</span>
+            </div>
+          )}
+        </div>
+
+        {/* Weekly progress */}
+        <div>
+          <div className="flex justify-between items-center mb-1.5">
+            <span className="text-[11px] font-medium text-white/50 flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" />
+              {completedThisWeek.length} / {totalChores} this week
+            </span>
+            <span className="text-[11px] font-bold text-primary">{weeklyPct}%</span>
+          </div>
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${weeklyPct}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="h-full rounded-full bg-gradient-to-r from-primary to-violet-500 shadow-sm shadow-primary/30"
+            />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Swipe hint for multiple children */}
+      {slideCount > 1 && (
+        <p className="text-center text-[10px] text-white/30 mt-2 font-medium">
+          Swipe to see other children
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function ParentDashboard() {
   const { familyId } = useParams();
@@ -31,21 +225,12 @@ export default function ParentDashboard() {
     [leaderboard]
   );
 
+  // FIX: Count only chores that actually have a "submitted" submission pending review,
+  // NOT just chores with requiresApproval flag set to true.
   const pendingCount = useMemo(() =>
-    allChores.filter((c) => c.requiresApproval).length,
+    allChores.filter((c: any) => c.latestSubmissionStatus === "submitted").length,
     [allChores]
   );
-
-  const getChildStats = (userId: number) => {
-    const userChores = allChores.filter((c) => c.assigneeId === userId);
-    const doneThisWeek = userChores.filter((c) => {
-      if (!c.lastCompletedAt) return false;
-      const days = (Date.now() - new Date(c.lastCompletedAt).getTime()) / (1000 * 60 * 60 * 24);
-      return days <= 7;
-    }).length;
-    const total = userChores.length || 1;
-    return { doneThisWeek, total, pct: Math.min(100, Math.round((doneThisWeek / total) * 100)) };
-  };
 
   const adminPath = family?.id ? `/family/${family.id}/admin` : "/";
 
@@ -133,7 +318,7 @@ export default function ParentDashboard() {
         onClose={() => setActiveModal(null)}
       />
 
-      {/* ── Family Overview ── */}
+      {/* ── Child Activity Carousel (replaces Family Progress) ── */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -141,73 +326,14 @@ export default function ParentDashboard() {
         className="mb-6"
       >
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Family Progress</p>
-          <span className="text-xs font-bold text-muted-foreground">This week</span>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Today's Activity</p>
+          <span className="text-xs font-bold text-muted-foreground">Live</span>
         </div>
-
-        {children.length === 0 ? (
-          <div className="rounded-2xl p-6 text-center glass-card" style={{ border: '1px dashed rgba(255,255,255,0.1)' }}>
-            <p className="text-sm text-muted-foreground font-medium">No children added yet. Invite your family!</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {children.map((child, i) => {
-              const stats = getChildStats(child.id);
-              const sorted = [...leaderboard].sort((a, b) => b.points - a.points);
-              const rank = sorted.findIndex((u) => u.id === child.id) + 1;
-              return (
-                <motion.div
-                  key={child.id}
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 + i * 0.06 }}
-                  className="rounded-2xl p-4 glass-card transition-all duration-300"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <UserAvatar user={child} size="md" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-bold text-sm truncate">{child.username}</p>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                          <span className="text-xs font-bold tabular-nums">{child.points}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[11px] font-medium text-muted-foreground">
-                          Rank #{rank}
-                        </span>
-                        {child.streak > 0 && (
-                          <span className="text-[11px] font-bold text-orange-500 flex items-center gap-0.5">
-                            <Flame className="w-3 h-3" />{child.streak}d streak
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  {/* Progress bar */}
-                  <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
-                        {stats.doneThisWeek} / {stats.total} chores done
-                      </span>
-                      <span className="text-[11px] font-bold text-primary">{stats.pct}%</span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${stats.pct}%` }}
-                        transition={{ duration: 1, ease: "easeOut", delay: 0.3 + i * 0.1 }}
-                        className="h-full rounded-full bg-gradient-to-r from-primary to-violet-500 shadow-sm shadow-primary/30"
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
+        <ChildActivityCarousel
+          children={children}
+          allChores={allChores}
+          leaderboard={leaderboard}
+        />
       </motion.div>
 
       {/* ── Leaderboard snapshot ── */}
