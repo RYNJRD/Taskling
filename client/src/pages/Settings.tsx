@@ -390,9 +390,11 @@ export default function Settings() {
             <div className="px-4 py-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-600 shadow-lg shadow-amber-500/20 text-white">
-                    <Crown size={20} />
-                  </div>
+                  <img 
+                    src="/assets/premium-penguin.png" 
+                    alt="Taskling Premium" 
+                    className="w-12 h-12 rounded-xl shadow-lg shadow-amber-500/20 object-cover"
+                  />
                   <div>
                     <h4 className="text-[15px] font-bold leading-tight">
                       {isPremium ? "Taskling Premium" : "Free Plan"}
