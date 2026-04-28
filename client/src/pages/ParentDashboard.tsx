@@ -67,7 +67,7 @@ function ChildActivityCarousel({
 
   if (childUsers.length === 0) {
     return (
-      <div className="rounded-3xl p-6 text-center bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/5 shadow-sm">
+      <div className="rounded-3xl p-6 text-center bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-slate-700 shadow-sm">
         <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">No children added yet. Invite your family!</p>
       </div>
     );
@@ -114,14 +114,14 @@ function ChildActivityCarousel({
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.2}
         onDragEnd={handleDragEnd}
-        className="rounded-3xl bg-white/60 dark:bg-white/5 border border-white/40 dark:border-white/10 p-5 cursor-grab active:cursor-grabbing select-none shadow-sm backdrop-blur-md"
+        className="rounded-3xl bg-white/60 dark:bg-white/5 border border-slate-200 dark:border-slate-700 p-5 cursor-grab active:cursor-grabbing select-none shadow-sm backdrop-blur-md"
       >
         <div className="flex items-center gap-3 mb-5">
-          <UserAvatar user={child} size="lg" className="border shadow-sm border-black/5 dark:border-white/10" />
+          <UserAvatar user={child} size="lg" className="border shadow-sm border-slate-200 dark:border-slate-700" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <p className="font-display font-bold text-lg text-slate-900 dark:text-white truncate">{child.username}</p>
-              <div className="flex items-center gap-1 bg-white/80 dark:bg-white/10 rounded-xl px-2.5 py-1 border border-black/5 dark:border-white/5 shadow-sm">
+              <div className="flex items-center gap-1 bg-white/80 dark:bg-white/10 rounded-xl px-2.5 py-1 border border-slate-200 dark:border-slate-700 shadow-sm">
                 <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                 <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{child.points}</span>
               </div>
@@ -137,7 +137,7 @@ function ChildActivityCarousel({
           </div>
         </div>
 
-        <div className="bg-white/50 dark:bg-black/20 rounded-2xl p-4 mb-4 border border-black/5 dark:border-white/5">
+        <div className="bg-white/50 dark:bg-black/20 rounded-2xl p-4 mb-4 border border-slate-200 dark:border-slate-700">
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-3">Today</p>
           {completedToday.length === 0 ? (
             <p className="text-sm text-slate-500 dark:text-slate-400 italic">No chores completed today yet.</p>
@@ -161,7 +161,7 @@ function ChildActivityCarousel({
             </div>
           )}
           {completedToday.length > 0 && (
-            <div className="flex items-center justify-between mt-3 pt-3 border-t border-black/5 dark:border-white/10">
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Stars earned today</span>
               <span className="text-sm font-bold text-amber-600 dark:text-amber-400">{starsEarnedToday} ⭐</span>
             </div>
@@ -176,7 +176,7 @@ function ChildActivityCarousel({
             </span>
             <span className="text-xs font-bold text-primary">{weeklyPct}%</span>
           </div>
-          <div className="h-2.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden border border-black/5 dark:border-white/5">
+          <div className="h-2.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${weeklyPct}%` }}
@@ -221,9 +221,9 @@ export default function ParentDashboard() {
   const adminPath = family?.id ? `/family/${family.id}/admin` : "/";
 
   const quickActions = [
-    { icon: ClipboardList, label: "Assign Chore", color: "bg-white/80 dark:bg-white/10 text-blue-600 dark:text-blue-400 border-black/5 dark:border-white/10", action: () => setActiveModal('chore') },
-    { icon: Gift, label: "Create Reward", color: "bg-white/80 dark:bg-white/10 text-amber-600 dark:text-amber-400 border-black/5 dark:border-white/10", action: () => setActiveModal('reward') },
-    { icon: Users, label: "Manage Family", color: "bg-white/80 dark:bg-white/10 text-emerald-600 dark:text-emerald-400 border-black/5 dark:border-white/10", action: () => setLocation(`${adminPath}#members`) },
+    { icon: ClipboardList, label: "Assign Chore", color: "bg-white/80 dark:bg-white/10 text-blue-600 dark:text-blue-400 border-slate-200 dark:border-slate-700", action: () => setActiveModal('chore') },
+    { icon: Gift, label: "Create Reward", color: "bg-white/80 dark:bg-white/10 text-amber-600 dark:text-amber-400 border-slate-200 dark:border-slate-700", action: () => setActiveModal('reward') },
+    { icon: Users, label: "Manage Family", color: "bg-white/80 dark:bg-white/10 text-emerald-600 dark:text-emerald-400 border-slate-200 dark:border-slate-700", action: () => setLocation(`${adminPath}#members`) },
   ];
 
   if (!currentUser) return null;
@@ -255,7 +255,7 @@ export default function ParentDashboard() {
           )}
           <button
             onClick={() => setIsDrawerOpen(true)}
-            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/60 dark:bg-white/5 border border-black/5 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm active:scale-95"
+            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/60 dark:bg-white/5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/10 transition-colors shadow-sm active:scale-95"
             aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
@@ -328,21 +328,21 @@ export default function ParentDashboard() {
               <TrendingUp className="w-3 h-3" /> Live ranking
             </button>
           </div>
-          <div className="rounded-3xl bg-white/60 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-sm backdrop-blur-sm overflow-hidden">
+          <div className="rounded-3xl bg-white/60 dark:bg-white/5 border border-slate-200 dark:border-slate-700 shadow-sm backdrop-blur-sm overflow-hidden">
             {[...leaderboard].sort((a, b) => b.points - a.points).slice(0, 3).map((u, i) => (
               <div
                 key={u.id}
                 className={cn(
                   "flex items-center gap-3.5 px-4 py-3.5",
-                  i < 2 && "border-b border-black/5 dark:border-white/5"
+                  i < 2 && "border-b border-slate-200 dark:border-slate-700"
                 )}
               >
                 <span className="text-xl w-7 text-center flex-none">
                   {i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"}
                 </span>
-                <UserAvatar user={u} size="sm" className="border shadow-sm border-black/5 dark:border-white/10" />
+                <UserAvatar user={u} size="sm" className="border shadow-sm border-slate-200 dark:border-slate-700" />
                 <span className="flex-1 font-bold text-[15px] text-slate-900 dark:text-white truncate">{u.username}</span>
-                <div className="flex items-center gap-1.5 bg-white/80 dark:bg-white/10 px-2.5 py-1 rounded-xl border border-black/5 dark:border-white/5 shadow-sm">
+                <div className="flex items-center gap-1.5 bg-white/80 dark:bg-white/10 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
                   <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                   <span className="font-bold text-sm text-slate-900 dark:text-white tabular-nums">{u.points}</span>
                 </div>
@@ -369,20 +369,20 @@ export default function ParentDashboard() {
         </div>
 
         {activity.length === 0 ? (
-          <div className="rounded-3xl p-6 text-center bg-white/40 dark:bg-white/5 border border-black/5 dark:border-white/5 shadow-sm">
+          <div className="rounded-3xl p-6 text-center bg-white/40 dark:bg-white/5 border border-slate-200 dark:border-slate-700 shadow-sm">
             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">No activity yet. Assign some chores to get started!</p>
           </div>
         ) : (
-          <div className="rounded-3xl bg-white/60 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-sm backdrop-blur-sm overflow-hidden">
+          <div className="rounded-3xl bg-white/60 dark:bg-white/5 border border-slate-200 dark:border-slate-700 shadow-sm backdrop-blur-sm overflow-hidden">
             {activity.slice(0, 5).map((event, i) => (
               <div
                 key={event.id}
                 className={cn(
                   "flex items-start gap-3.5 px-4 py-4",
-                  i < Math.min(activity.length - 1, 4) && "border-b border-black/5 dark:border-white/5"
+                  i < Math.min(activity.length - 1, 4) && "border-b border-slate-200 dark:border-slate-700"
                 )}
               >
-                <div className="w-10 h-10 rounded-2xl bg-white/80 dark:bg-white/10 border border-black/5 dark:border-white/10 shadow-sm flex items-center justify-center flex-none">
+                <div className="w-10 h-10 rounded-2xl bg-white/80 dark:bg-white/10 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center flex-none">
                   <span className="text-[18px] leading-none">{event.type === "chore_completed" ? "✅" : event.type === "reward_claimed" ? "🎁" : "📋"}</span>
                 </div>
                 <div className="flex-1 min-w-0 mt-0.5">
