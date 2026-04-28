@@ -71,6 +71,8 @@ export class DatabaseStorage implements IStorage {
       inviteCode: family.inviteCode ?? generateInviteCode(family.name),
       timeZone: family.timeZone ?? "UTC",
       themeColor: family.themeColor ?? "violet",
+      subscriptionStatus: "trialing",
+      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days trial
     };
     const [newFamily] = await db.insert(families).values(payload).returning();
     return newFamily;

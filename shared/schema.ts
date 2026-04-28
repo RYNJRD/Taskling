@@ -17,6 +17,10 @@ export const families = pgTable("families", {
   inviteCode: varchar("invite_code", { length: 50 }).notNull().unique(),
   timeZone: varchar("time_zone", { length: 100 }).notNull().default("UTC"),
   themeColor: varchar("theme_color", { length: 20 }).default("violet"),
+  subscriptionStatus: varchar("subscription_status", { length: 50 }).notNull().default("trialing"), // 'trialing', 'active', 'canceled', 'past_due', 'unpaid'
+  subscriptionId: varchar("subscription_id", { length: 255 }),
+  trialEndsAt: timestamp("trial_ends_at"),
+  currentPeriodEndsAt: timestamp("current_period_ends_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -154,7 +158,14 @@ export const monthlyWinners = pgTable("monthly_winners", {
 });
 
 export const insertFamilySchema = createInsertSchema(families)
-  .omit({ id: true, createdAt: true })
+  .omit({ 
+    id: true, 
+    createdAt: true,
+    subscriptionStatus: true,
+    subscriptionId: true,
+    trialEndsAt: true,
+    currentPeriodEndsAt: true
+  })
   .extend({
     inviteCode: z.string().optional(),
   });

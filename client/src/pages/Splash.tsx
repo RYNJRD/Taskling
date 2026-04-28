@@ -58,18 +58,8 @@ export default function Splash() {
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
-          {phase >= 2 && (
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", bounce: 0.3 }}
-              className="text-white/40 font-bold text-base mt-3"
-            >
-              Making chores fun for the whole family ✨
-            </motion.p>
-          )}
-        </AnimatePresence>
+
+
       </div>
 
       <motion.div

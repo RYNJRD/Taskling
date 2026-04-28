@@ -386,48 +386,30 @@ export default function Settings() {
           </SettingsGroup>
 
           <SectionHeader title="Subscription" />
-          <div className="mx-4 bg-white dark:bg-card rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-4">
-            <div className="flex items-center justify-between mb-5">
+          <div 
+            onClick={() => setLocation(`/family/${familyId}/subscription`)}
+            className="mx-4 bg-white dark:bg-card rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-4 cursor-pointer active:scale-[0.98] transition-all hover:border-purple-300 dark:hover:border-purple-900"
+          >
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3.5">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-orange-400 blur-xl opacity-20 rounded-full translate-y-2"></div>
+                  <div className="absolute inset-0 bg-purple-400 blur-xl opacity-20 rounded-full translate-y-2"></div>
                   <img 
                     src="/assets/premium-penguin-icon.png" 
                     alt="Taskling Premium" 
-                    className="w-16 h-16 relative z-10 drop-shadow-md"
+                    className="w-14 h-14 relative z-10 drop-shadow-md"
                   />
                 </div>
                 <div>
-                  <h4 className="text-lg font-black text-slate-900 dark:text-white leading-tight tracking-tight">
+                  <h4 className="text-base font-black text-slate-900 dark:text-white leading-tight">
                     {isPremium ? "Taskling Premium" : "Free Plan"}
                   </h4>
-                  {isPremium && (
-                    <p className="text-[13px] font-bold text-orange-500 mt-0.5 tracking-wide">
-                      {daysRemaining} days remaining
-                    </p>
-                  )}
+                  <p className="text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5">
+                    {isPremium ? `${daysRemaining} days remaining` : "Unlock royal features"}
+                  </p>
                 </div>
               </div>
-              <div className="px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[13px] font-bold text-slate-700 dark:text-slate-300">
-                {isPremium ? "Active" : "Free"}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {!isPremium && (
-                <button className="col-span-2 py-3.5 rounded-2xl font-bold text-[15px] bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg shadow-orange-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                  <Crown size={18} /> Upgrade to Premium
-                </button>
-              )}
-              {isPremium && (
-                <>
-                  <button className="py-3 rounded-2xl font-bold text-[14px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                    <CreditCard size={16} className="text-slate-500 dark:text-slate-400" /> Manage
-                  </button>
-                  <button className="py-3 rounded-2xl font-bold text-[14px] bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md shadow-orange-500/20 active:scale-95 transition-transform flex items-center justify-center">
-                    Renew Plan
-                  </button>
-                </>
-              )}
+              <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-700" />
             </div>
           </div>
 

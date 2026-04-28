@@ -218,22 +218,26 @@
   }
 
   .dock-glass {
-    background: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(10, 10, 20, 0.35);
+    backdrop-filter: blur(40px) saturate(1.6);
+    -webkit-backdrop-filter: blur(40px) saturate(1.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 
-      0 10px 40px rgba(0, 0, 0, 0.5),
-      inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      0 12px 48px rgba(0, 0, 0, 0.55),
+      0 2px 12px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04);
     transition: background 0.5s ease, border-color 0.5s ease;
   }
   
   .light .dock-glass {
-    background: rgba(255, 255, 255, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow: 
-      0 10px 40px rgba(0, 0, 0, 0.1),
-      inset 0 1px 1px rgba(255, 255, 255, 0.5);
+      0 12px 48px rgba(100, 80, 160, 0.12),
+      0 2px 8px rgba(100, 80, 160, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .mask-bottom-fade {
@@ -540,49 +544,114 @@
   }
 
   /* ── Per-tab background gradients (dark, immersive) ── */
+
+  /* ─ HOME V2.0 ─ Layered radial gradients: soft, playful, advanced ─ */
   .bg-tab-home {
-    background: linear-gradient(180deg, hsl(265 20% 16%) 0%, transparent 100%);
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -5%, hsl(270 25% 20%) 0%, transparent 65%),
+      radial-gradient(ellipse 80% 50% at 80% 30%, hsl(300 15% 16% / 0.5) 0%, transparent 55%),
+      radial-gradient(ellipse 90% 45% at 15% 60%, hsl(250 20% 15% / 0.35) 0%, transparent 50%),
+      radial-gradient(circle at 50% 100%, hsl(260 10% 12% / 0.4) 0%, transparent 40%);
     position: relative;
     min-height: 100%;
   }
-  
+
   .bg-tab-home::after {
     content: '';
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 180px;
-    background: linear-gradient(to top, var(--background) 10%, transparent 100%);
+    height: 140px;
+    background: linear-gradient(to top, var(--background) 15%, transparent 100%);
     pointer-events: none;
     z-index: 10;
   }
 
   .light .bg-tab-home {
-    background: linear-gradient(180deg, hsl(265 30% 92%) 0%, transparent 100%);
+    background:
+      radial-gradient(ellipse 120% 55% at 50% -5%, hsl(265 40% 93%) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 45% at 85% 25%, hsl(290 30% 92% / 0.6) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 40% at 10% 55%, hsl(245 30% 94% / 0.4) 0%, transparent 45%),
+      radial-gradient(circle at 50% 100%, hsl(260 15% 96% / 0.5) 0%, transparent 35%);
   }
 
   .light .bg-tab-home::after {
-    background: linear-gradient(to top, var(--background) 10%, transparent 100%);
+    background: linear-gradient(to top, var(--background) 15%, transparent 100%);
   }
 
+  /* ─ LEADERBOARD V2.0 ─ Amber/Gold ─ */
   .bg-tab-leaderboard {
-    background: linear-gradient(180deg, hsl(43 40% 12%) 0%, transparent 100%);
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -5%, hsl(35 30% 18%) 0%, transparent 65%),
+      radial-gradient(ellipse 80% 50% at 85% 30%, hsl(45 20% 14% / 0.5) 0%, transparent 55%),
+      radial-gradient(ellipse 90% 45% at 15% 60%, hsl(30 25% 12% / 0.35) 0%, transparent 50%),
+      radial-gradient(circle at 50% 100%, hsl(40 15% 10% / 0.4) 0%, transparent 40%);
   }
 
-  .bg-tab-chat {
-    background: linear-gradient(180deg, hsl(230 30% 13%) 0%, transparent 100%);
+  .light .bg-tab-leaderboard {
+    background:
+      radial-gradient(ellipse 120% 55% at 50% -5%, hsl(35 50% 94%) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 45% at 85% 25%, hsl(45 40% 93% / 0.6) 0%, transparent 50%);
   }
 
+  /* ─ REWARDS V2.0 ─ Teal/Emerald ─ */
   .bg-tab-rewards {
-    background: linear-gradient(180deg, hsl(189 30% 12%) 0%, transparent 100%);
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -5%, hsl(175 25% 18%) 0%, transparent 65%),
+      radial-gradient(ellipse 80% 50% at 85% 30%, hsl(160 20% 14% / 0.5) 0%, transparent 55%),
+      radial-gradient(ellipse 90% 45% at 15% 60%, hsl(185 20% 12% / 0.35) 0%, transparent 50%),
+      radial-gradient(circle at 50% 100%, hsl(170 15% 10% / 0.4) 0%, transparent 40%);
   }
 
+  .light .bg-tab-rewards {
+    background:
+      radial-gradient(ellipse 120% 55% at 50% -5%, hsl(175 40% 93%) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 45% at 85% 25%, hsl(165 35% 92% / 0.6) 0%, transparent 50%);
+  }
+
+  /* ─ CHAT V2.0 ─ Indigo/Blue ─ */
+  .bg-tab-chat {
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -5%, hsl(225 25% 18%) 0%, transparent 65%),
+      radial-gradient(ellipse 80% 50% at 85% 30%, hsl(240 20% 15% / 0.5) 0%, transparent 55%),
+      radial-gradient(circle at 50% 100%, hsl(230 15% 12% / 0.4) 0%, transparent 40%);
+  }
+
+  /* ─ PROFILE V2.0 ─ Deep Violet ─ */
   .bg-tab-profile {
-    background: linear-gradient(180deg, hsl(262 25% 14%) 0%, transparent 100%);
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -5%, hsl(265 25% 18%) 0%, transparent 65%),
+      radial-gradient(ellipse 80% 50% at 85% 30%, hsl(280 20% 15% / 0.5) 0%, transparent 55%),
+      radial-gradient(circle at 50% 100%, hsl(265 15% 12% / 0.4) 0%, transparent 40%);
   }
 
+  .light .bg-tab-profile {
+    background:
+      radial-gradient(ellipse 120% 55% at 50% -5%, hsl(265 40% 94%) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 45% at 85% 25%, hsl(275 30% 93% / 0.6) 0%, transparent 50%);
+  }
+
+  /* ─ ADMIN V2.0 ─ Slate ─ */
   .bg-tab-admin {
-    background: linear-gradient(180deg, hsl(230 25% 13%) 0%, transparent 100%);
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -5%, hsl(215 20% 16%) 0%, transparent 65%),
+      radial-gradient(ellipse 80% 50% at 85% 30%, hsl(225 15% 14% / 0.5) 0%, transparent 55%),
+      radial-gradient(circle at 50% 100%, hsl(215 10% 12% / 0.4) 0%, transparent 40%);
+  }
+
+  /* Global card refinement for V2.0 aesthetic */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 1.5rem;
+  }
+
+  .light .glass-card {
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   }
 }

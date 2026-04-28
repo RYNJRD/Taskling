@@ -23,6 +23,7 @@ const Chat = lazy(() => import("./pages/Chat"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
 const ActivityLog = lazy(() => import("./pages/ActivityLog"));
+const Subscription = lazy(() => import("./pages/Subscription"));
 const NotFound = lazy(() => import("./pages/not-found"));
 
 function RouteFallback() {
@@ -55,6 +56,7 @@ function Router() {
         <Route path="/family/:familyId/chat" component={Chat} />
         <Route path="/family/:familyId/profile" component={Profile} />
         <Route path="/family/:familyId/settings" component={Settings} />
+        <Route path="/family/:familyId/subscription" component={Subscription} />
         <Route path="/family/:familyId/admin" component={Admin} />
         <Route path="/family/:familyId/activity" component={ActivityLog} />
         <Route component={NotFound} />

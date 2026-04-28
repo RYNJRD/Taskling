@@ -56,15 +56,15 @@ function CalendarStrip() {
                 "flex flex-col items-center rounded-2xl py-2.5 px-3 min-w-[46px] transition-all duration-300",
                 isToday
                   ? "text-white"
-                  : "text-white/35 hover:bg-white/5",
+                  : "text-slate-400 dark:text-white/60 hover:bg-white/5 dark:hover:bg-white/5",
               )}
               style={isToday ? {
                 background: 'linear-gradient(135deg, hsl(262, 83%, 58%), hsl(280, 75%, 60%))',
                 boxShadow: '0 0 16px rgba(var(--glow-primary), 0.4)',
               } : undefined}
             >
-              <span className="text-[10px] font-bold uppercase" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{format(day, "EEE")}</span>
-              <span className={cn("text-base font-bold mt-0.5", isToday && "text-white")} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{format(day, "d")}</span>
+              <span className="text-[10px] font-bold uppercase">{format(day, "EEE")}</span>
+              <span className={cn("text-base font-bold mt-0.5", isToday && "text-white")}>{format(day, "d")}</span>
               {isToday && <div className="w-1 h-1 rounded-full bg-white/70 mt-1" />}
             </motion.div>
           );
@@ -238,37 +238,36 @@ export default function Dashboard() {
   return (
     <div className="pt-[max(1.5rem,env(safe-area-inset-top))] px-5 pb-32 min-h-screen bg-tab-home">
 
-      {/* ── Hero Card ── */}
+      {/* ── Hero Card V2.0 ── */}
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-5 rounded-[2rem] overflow-hidden relative"
+        className="mb-5 rounded-[2rem] overflow-hidden relative glass-card"
       >
-        {/* Nice faded lilac/purple glass background to match adults' premium feel */}
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-transparent backdrop-blur-xl border border-white/20" />
-
-        <div className="relative px-4 pt-3 pb-2">
+        <div className="relative px-5 pt-5 pb-4">
           {/* Top row: avatar + greeting + menu */}
-          <div className="flex items-start justify-between mb-2.5">
-            <div className="flex items-center gap-2.5">
-              <UserAvatar user={currentUser} size="sm" className="border-2 border-white/40 shadow-lg" />
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <UserAvatar user={currentUser} size="md" className="border-2 border-white/20 shadow-xl" />
+                <div className="absolute -bottom-1 -right-1 bg-emerald-500 w-4 h-4 rounded-full border-2 border-[#1a1a2e]" />
+              </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">Welcome back</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Family Member</p>
                 <h1 className="font-display text-xl font-bold text-white leading-tight">
                   Hi, {currentUser.username}! 👋
                 </h1>
               </div>
             </div>
-            {/* Action Buttons Top Right */}
+            {/* Stars counter & Menu */}
             <div className="flex items-center gap-2">
-              {/* Stars counter - inline */}
-              <div className="rounded-xl px-3 py-1.5 flex items-center gap-1.5 glass">
-                <Star className="w-3.5 h-3.5 fill-yellow-300 text-yellow-300" style={{ filter: 'drop-shadow(0 0 4px rgba(250, 204, 21, 0.5))' }} />
-                <p className="font-display text-base font-bold text-white leading-none">{currentUser.points}</p>
+              <div className="rounded-2xl px-3.5 py-2 flex items-center gap-2 bg-white/5 border border-white/10 shadow-inner">
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <p className="font-display text-lg font-bold text-white leading-none">{currentUser.points}</p>
               </div>
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl btn-glass text-white hover:bg-white/10 transition-all duration-300 active:scale-95"
+                className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all duration-300 active:scale-95 shadow-sm"
                 aria-label="Open menu"
               >
                 <Menu className="w-5 h-5" />
@@ -277,26 +276,31 @@ export default function Dashboard() {
           </div>
           
           {/* Rank info */}
-          <p className="text-sm text-white/80 mb-2" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-            {rank === 1 ? "🥇 You're leading the family!" : `Rank #${rank || 1} in your family`}
-          </p>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
+              <Trophy className="w-4 h-4 text-purple-400" />
+            </div>
+            <p className="text-sm font-medium text-white/80">
+              {rank === 1 ? "🥇 Leading the family board!" : `Ranked #${rank} in your family`}
+            </p>
+          </div>
 
           {/* Progress to next rank */}
-          <div className="mb-0.5">
-            <div className="flex justify-between items-center mb-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-white/80 flex items-center gap-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>
-                <TrendingUp className="w-3 h-3" />
-                {userAbove ? `Progress to rank #${rank - 1}` : "You're #1 — keep it up!"}
+          <div className="mb-2">
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5" />
+                {userAbove ? `On the heels of #${rank - 1}` : "Top of the board!"}
               </p>
-              <p className="text-[9px] font-bold text-white/80" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>{progressToNext}%</p>
+              <p className="text-[10px] font-bold text-white/60">{progressToNext}%</p>
             </div>
-            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+            <div className="h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressToNext}%` }}
                 transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
                 className="h-full rounded-full"
-                style={{ background: 'linear-gradient(90deg, rgb(250, 204, 21), rgb(245, 158, 11))', boxShadow: '0 0 8px rgba(250, 204, 21, 0.4)' }}
+                style={{ background: 'linear-gradient(90deg, hsl(262, 83%, 65%), hsl(280, 75%, 60%))' }}
               />
             </div>
           </div>

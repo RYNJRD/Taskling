@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { 
   X, Settings, Home, Trophy, Star, MessageCircle, 
-  LogOut, Shield, Moon, Sun, User, LayoutDashboard
+  LogOut, Shield, Moon, Sun, User, LayoutDashboard, Crown
 } from "lucide-react";
 import { useStore } from "../store/useStore";
 import { auth } from "../lib/firebase";
@@ -36,7 +36,9 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
   );
 
   const navItems = [
+    { label: "Settings", icon: Settings, path: `/family/${family?.id}/settings` },
     { label: "Dashboard", icon: LayoutDashboard, path: `/family/${family?.id}/dashboard` },
+    { label: "Subscription", icon: Crown, path: `/family/${family?.id}/subscription` },
     { label: "Leaderboard", icon: Trophy, path: `/family/${family?.id}/leaderboard` },
     { label: "Rewards", icon: Star, path: `/family/${family?.id}/rewards` },
     { 
@@ -48,7 +50,6 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
     ...(currentUser?.role === "admin" ? [
       { label: "Admin Panel", icon: Shield, path: `/family/${family?.id}/admin` }
     ] : []),
-    { label: "Settings", icon: Settings, path: `/family/${family?.id}/settings` },
   ];
 
   const handleNavigate = (path: string) => {
