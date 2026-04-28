@@ -72,7 +72,7 @@ export class DatabaseStorage implements IStorage {
       timeZone: family.timeZone ?? "UTC",
       themeColor: family.themeColor ?? "violet",
       subscriptionStatus: "trialing",
-      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days trial
+      trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days trial
     };
     const [newFamily] = await db.insert(families).values(payload).returning();
     return newFamily;
