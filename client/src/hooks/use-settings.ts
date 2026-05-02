@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export type PointsResetCycle = "monthly" | "3months" | "6months" | "12months";
+export type PointsResetCycle = "never" | "monthly" | "6months" | "12months";
 
 export interface AppSettings {
   enableStreaks: boolean;
@@ -13,7 +13,7 @@ export interface AppSettings {
 
 const DEFAULTS: AppSettings = {
   enableStreaks: true,
-  pointsResetCycle: "monthly",
+  pointsResetCycle: "never",
   notifyTaskComplete: true,
   notifyLeaderboard: false,
   notifyReminders: true,

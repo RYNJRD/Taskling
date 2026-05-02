@@ -298,8 +298,8 @@ export default function Settings() {
   }
 
   const cycleLabels: Record<PointsResetCycle, string> = {
+    never: "Never",
     monthly: "Monthly",
-    "3months": "Every 3 months",
     "6months": "Every 6 months",
     "12months": "Every 12 months",
   };
